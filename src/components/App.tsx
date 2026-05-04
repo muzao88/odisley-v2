@@ -21,7 +21,7 @@ function AppInner() {
   const [payOpen, setPayOpen] = useState(false);
   const [payPlan, setPayPlan] = useState<PlanType | null>(null);
   const [conteudoAtivo, setConteudoAtivo] = useState<{ id: string; nome: string } | null>(null);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, login } = useAuth();
 
   const navigate = (p: Page) => {
     setPage(p);
@@ -43,11 +43,41 @@ function AppInner() {
     return () => { document.body.style.overflow = ''; };
   }, [authOpen, payOpen]);
 
+  // Captura o token do Google após o redirect de volta ao site
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const google_token = params.get('google_token');
+    const google_error = params.get('google_error');
+
+    // Limpa a URL em qualquer caso
+    if (google_token || google_error) {
+      window.history.replaceState({}, '', '/');
+    }
+
+    if (google_error) {
+      openAuth('login');
+      return;
+    }
+
+    if (!google_token) return;
+
+    // Faz login com o token recebido do Google
+    fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: google_token }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.token) login(data.user, data.token);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       <Navbar currentPage={page} onNavigate={navigate} onOpenAuth={openAuth} />
 
-      {/* Conteúdo (aula) page */}
       {conteudoAtivo ? (
         <ConteudoPage
           conteudoId={conteudoAtivo.id}
