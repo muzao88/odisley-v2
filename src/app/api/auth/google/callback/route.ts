@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     (function() {
       // O Google coloca o token no HASH da URL (#id_token=xxx)
       var hash = window.location.hash;
-      
+
       if (!hash || hash.length < 2) {
         // Sem hash — tenta pegar da query string como fallback
         var search = window.location.search;
@@ -68,6 +68,6 @@ export async function GET(req: NextRequest) {
   </script>
 </body>
 </html>`,
-    { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+    { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } },
   );
 }
