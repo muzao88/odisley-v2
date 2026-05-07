@@ -827,15 +827,20 @@ export default function CoursesPage({
         });
         if (res.ok) {
           const data: ConteudoCard[] = await res.json();
-          // Enriquecer com o flag totalmenteGratuito do seed
-          const enriched = data.map((c) => {
-            const seed = CONTEUDOS_SEED.find((s) => s.nome === c.nome);
-            return {
-              ...c,
-              totalmenteGratuito: seed?.totalmenteGratuito === true,
-            };
-          });
-          setConteudos(enriched);
+          // Se o banco ainda não tem conteúdos cadastrados, usa o seed
+          if (data.length === 0) {
+            setConteudos(buildFromSeed());
+          } else {
+            // Enriquecer com o flag totalmenteGratuito do seed
+            const enriched = data.map((c) => {
+              const seed = CONTEUDOS_SEED.find((s) => s.nome === c.nome);
+              return {
+                ...c,
+                totalmenteGratuito: seed?.totalmenteGratuito === true,
+              };
+            });
+            setConteudos(enriched);
+          }
         } else {
           setConteudos(buildFromSeed());
         }
