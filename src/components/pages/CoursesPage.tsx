@@ -848,21 +848,15 @@ export default function CoursesPage({
     fetchConteudos();
   }, [token]);
 
+  // ── REGRA DE ACESSO ─────────────────────────────────────────────────────────
+  // TODOS os usuários podem abrir qualquer conteúdo e visualizar a lista de aulas.
+  // O bloqueio acontece APENAS ao tentar assistir/consumir (dentro da ConteudoPage).
   const handlePremiumCardClick = useCallback(
     (c: ConteudoCard) => {
-      if (isPremium) {
-        onSelectConteudo(c._id, c.nome);
-      } else if (!isLoggedIn) {
-        if (onOpenAuth) {
-          onOpenAuth("register");
-        } else {
-          onNavigate("planos");
-        }
-      } else {
-        onNavigate("planos");
-      }
+      // Sempre abre o conteúdo — a ConteudoPage gerencia o que é acessível
+      onSelectConteudo(c._id, c.nome);
     },
-    [isPremium, isLoggedIn, onSelectConteudo, onOpenAuth, onNavigate],
+    [onSelectConteudo],
   );
 
   // Agrupa por categoria

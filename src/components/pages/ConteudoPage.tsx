@@ -307,12 +307,14 @@ function LockIcon({
 function PremiumLockScreen({
   conteudoNome,
   totalAulas,
+  aulaAtiva,
   onNavigate,
   onOpenAuth,
   isLoggedIn,
 }: {
   conteudoNome: string;
   totalAulas: number;
+  aulaAtiva: AulaComStatus | null;
   onNavigate: (p: Page) => void;
   onOpenAuth: (tab: "login" | "register") => void;
   isLoggedIn: boolean;
@@ -370,19 +372,48 @@ function PremiumLockScreen({
         <LockIcon size={32} color="#a78bfa" />
       </div>
 
-      {/* Título */}
+      {/* Título da aula selecionada ou nome do curso */}
+      {aulaAtiva && (
+        <div
+          style={{
+            fontSize: ".72rem",
+            color: "rgba(255,255,255,.4)",
+            textTransform: "uppercase",
+            letterSpacing: ".1em",
+            marginBottom: ".3rem",
+          }}
+        >
+          {conteudoNome}
+        </div>
+      )}
       <div
         style={{
           fontFamily: "'Syne', sans-serif",
-          fontSize: "1.35rem",
+          fontSize: aulaAtiva ? "1.1rem" : "1.35rem",
           fontWeight: 800,
           color: "#fff",
-          marginBottom: ".5rem",
+          marginBottom: ".35rem",
           letterSpacing: "-0.01em",
+          maxWidth: 380,
+          textAlign: "center",
+          lineHeight: 1.3,
         }}
       >
-        Conteúdo Premium
+        {aulaAtiva ? aulaAtiva.titulo : "Conteúdo Premium"}
       </div>
+
+      {/* Duração da aula selecionada */}
+      {aulaAtiva && (
+        <div
+          style={{
+            fontSize: ".78rem",
+            color: "rgba(255,255,255,.4)",
+            marginBottom: ".75rem",
+          }}
+        >
+          ⏱ {aulaAtiva.duracao} · ⭐ Premium
+        </div>
+      )}
 
       {/* Subtítulo */}
       <div
@@ -392,6 +423,7 @@ function PremiumLockScreen({
           marginBottom: "1.5rem",
           maxWidth: 360,
           lineHeight: 1.55,
+          textAlign: "center",
         }}
       >
         Assine para assistir as{" "}
@@ -579,13 +611,12 @@ export default function ConteudoPage({
     return m ? m[1] : null;
   };
 
-  // ── Clique em aula bloqueada ────────────────────────────────────────────────
-  const handleAulaBloqueadaClick = () => {
-    if (!isLoggedIn) {
-      onOpenAuth("register");
-    } else {
-      onNavigate("planos");
-    }
+  // ── Clique em aula bloqueada ─────────────────────────────────────────────────────────
+  // Para cursos premium: seleciona a aula (mostra título/duração no painel)
+  // O player de bloqueio já está visível — o CTA de assinar está lá
+  const handleAulaBloqueadaClick = (aula: AulaComStatus) => {
+    // Sempre troca a aula ativa para o usuário ver o título selecionado
+    setAulaAtiva(aula);
   };
 
   // ── Loading ─────────────────────────────────────────────────────────────────
@@ -730,31 +761,41 @@ export default function ConteudoPage({
             {conteudo?.descricao}
           </p>
 
-          {/* Barra de progresso — só para gratuitos ou premium com acesso */}
-          {!isPremiumLocked && (
-            <div style={{ maxWidth: 400 }}>
-              <div
+          {/* Barra de progresso — sempre visível. Premium bloqueado mostra 0/X */}
+          <div style={{ maxWidth: 400 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: ".75rem",
+                color: "var(--text3)",
+                marginBottom: ".4rem",
+              }}
+            >
+              <span>
+                {isPremiumLocked
+                  ? `0/${aulas.length} aulas concluídas`
+                  : `${concluidas}/${aulas.length} aulas concluídas`}
+              </span>
+              <span
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: ".75rem",
-                  color: "var(--text3)",
-                  marginBottom: ".4rem",
+                  color: isPremiumLocked ? "var(--text3)" : cor,
+                  fontWeight: 600,
                 }}
               >
-                <span>
-                  {concluidas}/{aulas.length} aulas concluídas
-                </span>
-                <span style={{ color: cor, fontWeight: 600 }}>{pct}%</span>
-              </div>
-              <div className="progress-bar" style={{ height: 6 }}>
-                <div
-                  className="progress-fill"
-                  style={{ width: `${pct}%`, background: cor }}
-                />
-              </div>
+                {isPremiumLocked ? "0%" : `${pct}%`}
+              </span>
             </div>
-          )}
+            <div className="progress-bar" style={{ height: 6 }}>
+              <div
+                className="progress-fill"
+                style={{
+                  width: isPremiumLocked ? "0%" : `${pct}%`,
+                  background: cor,
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* ── Grid principal: vídeo + lista de aulas ────────────────────────── */}
@@ -774,6 +815,7 @@ export default function ConteudoPage({
                 <PremiumLockScreen
                   conteudoNome={conteudoNome}
                   totalAulas={aulas.length}
+                  aulaAtiva={aulaAtiva}
                   onNavigate={onNavigate}
                   onOpenAuth={onOpenAuth}
                   isLoggedIn={isLoggedIn}
@@ -992,7 +1034,8 @@ export default function ConteudoPage({
                     key={aula._id}
                     onClick={() => {
                       if (isLocked) {
-                        handleAulaBloqueadaClick();
+                        // Seleciona a aula para mostrar título/duração no player de bloqueio
+                        handleAulaBloqueadaClick(aula);
                         return;
                       }
                       setAulaAtiva(aula);
@@ -1004,7 +1047,8 @@ export default function ConteudoPage({
                       padding: ".65rem .75rem",
                       borderRadius: 10,
                       marginBottom: ".35rem",
-                      cursor: isLocked ? "not-allowed" : "pointer",
+                      // cursor pointer mesmo bloqueada — o usuário pode selecionar
+                      cursor: "pointer",
                       border: isActive
                         ? `1px solid ${cor}`
                         : "1px solid transparent",
