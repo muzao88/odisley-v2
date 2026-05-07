@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import type { AulaComStatus, Page } from "@/types";
@@ -12,53 +11,479 @@ interface Props {
   onOpenAuth: (tab: "login" | "register") => void;
 }
 
-// Gera aulas mock para demo (quando o BD ainda não tem dados)
-// totalmenteGratuito = todas as aulas são free
-// caso contrário = todas as aulas são premium (sem preview grátis)
+// ── Títulos realistas por conteúdo ────────────────────────────────────────────
+const TITULOS_MOCK: Record<string, string[]> = {
+  "Matemática Básica": [
+    "Números inteiros e operações",
+    "Frações e decimais",
+    "Potências e raízes",
+    "Expressões numéricas",
+    "MMC e MDC",
+    "Números racionais",
+    "Ordem de grandeza",
+    "Revisão e simulado",
+  ],
+  "Razão e Proporção": [
+    "O que é razão",
+    "Proporção e propriedades",
+    "Grandezas diretamente proporcionais",
+    "Grandezas inversamente proporcionais",
+    "Regra de três simples",
+    "Problemas com proporção",
+  ],
+  Porcentagem: [
+    "Conceito de porcentagem",
+    "Cálculo de porcentagem",
+    "Acréscimo e desconto",
+    "Juros simples",
+    "Juros compostos",
+    "Taxa percentual",
+    "Problemas ENEM",
+  ],
+  "Regra de Três": [
+    "Regra de três simples direta",
+    "Regra de três simples inversa",
+    "Regra de três composta",
+    "Problemas práticos",
+    "Casos especiais",
+  ],
+  "Potenciação e Radiciação": [
+    "Potências inteiras",
+    "Propriedades das potências",
+    "Notação científica",
+    "Raiz quadrada",
+    "Raiz cúbica",
+    "Propriedades da radiciação",
+    "Operações com radicais",
+  ],
+  "Expressões Algébricas": [
+    "Monômios",
+    "Polinômios",
+    "Adição de polinômios",
+    "Multiplicação de polinômios",
+    "Divisão algébrica",
+    "Valor numérico",
+  ],
+  "Produtos Notáveis": [
+    "Quadrado da soma",
+    "Quadrado da diferença",
+    "Produto da soma pela diferença",
+    "Cubo da soma",
+    "Cubo da diferença",
+  ],
+  Fatoração: [
+    "Fator comum em evidência",
+    "Agrupamento",
+    "Diferença de dois quadrados",
+    "Trinômio quadrado perfeito",
+    "Soma/diferença de cubos",
+    "Trinômio geral",
+  ],
+  "Equações do 1º Grau": [
+    "Conceito de equação",
+    "Equações equivalentes",
+    "Resolução de equações",
+    "Problemas do 1º grau",
+    "Equações com frações",
+    "Aplicações práticas",
+  ],
+  "Equações do 2º Grau": [
+    "Forma geral",
+    "Fórmula de Bhaskara",
+    "Discriminante (Δ)",
+    "Natureza das raízes",
+    "Relações de Girard",
+    "Equações incompletas",
+    "Problemas com x²",
+    "Aplicações no ENEM",
+  ],
+  Inequações: [
+    "Inequações do 1º grau",
+    "Resolução e representação",
+    "Inequações do 2º grau",
+    "Estudo do sinal",
+    "Inequações produto/quociente",
+    "Sistemas de inequações",
+  ],
+  "Sistemas Lineares": [
+    "Conceito de sistema",
+    "Método da substituição",
+    "Método da adição",
+    "Método da comparação",
+    "Interpretação gráfica",
+    "Sistemas impossíveis/indeterminados",
+    "Problemas com sistemas",
+  ],
+  "Função Afim": [
+    "Conceito de função",
+    "Lei de formação",
+    "Coeficientes angular e linear",
+    "Gráfico da função afim",
+    "Zeros da função",
+    "Função crescente e decrescente",
+    "Problemas com função afim",
+    "Aplicações no ENEM",
+  ],
+  "Função Quadrática": [
+    "Forma geral ax²+bx+c",
+    "Coeficientes a, b e c",
+    "Vértice da parábola",
+    "Zeros da função quadrática",
+    "Gráfico e concavidade",
+    "Máximo e mínimo",
+    "Inequação do 2º grau",
+    "Problemas de otimização",
+    "Questões ENEM",
+  ],
+  "Função Exponencial": [
+    "Definição e propriedades",
+    "Gráfico da exponencial",
+    "Crescimento exponencial",
+    "Decaimento exponencial",
+    "Equações exponenciais",
+    "Aplicações práticas",
+    "Questões vestibulares",
+  ],
+  "Função Logarítmica": [
+    "Definição de logaritmo",
+    "Propriedades dos logaritmos",
+    "Log na base 10 e natural",
+    "Equações logarítmicas",
+    "Inequações logarítmicas",
+    "Mudança de base",
+    "Aplicações",
+    "Questões ENEM",
+  ],
+  "Geometria Plana": [
+    "Ponto, reta e plano",
+    "Ângulos e classificação",
+    "Triângulos",
+    "Quadriláteros",
+    "Polígonos regulares",
+    "Círculo e circunferência",
+    "Áreas de figuras planas",
+    "Teorema de Pitágoras",
+    "Semelhança",
+    "Questões ENEM",
+  ],
+  "Geometria Espacial": [
+    "Prismas — área e volume",
+    "Pirâmides",
+    "Cilindro",
+    "Cone",
+    "Esfera",
+    "Poliedros de Platão",
+    "Troncos",
+    "Planificação",
+    "Questões vestibulares",
+  ],
+  "Geometria Analítica": [
+    "Sistema cartesiano",
+    "Distância entre dois pontos",
+    "Ponto médio e divisão",
+    "Equação da reta",
+    "Posições relativas de retas",
+    "Distância ponto-reta",
+    "Circunferência",
+    "Cônicas",
+    "Problemas ENEM",
+    "Questões vestibulares",
+  ],
+  Trigonometria: [
+    "Razões trigonométricas",
+    "Seno, cosseno e tangente",
+    "Triângulo retângulo",
+    "Tabela trigonométrica",
+    "Lei dos senos",
+    "Lei dos cossenos",
+    "Funções trigonométricas",
+    "Gráficos",
+    "Equações trig",
+    "Questões ENEM",
+  ],
+  Estatística: [
+    "Dados e tabelas",
+    "Gráficos estatísticos",
+    "Média aritmética",
+    "Mediana",
+    "Moda",
+    "Desvio médio",
+    "Variância",
+    "Desvio padrão",
+  ],
+  Probabilidade: [
+    "Espaço amostral",
+    "Eventos e operações",
+    "Probabilidade clássica",
+    "Probabilidade condicional",
+    "Eventos independentes",
+    "Combinatória e probabilidade",
+    "Questões ENEM",
+  ],
+  "Análise Combinatória": [
+    "Princípio multiplicativo",
+    "Fatorial",
+    "Arranjos simples",
+    "Permutações simples",
+    "Permutações com repetição",
+    "Combinações simples",
+    "Aplicações",
+    "Questões vestibulares",
+    "Simulado ENEM",
+  ],
+  "Progressões (PA e PG)": [
+    "PA — conceito e termo geral",
+    "PA — soma dos termos",
+    "PA — inserção de meios",
+    "PG — conceito e razão",
+    "PG — termo geral",
+    "PG — soma dos termos",
+    "PG infinita",
+    "Questões ENEM",
+  ],
+};
+
+// ── Gerador de aulas mock ─────────────────────────────────────────────────────
 function mockAulas(
   nome: string,
   total: number,
   totalmenteGratuito: boolean,
 ): AulaComStatus[] {
-  const temas: Record<string, string[]> = {
-    "Função Quadrática": [
-      "Introdução à função do 2º grau",
-      "Coeficientes a, b e c",
-      "Zeros da função",
-      "Vértice da parábola",
-      "Gráfico e concavidade",
-      "Máximo e mínimo",
-      "Inequação do 2º grau",
-      "Problemas de otimização",
-      "Questões ENEM",
-    ],
-    default: [
-      "Introdução ao conteúdo",
-      "Conceitos fundamentais",
-      "Exemplos resolvidos",
-      "Exercícios básicos",
-      "Aprofundamento",
-      "Casos especiais",
-      "Questões de vestibular",
-      "Simulado ENEM",
-    ],
-  };
-  const titulos = temas[nome] || temas.default;
+  const titulos = TITULOS_MOCK[nome] ?? [];
+  const duracoes = [
+    "08:30",
+    "11:15",
+    "09:45",
+    "14:20",
+    "07:55",
+    "12:40",
+    "10:10",
+    "13:05",
+    "08:50",
+    "15:30",
+  ];
+
   return Array.from({ length: total }, (_, i) => ({
-    _id: `aula-${i}`,
+    _id: `aula-${nome.replace(/\s/g, "-").toLowerCase()}-${i}`,
     titulo: titulos[i] ?? `Aula ${i + 1} — ${nome}`,
-    descricao: "Aula em breve disponível.",
+    descricao: "Aula disponível para assinantes.",
     video_url: "",
-    duracao: `${Math.floor(Math.random() * 15) + 8}:${String(Math.floor(Math.random() * 60)).padStart(2, "0")}`,
-    conteudo_id: "",
+    duracao: duracoes[i % duracoes.length],
+    conteudo_id: nome,
     ordem: i + 1,
-    // Se totalmenteGratuito: todas free. Senão: todas premium.
     tipo: totalmenteGratuito ? "free" : "premium",
     concluida: false,
     bloqueada: false,
   }));
 }
 
+// ── Ícone SVG de cadeado ──────────────────────────────────────────────────────
+function LockIcon({
+  size = 24,
+  color = "currentColor",
+}: {
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+// ── Tela de bloqueio premium ──────────────────────────────────────────────────
+function PremiumLockScreen({
+  conteudoNome,
+  totalAulas,
+  onNavigate,
+  onOpenAuth,
+  isLoggedIn,
+}: {
+  conteudoNome: string;
+  totalAulas: number;
+  onNavigate: (p: Page) => void;
+  onOpenAuth: (tab: "login" | "register") => void;
+  isLoggedIn: boolean;
+}) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        aspectRatio: "16/9",
+        background:
+          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1a1040 100%)",
+        borderRadius: "var(--radius)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem 1.5rem",
+        textAlign: "center",
+        position: "relative",
+        overflow: "hidden",
+        border: "1px solid rgba(124,94,247,.25)",
+      }}
+    >
+      {/* Glow de fundo decorativo */}
+      <div
+        style={{
+          position: "absolute",
+          top: "30%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 320,
+          height: 320,
+          background:
+            "radial-gradient(circle, rgba(124,94,247,.18) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Ícone de cadeado */}
+      <div
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: "50%",
+          background:
+            "linear-gradient(135deg, rgba(79,142,247,.2), rgba(124,94,247,.3))",
+          border: "1px solid rgba(124,94,247,.4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "1.25rem",
+          boxShadow: "0 0 32px rgba(124,94,247,.25)",
+        }}
+      >
+        <LockIcon size={32} color="#a78bfa" />
+      </div>
+
+      {/* Título */}
+      <div
+        style={{
+          fontFamily: "'Syne', sans-serif",
+          fontSize: "1.35rem",
+          fontWeight: 800,
+          color: "#fff",
+          marginBottom: ".5rem",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        Conteúdo Premium
+      </div>
+
+      {/* Subtítulo */}
+      <div
+        style={{
+          fontSize: ".88rem",
+          color: "rgba(255,255,255,.55)",
+          marginBottom: "1.5rem",
+          maxWidth: 360,
+          lineHeight: 1.55,
+        }}
+      >
+        Assine para assistir as{" "}
+        <strong style={{ color: "rgba(255,255,255,.8)" }}>
+          {totalAulas} aulas
+        </strong>{" "}
+        de{" "}
+        <strong style={{ color: "rgba(255,255,255,.8)" }}>
+          {conteudoNome}
+        </strong>
+      </div>
+
+      {/* Lista de benefícios */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: ".45rem",
+          marginBottom: "1.75rem",
+        }}
+      >
+        {[
+          "Acesso imediato a todos os conteúdos",
+          "Todos os 24 conteúdos desbloqueados",
+          "Cancele quando quiser, sem burocracia",
+        ].map((b) => (
+          <div
+            key={b}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: ".5rem",
+              fontSize: ".8rem",
+              color: "rgba(255,255,255,.7)",
+            }}
+          >
+            <span
+              style={{ color: "#3fcf8e", fontWeight: 700, fontSize: ".9rem" }}
+            >
+              ✓
+            </span>
+            {b}
+          </div>
+        ))}
+      </div>
+
+      {/* Botão CTA principal */}
+      <button
+        className="btn btn-primary"
+        onClick={() => onNavigate("planos")}
+        style={{
+          background: "linear-gradient(90deg, #4f8ef7, #7c5ef7)",
+          border: "none",
+          padding: ".75rem 2rem",
+          fontSize: ".95rem",
+          fontWeight: 700,
+          borderRadius: 10,
+          cursor: "pointer",
+          color: "#fff",
+          letterSpacing: ".02em",
+          boxShadow: "0 4px 20px rgba(124,94,247,.4)",
+          marginBottom: ".75rem",
+        }}
+      >
+        ⭐ Assinar agora — R$39/mês
+      </button>
+
+      {/* Link login */}
+      {!isLoggedIn ? (
+        <button
+          onClick={() => onOpenAuth("login")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "rgba(255,255,255,.4)",
+            fontSize: ".78rem",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          Já sou assinante → Fazer login
+        </button>
+      ) : (
+        <div style={{ fontSize: ".78rem", color: "rgba(255,255,255,.35)" }}>
+          Sua conta não possui assinatura ativa
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Componente principal ──────────────────────────────────────────────────────
 export default function ConteudoPage({
   conteudoId,
   conteudoNome,
@@ -74,40 +499,50 @@ export default function ConteudoPage({
   const conteudo = CONTEUDOS_SEED.find(
     (c) => c.nome === conteudoNome || c.nome === conteudoId,
   );
-  const cor = conteudo ? CATEGORIA_CORES[conteudo.categoria] : "var(--accent)";
 
+  const cor = conteudo ? CATEGORIA_CORES[conteudo.categoria] : "var(--accent)";
+  const isGratuito = conteudo?.totalmenteGratuito === true;
+  const isPremiumLocked = !isGratuito && !isPremium;
+
+  // ── Fetch de aulas ──────────────────────────────────────────────────────────
   useEffect(() => {
     const fetch_ = async () => {
+      setLoading(true);
       try {
+        const headers: Record<string, string> = token
+          ? { Authorization: `Bearer ${token}` }
+          : {};
         const res = await fetch(`/api/conteudos/${conteudoId}/aulas`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers,
         });
-        if (res.ok) {
-          const data = await res.json();
-          setAulas(data);
-          setAulaAtiva(data[0] || null);
-        } else throw new Error();
+        if (!res.ok) throw new Error("api-error");
+        const data: AulaComStatus[] = await res.json();
+        setAulas(data);
+        setAulaAtiva(data[0] ?? null);
       } catch {
-        // Fallback mock — usa totalmenteGratuito como única fonte de verdade
+        // Fallback mock
         if (conteudo) {
           const mock = mockAulas(
             conteudo.nome,
             conteudo.totalAulas,
-            conteudo.totalmenteGratuito ?? false,
-          ).map((a) => ({
+            isGratuito,
+          ).map<AulaComStatus>((a) => ({
             ...a,
-            bloqueada: a.tipo === "premium" && !isPremium,
+            // Para cursos premium, todas as aulas ficam bloqueadas para não-assinantes
+            bloqueada: !isGratuito && !isPremium,
           }));
           setAulas(mock);
-          setAulaAtiva(mock[0] || null);
+          setAulaAtiva(mock[0] ?? null);
         }
       } finally {
         setLoading(false);
       }
     };
     fetch_();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conteudoId, token, isPremium]);
 
+  // ── Marcar aula como concluída ──────────────────────────────────────────────
   const marcarConcluida = async () => {
     if (!aulaAtiva || !token) return;
     setMarcando(true);
@@ -126,8 +561,7 @@ export default function ConteudoPage({
         ),
       );
       setAulaAtiva((prev) => (prev ? { ...prev, concluida: true } : null));
-
-      // Auto-advance to next
+      // Auto-avança para próxima aula disponível
       const idx = aulas.findIndex((a) => a._id === aulaAtiva._id);
       const next = aulas[idx + 1];
       if (next && !next.bloqueada) setAulaAtiva(next);
@@ -140,11 +574,21 @@ export default function ConteudoPage({
   const pct =
     aulas.length > 0 ? Math.round((concluidas / aulas.length) * 100) : 0;
 
-  const getYouTubeId = (url: string) => {
+  const getYouTubeId = (url: string): string | null => {
     const m = url.match(/(?:v=|youtu\.be\/)([^&\s]+)/);
     return m ? m[1] : null;
   };
 
+  // ── Clique em aula bloqueada ────────────────────────────────────────────────
+  const handleAulaBloqueadaClick = () => {
+    if (!isLoggedIn) {
+      onOpenAuth("register");
+    } else {
+      onNavigate("planos");
+    }
+  };
+
+  // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div
@@ -156,22 +600,75 @@ export default function ConteudoPage({
           minHeight: "80vh",
         }}
       >
-        <div style={{ color: "var(--text3)" }}>Carregando aulas...</div>
+        <div style={{ color: "var(--text3)", fontSize: ".95rem" }}>
+          Carregando aulas...
+        </div>
       </div>
     );
   }
 
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="page">
       <section>
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <a onClick={() => onNavigate("cursos")}>Cursos</a>
+          <a onClick={() => onNavigate("cursos")} style={{ cursor: "pointer" }}>
+            Cursos
+          </a>
           <span>›</span>
           <span>{conteudoNome}</span>
         </div>
 
-        {/* Header */}
+        {/* ── Banner de aviso premium ────────────────────────────────────────── */}
+        {isPremiumLocked && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              padding: ".85rem 1.25rem",
+              marginBottom: "1.5rem",
+              background:
+                "linear-gradient(90deg, rgba(124,94,247,.12), rgba(79,142,247,.08))",
+              border: "1px solid rgba(124,94,247,.3)",
+              borderRadius: "var(--radius)",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: ".5rem",
+                flex: 1,
+              }}
+            >
+              <LockIcon size={16} color="#a78bfa" />
+              <span
+                style={{
+                  fontSize: ".85rem",
+                  color: "var(--text2)",
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong style={{ color: "var(--text)" }}>
+                  🔒 Este conteúdo é exclusivo para assinantes Premium.
+                </strong>{" "}
+                Assine e tenha acesso a todos os 24 conteúdos da plataforma.
+              </span>
+            </div>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => onNavigate("planos")}
+              style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+            >
+              ⭐ Assinar Premium
+            </button>
+          </div>
+        )}
+
+        {/* ── Header do conteúdo ─────────────────────────────────────────────── */}
         <div style={{ marginBottom: "2rem" }}>
           <div style={{ fontSize: "2rem", marginBottom: ".5rem" }}>
             {conteudo?.icone ?? "📚"}
@@ -188,8 +685,9 @@ export default function ConteudoPage({
             <h2 className="section-title" style={{ margin: 0 }}>
               {conteudoNome}
             </h2>
-            {/* Badge de acesso do conteúdo */}
-            {conteudo?.totalmenteGratuito ? (
+
+            {/* Badge de acesso */}
+            {isGratuito ? (
               <span
                 style={{
                   padding: "3px 10px",
@@ -221,6 +719,7 @@ export default function ConteudoPage({
               </span>
             )}
           </div>
+
           <p
             style={{
               color: "var(--text2)",
@@ -231,65 +730,83 @@ export default function ConteudoPage({
             {conteudo?.descricao}
           </p>
 
-          {/* Progress bar */}
-          <div style={{ maxWidth: 400 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: ".75rem",
-                color: "var(--text3)",
-                marginBottom: ".4rem",
-              }}
-            >
-              <span>
-                {concluidas}/{aulas.length} aulas concluídas
-              </span>
-              <span style={{ color: cor, fontWeight: 600 }}>{pct}%</span>
-            </div>
-            <div className="progress-bar" style={{ height: 6 }}>
+          {/* Barra de progresso — só para gratuitos ou premium com acesso */}
+          {!isPremiumLocked && (
+            <div style={{ maxWidth: 400 }}>
               <div
-                className="progress-fill"
-                style={{ width: `${pct}%`, background: cor }}
-              />
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: ".75rem",
+                  color: "var(--text3)",
+                  marginBottom: ".4rem",
+                }}
+              >
+                <span>
+                  {concluidas}/{aulas.length} aulas concluídas
+                </span>
+                <span style={{ color: cor, fontWeight: 600 }}>{pct}%</span>
+              </div>
+              <div className="progress-bar" style={{ height: 6 }}>
+                <div
+                  className="progress-fill"
+                  style={{ width: `${pct}%`, background: cor }}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
+        {/* ── Grid principal: vídeo + lista de aulas ────────────────────────── */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 360px",
+            gridTemplateColumns: "minmax(0,1fr) 360px",
             gap: "2rem",
             alignItems: "start",
           }}
         >
-          {/* LEFT: Video + info */}
+          {/* ── LEFT: Player / Tela de bloqueio + info da aula ──────────────── */}
           <div>
-            {/* Video */}
-            <div className="video-wrap" style={{ marginBottom: "1.25rem" }}>
-              {aulaAtiva?.video_url && getYouTubeId(aulaAtiva.video_url) ? (
-                <iframe
-                  src={`https://www.youtube.com/embed/${getYouTubeId(aulaAtiva.video_url)}`}
-                  allowFullScreen
-                  title={aulaAtiva.titulo}
+            {/* Player ou tela de bloqueio */}
+            {isPremiumLocked ? (
+              <div style={{ marginBottom: "1.25rem" }}>
+                <PremiumLockScreen
+                  conteudoNome={conteudoNome}
+                  totalAulas={aulas.length}
+                  onNavigate={onNavigate}
+                  onOpenAuth={onOpenAuth}
+                  isLoggedIn={isLoggedIn}
                 />
-              ) : (
-                <div className="video-placeholder">
-                  <div className="play-btn" />
-                  <div
-                    style={{ fontFamily: "'Syne',sans-serif", fontWeight: 600 }}
-                  >
-                    {aulaAtiva ? aulaAtiva.titulo : "Selecione uma aula"}
+              </div>
+            ) : (
+              <div className="video-wrap" style={{ marginBottom: "1.25rem" }}>
+                {aulaAtiva?.video_url && getYouTubeId(aulaAtiva.video_url) ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(aulaAtiva.video_url)}`}
+                    allowFullScreen
+                    title={aulaAtiva.titulo}
+                  />
+                ) : (
+                  <div className="video-placeholder">
+                    <div className="play-btn" />
+                    <div
+                      style={{
+                        fontFamily: "'Syne', sans-serif",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {aulaAtiva ? aulaAtiva.titulo : "Selecione uma aula"}
+                    </div>
+                    <div style={{ fontSize: ".8rem" }}>
+                      Vídeo será adicionado em breve
+                    </div>
                   </div>
-                  <div style={{ fontSize: ".8rem" }}>
-                    Vídeo será adicionado em breve
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
-            {/* Aula info */}
+            {/* Info da aula ativa — exibe sempre (mesmo bloqueada, mostra título) */}
             {aulaAtiva && (
               <div
                 style={{
@@ -311,12 +828,18 @@ export default function ConteudoPage({
                   <div>
                     <div
                       style={{
-                        fontFamily: "'Syne',sans-serif",
+                        fontFamily: "'Syne', sans-serif",
                         fontSize: "1.1rem",
                         fontWeight: 700,
                         marginBottom: ".4rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: ".5rem",
                       }}
                     >
+                      {isPremiumLocked && (
+                        <LockIcon size={16} color="var(--text3)" />
+                      )}
                       {aulaAtiva.titulo}
                     </div>
                     <div
@@ -325,46 +848,68 @@ export default function ConteudoPage({
                         gap: "1rem",
                         fontSize: ".78rem",
                         color: "var(--text3)",
+                        flexWrap: "wrap",
                       }}
                     >
                       <span>⏱ {aulaAtiva.duracao}</span>
-                      <span>
-                        {aulaAtiva.tipo === "free"
-                          ? "🟢 Gratuita"
-                          : "⭐ Premium"}
-                      </span>
-                      {aulaAtiva.concluida && (
+                      {isPremiumLocked ? (
+                        <span style={{ color: "#a78bfa" }}>⭐ Premium</span>
+                      ) : (
+                        <span>
+                          {aulaAtiva.tipo === "free"
+                            ? "🟢 Gratuita"
+                            : "⭐ Premium"}
+                        </span>
+                      )}
+                      {aulaAtiva.concluida && !isPremiumLocked && (
                         <span style={{ color: "var(--green)" }}>
                           ✓ Concluída
                         </span>
                       )}
                     </div>
                   </div>
+
+                  {/* Ações */}
                   <div
                     style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}
                   >
-                    {isLoggedIn &&
-                      !aulaAtiva.concluida &&
-                      !aulaAtiva.bloqueada && (
-                        <button
-                          className="btn btn-green btn-md"
-                          onClick={marcarConcluida}
-                          disabled={marcando}
-                        >
-                          {marcando ? "Salvando..." : "✓ Marcar como concluída"}
-                        </button>
-                      )}
-                    {!isLoggedIn && (
+                    {isPremiumLocked ? (
                       <button
-                        className="btn btn-ghost btn-md"
-                        onClick={() => onOpenAuth("register")}
+                        className="btn btn-primary btn-md"
+                        onClick={() => onNavigate("planos")}
                       >
-                        Criar conta para salvar progresso
+                        🔓 Desbloquear acesso
                       </button>
+                    ) : (
+                      <>
+                        {isLoggedIn &&
+                          !aulaAtiva.concluida &&
+                          !aulaAtiva.bloqueada && (
+                            <button
+                              className="btn btn-green btn-md"
+                              onClick={marcarConcluida}
+                              disabled={marcando}
+                            >
+                              {marcando
+                                ? "Salvando..."
+                                : "✓ Marcar como concluída"}
+                            </button>
+                          )}
+                        {!isLoggedIn && (
+                          <button
+                            className="btn btn-ghost btn-md"
+                            onClick={() => onOpenAuth("register")}
+                          >
+                            Criar conta para salvar progresso
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
-                {aulaAtiva.descricao && (
+
+                {/* Descrição da aula — só para cursos acessíveis */}
+                {!isPremiumLocked && aulaAtiva.descricao && (
                   <p
                     style={{
                       color: "var(--text2)",
@@ -376,7 +921,8 @@ export default function ConteudoPage({
                     {aulaAtiva.descricao}
                   </p>
                 )}
-                {aulaAtiva.materialPdf && (
+
+                {!isPremiumLocked && aulaAtiva.materialPdf && (
                   <a
                     href={aulaAtiva.materialPdf}
                     target="_blank"
@@ -398,18 +944,38 @@ export default function ConteudoPage({
             )}
           </div>
 
-          {/* RIGHT: Lesson list */}
+          {/* ── RIGHT: Lista de aulas ─────────────────────────────────────────── */}
           <div>
             <div
               style={{
-                fontFamily: "'Syne',sans-serif",
+                fontFamily: "'Syne', sans-serif",
                 fontWeight: 700,
                 marginBottom: "1rem",
                 fontSize: "1rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              Aulas ({aulas.length})
+              <span>Aulas ({aulas.length})</span>
+              {isPremiumLocked && (
+                <span
+                  style={{
+                    fontSize: ".68rem",
+                    fontWeight: 600,
+                    color: "#a78bfa",
+                    background: "rgba(124,94,247,.12)",
+                    padding: "2px 8px",
+                    borderRadius: 20,
+                    border: "1px solid rgba(124,94,247,.25)",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  🔒 Bloqueadas
+                </span>
+              )}
             </div>
+
             <div
               style={{
                 maxHeight: "70vh",
@@ -417,69 +983,176 @@ export default function ConteudoPage({
                 paddingRight: ".25rem",
               }}
             >
-              {aulas.map((aula) => (
-                <div
-                  key={aula._id}
-                  className={`aula-item ${aula.bloqueada ? "locked" : ""} ${aula.concluida ? "concluida" : ""} ${aulaAtiva?._id === aula._id ? "active-aula" : ""}`}
-                  onClick={() => {
-                    if (aula.bloqueada) {
-                      if (!isLoggedIn) onOpenAuth("register");
-                      else onNavigate("planos");
-                      return;
-                    }
-                    setAulaAtiva(aula);
-                  }}
-                  style={{
-                    border:
-                      aulaAtiva?._id === aula._id
-                        ? `1px solid ${cor}`
-                        : undefined,
-                    background:
-                      aulaAtiva?._id === aula._id ? `${cor}10` : undefined,
-                  }}
-                >
+              {aulas.map((aula) => {
+                const isActive = aulaAtiva?._id === aula._id;
+                const isLocked = aula.bloqueada || isPremiumLocked;
+
+                return (
                   <div
-                    className={`aula-num ${aula.concluida ? "done" : aula.tipo === "free" ? "free-badge" : ""}`}
+                    key={aula._id}
+                    onClick={() => {
+                      if (isLocked) {
+                        handleAulaBloqueadaClick();
+                        return;
+                      }
+                      setAulaAtiva(aula);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: ".75rem",
+                      padding: ".65rem .75rem",
+                      borderRadius: 10,
+                      marginBottom: ".35rem",
+                      cursor: isLocked ? "not-allowed" : "pointer",
+                      border: isActive
+                        ? `1px solid ${cor}`
+                        : "1px solid transparent",
+                      background: isActive ? `${cor}10` : "var(--surface)",
+                      opacity: isLocked ? 0.65 : 1,
+                      transition:
+                        "opacity .15s, background .15s, border-color .15s",
+                      position: "relative",
+                    }}
+                    title={
+                      isLocked
+                        ? "Conteúdo exclusivo para assinantes Premium"
+                        : aula.titulo
+                    }
                   >
-                    {aula.concluida ? "✓" : aula.bloqueada ? "🔒" : aula.ordem}
-                  </div>
-                  <div className="aula-info">
-                    <div className="aula-titulo">{aula.titulo}</div>
-                    <div className="aula-meta">
-                      <span>⏱ {aula.duracao}</span>
-                      <span
-                        className={`aula-tipo-badge ${aula.tipo === "premium" ? "premium" : ""}`}
+                    {/* Número / ícone */}
+                    <div
+                      style={{
+                        minWidth: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: ".75rem",
+                        fontWeight: 700,
+                        flexShrink: 0,
+                        background:
+                          aula.concluida && !isPremiumLocked
+                            ? "rgba(63,207,142,.18)"
+                            : isLocked
+                              ? "rgba(124,94,247,.12)"
+                              : isActive
+                                ? `${cor}22`
+                                : "var(--bg3)",
+                        color:
+                          aula.concluida && !isPremiumLocked
+                            ? "#3fcf8e"
+                            : isLocked
+                              ? "#a78bfa"
+                              : isActive
+                                ? cor
+                                : "var(--text3)",
+                        border:
+                          aula.concluida && !isPremiumLocked
+                            ? "1px solid rgba(63,207,142,.3)"
+                            : isLocked
+                              ? "1px solid rgba(124,94,247,.2)"
+                              : "none",
+                      }}
+                    >
+                      {aula.concluida && !isPremiumLocked ? (
+                        "✓"
+                      ) : isLocked ? (
+                        <LockIcon size={13} color="#a78bfa" />
+                      ) : (
+                        aula.ordem
+                      )}
+                    </div>
+
+                    {/* Conteúdo da aula */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: ".83rem",
+                          fontWeight: isActive ? 600 : 500,
+                          color: isActive ? "var(--text)" : "var(--text2)",
+                          lineHeight: 1.35,
+                          marginBottom: ".2rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
                       >
-                        {aula.tipo === "free" ? "GRÁTIS" : "PREMIUM"}
-                      </span>
+                        {aula.titulo}
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: ".5rem",
+                          fontSize: ".7rem",
+                          color: "var(--text3)",
+                        }}
+                      >
+                        <span>⏱ {aula.duracao}</span>
+                        {isLocked ? (
+                          <span
+                            style={{
+                              color: "#a78bfa",
+                              background: "rgba(124,94,247,.1)",
+                              padding: "1px 6px",
+                              borderRadius: 4,
+                              fontSize: ".65rem",
+                              fontWeight: 700,
+                              letterSpacing: ".03em",
+                            }}
+                          >
+                            PREMIUM
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              color:
+                                aula.tipo === "free" ? "#3fcf8e" : "#4f8ef7",
+                              background:
+                                aula.tipo === "free"
+                                  ? "rgba(63,207,142,.1)"
+                                  : "rgba(79,142,247,.1)",
+                              padding: "1px 6px",
+                              borderRadius: 4,
+                              fontSize: ".65rem",
+                              fontWeight: 700,
+                              letterSpacing: ".03em",
+                            }}
+                          >
+                            {aula.tipo === "free" ? "GRÁTIS" : "PREMIUM"}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Upsell premium — só aparece para cursos premium com usuário sem plano */}
-            {!isPremium && aulas.some((a) => a.bloqueada) && (
+            {/* ── Card de upsell na lista — para cursos premium bloqueados ──── */}
+            {isPremiumLocked && (
               <div
                 style={{
                   marginTop: "1rem",
                   padding: "1.25rem",
                   textAlign: "center",
                   background:
-                    "linear-gradient(135deg, rgba(79,142,247,.08), rgba(124,94,247,.08))",
-                  border: "1px solid rgba(79,142,247,.25)",
+                    "linear-gradient(135deg, rgba(79,142,247,.07), rgba(124,94,247,.1))",
+                  border: "1px solid rgba(124,94,247,.25)",
                   borderRadius: 14,
                 }}
               >
-                <div style={{ fontSize: "1.3rem", marginBottom: ".4rem" }}>
+                <div style={{ fontSize: "1.4rem", marginBottom: ".5rem" }}>
                   🔒
                 </div>
                 <div
                   style={{
                     fontSize: ".88rem",
                     fontWeight: 700,
-                    marginBottom: ".25rem",
-                    fontFamily: "'Syne',sans-serif",
+                    marginBottom: ".3rem",
+                    fontFamily: "'Syne', sans-serif",
                   }}
                 >
                   Conteúdo exclusivo para assinantes
@@ -489,42 +1162,132 @@ export default function ConteudoPage({
                     fontSize: ".75rem",
                     color: "var(--text2)",
                     marginBottom: "1rem",
-                    lineHeight: 1.5,
+                    lineHeight: 1.55,
                   }}
                 >
-                  {aulas.filter((a) => a.bloqueada).length} aulas disponíveis no
-                  plano Premium. Assine e desbloqueie todos os {aulas.length}{" "}
-                  conteúdos da plataforma.
+                  {aulas.length} aulas disponíveis no plano Premium.
+                  <br />
+                  Assine e desbloqueie todos os 24 conteúdos da plataforma.
                 </div>
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() => onNavigate("planos")}
+                  style={{ width: "100%" }}
                 >
                   ⭐ Assinar agora
                 </button>
-                {!isLoggedIn && (
+                {!isLoggedIn ? (
                   <div
                     style={{
-                      marginTop: ".6rem",
-                      fontSize: ".72rem",
+                      marginTop: ".7rem",
+                      fontSize: ".73rem",
                       color: "var(--text3)",
                     }}
                   >
                     Já assina?{" "}
                     <span
+                      role="button"
+                      tabIndex={0}
                       style={{
                         color: "var(--accent)",
                         cursor: "pointer",
                         fontWeight: 600,
                       }}
                       onClick={() => onOpenAuth("login")}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && onOpenAuth("login")
+                      }
                     >
-                      Faça login
+                      Fazer login
                     </span>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      marginTop: ".7rem",
+                      fontSize: ".73rem",
+                      color: "var(--text3)",
+                    }}
+                  >
+                    Sua conta atual não possui assinatura ativa.
                   </div>
                 )}
               </div>
             )}
+
+            {/* ── Card de upsell — para logados sem premium com aulas bloqueadas (cursos mistos) */}
+            {!isPremiumLocked &&
+              !isPremium &&
+              aulas.some((a) => a.bloqueada) && (
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    padding: "1.25rem",
+                    textAlign: "center",
+                    background:
+                      "linear-gradient(135deg, rgba(79,142,247,.08), rgba(124,94,247,.08))",
+                    border: "1px solid rgba(79,142,247,.25)",
+                    borderRadius: 14,
+                  }}
+                >
+                  <div style={{ fontSize: "1.3rem", marginBottom: ".4rem" }}>
+                    🔒
+                  </div>
+                  <div
+                    style={{
+                      fontSize: ".88rem",
+                      fontWeight: 700,
+                      marginBottom: ".25rem",
+                      fontFamily: "'Syne', sans-serif",
+                    }}
+                  >
+                    Mais aulas disponíveis no Premium
+                  </div>
+                  <div
+                    style={{
+                      fontSize: ".75rem",
+                      color: "var(--text2)",
+                      marginBottom: "1rem",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {aulas.filter((a) => a.bloqueada).length} aulas bloqueadas.
+                    Assine e desbloqueie tudo.
+                  </div>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => onNavigate("planos")}
+                  >
+                    ⭐ Assinar agora
+                  </button>
+                  {!isLoggedIn && (
+                    <div
+                      style={{
+                        marginTop: ".6rem",
+                        fontSize: ".72rem",
+                        color: "var(--text3)",
+                      }}
+                    >
+                      Já assina?{" "}
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        style={{
+                          color: "var(--accent)",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                        }}
+                        onClick={() => onOpenAuth("login")}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && onOpenAuth("login")
+                        }
+                      >
+                        Faça login
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
         </div>
       </section>
