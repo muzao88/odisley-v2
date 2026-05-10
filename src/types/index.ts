@@ -73,6 +73,6 @@ export interface Plano {
 
 // ── UI ───────────────────────────────────────────────────────
 export type Page = 'home' | 'cursos' | 'planos' | 'sobre' | 'dashboard';
-export type AuthTab = 'login' | 'register';
+export type AuthTab = 'login' | 'register' | 'update_name';
 export type PayMethod = 'pix' | 'card' | 'boleto';
 export type PlanType = 'anual' | 'mensal';

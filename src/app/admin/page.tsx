@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 interface Stats {
@@ -29,6 +29,7 @@ interface Conteudo {
   descricao: string;
   icone: string;
   totalAulas: number;
+  aulasGratuitas: number;
 }
 interface Aula {
   _id: string;
@@ -40,7 +41,7 @@ interface Aula {
   descricao: string;
 }
 
-type Aba = "overview" | "usuarios" | "conteudos" | "aulas";
+type Aba = "overview" | "usuarios" | "conteudos";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const api = (token: string) => ({
@@ -93,7 +94,7 @@ const S = {
     padding: "0 2rem",
     height: 60,
     background: "#0d1426",
-    borderBottom: "1px solid rgba(79,142,247,.18)",
+    borderBottom: "1px solid rgba(55,138,221,.18)",
     position: "sticky" as const,
     top: 0,
     zIndex: 50,
@@ -103,7 +104,7 @@ const S = {
     fontFamily: "'Syne', sans-serif",
     fontWeight: 800,
     fontSize: "1.1rem",
-    background: "linear-gradient(135deg, #4f8ef7, #7c5ef7)",
+    background: "linear-gradient(135deg, #378ADD, #185FA5)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
   },
@@ -116,28 +117,28 @@ const S = {
       fontWeight: 700,
       background:
         color === "premium"
-          ? "rgba(124,94,247,.18)"
+          ? "rgba(247,201,79,.18)"
           : color === "free"
-            ? "rgba(79,142,247,.12)"
+            ? "rgba(55,138,221,.12)"
             : "rgba(63,207,142,.12)",
       color:
         color === "premium"
-          ? "#a78bfa"
+          ? "#f7c94f"
           : color === "free"
-            ? "#4f8ef7"
+            ? "#378ADD"
             : "#3fcf8e",
     }) as React.CSSProperties,
 
   card: {
     background: "#131d35",
-    border: "1px solid rgba(79,142,247,.14)",
+    border: "1px solid rgba(55,138,221,.14)",
     borderRadius: 14,
     padding: "1.25rem",
   } as React.CSSProperties,
 
   input: {
     background: "#0d1426",
-    border: "1px solid rgba(79,142,247,.2)",
+    border: "1px solid rgba(55,138,221,.2)",
     borderRadius: 8,
     color: "#e2e8f0",
     padding: ".55rem .85rem",
@@ -149,7 +150,7 @@ const S = {
 
   select: {
     background: "#0d1426",
-    border: "1px solid rgba(79,142,247,.2)",
+    border: "1px solid rgba(55,138,221,.2)",
     borderRadius: 8,
     color: "#e2e8f0",
     padding: ".55rem .85rem",
@@ -170,12 +171,12 @@ const S = {
       transition: ".15s",
       background:
         variant === "primary"
-          ? "linear-gradient(135deg,#4f8ef7,#7c5ef7)"
+          ? "linear-gradient(135deg,#378ADD,#185FA5)"
           : variant === "danger"
             ? "rgba(247,79,110,.15)"
             : variant === "green"
               ? "linear-gradient(135deg,#3fcf8e,#2eb87e)"
-              : "rgba(79,142,247,.1)",
+              : "rgba(55,138,221,.1)",
       color:
         variant === "danger"
           ? "#f74f6e"
@@ -186,7 +187,7 @@ const S = {
         variant === "danger"
           ? "1px solid rgba(247,79,110,.3)"
           : variant === "ghost"
-            ? "1px solid rgba(79,142,247,.2)"
+            ? "1px solid rgba(55,138,221,.2)"
             : "none",
       outlineOffset: -1,
     }) as React.CSSProperties,
@@ -240,7 +241,7 @@ function LoginScreen({ onLogin }: { onLogin: (t: string) => void }) {
           width: "100%",
           maxWidth: 380,
           background: "#0d1426",
-          border: "1px solid rgba(79,142,247,.22)",
+          border: "1px solid rgba(55,138,221,.22)",
           borderRadius: 20,
           padding: "2.5rem",
         }}
@@ -360,13 +361,13 @@ function Overview({ token }: { token: string }) {
       label: "Total de usuários",
       value: stats.totalUsuarios,
       icon: "👥",
-      color: "#4f8ef7",
+      color: "#378ADD",
     },
     {
       label: "Assinantes Premium",
       value: stats.totalPremium,
       icon: "⭐",
-      color: "#a78bfa",
+      color: "#f7c94f",
     },
     {
       label: "Usuários Gratuitos",
@@ -471,7 +472,7 @@ function Overview({ token }: { token: string }) {
                 style={{
                   textAlign: "left",
                   padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(79,142,247,.1)",
+                  borderBottom: "1px solid rgba(55,138,221,.1)",
                 }}
               >
                 Nome
@@ -480,7 +481,7 @@ function Overview({ token }: { token: string }) {
                 style={{
                   textAlign: "left",
                   padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(79,142,247,.1)",
+                  borderBottom: "1px solid rgba(55,138,221,.1)",
                 }}
               >
                 E-mail
@@ -489,7 +490,7 @@ function Overview({ token }: { token: string }) {
                 style={{
                   textAlign: "left",
                   padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(79,142,247,.1)",
+                  borderBottom: "1px solid rgba(55,138,221,.1)",
                 }}
               >
                 Plano
@@ -498,7 +499,7 @@ function Overview({ token }: { token: string }) {
                 style={{
                   textAlign: "left",
                   padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(79,142,247,.1)",
+                  borderBottom: "1px solid rgba(55,138,221,.1)",
                 }}
               >
                 Cadastro
@@ -509,7 +510,7 @@ function Overview({ token }: { token: string }) {
             {stats.recentes.map((u) => (
               <tr
                 key={u._id}
-                style={{ borderBottom: "1px solid rgba(79,142,247,.06)" }}
+                style={{ borderBottom: "1px solid rgba(55,138,221,.06)" }}
               >
                 <td style={{ padding: ".6rem .75rem" }}>{u.nome}</td>
                 <td style={{ padding: ".6rem .75rem", color: "#8fa4c8" }}>
@@ -627,7 +628,7 @@ function Usuarios({ token }: { token: string }) {
                     style={{
                       textAlign: "left",
                       padding: ".5rem .75rem",
-                      borderBottom: "1px solid rgba(79,142,247,.1)",
+                      borderBottom: "1px solid rgba(55,138,221,.1)",
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -640,7 +641,7 @@ function Usuarios({ token }: { token: string }) {
               {users.map((u) => (
                 <tr
                   key={u._id}
-                  style={{ borderBottom: "1px solid rgba(79,142,247,.06)" }}
+                  style={{ borderBottom: "1px solid rgba(55,138,221,.06)" }}
                 >
                   <td style={{ padding: ".6rem .75rem", fontWeight: 500 }}>
                     {u.nome}
@@ -737,21 +738,392 @@ const CATEGORIAS = [
   "Matemática Discreta",
 ];
 
-function Conteudos({
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAINEL INLINE DE AULAS (por conteúdo)
+// ═══════════════════════════════════════════════════════════════════════════════
+function ConteudoAulasPanel({
   token,
-  onSelectConteudo,
+  conteudo,
+  onReloadConteudos,
 }: {
   token: string;
-  onSelectConteudo: (c: Conteudo) => void;
+  conteudo: Conteudo;
+  onReloadConteudos: () => void;
 }) {
+  const [aulas, setAulas] = useState<Aula[]>([]);
+  const [editando, setEditando] = useState<Aula | null>(null);
+  const [loadingAulas, setLoadingAulas] = useState(true);
+  const [form, setForm] = useState({
+    titulo: "",
+    video_url: "",
+    duracao: "",
+    descricao: "",
+    tipo: "premium" as "free" | "premium",
+  });
+
+  const load = useCallback(async () => {
+    setLoadingAulas(true);
+    const data = await api(token).get(
+      `/api/admin/aulas?conteudoId=${conteudo._id}`,
+    );
+    setAulas(Array.isArray(data) ? data : []);
+    setLoadingAulas(false);
+  }, [token, conteudo._id]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const resetForm = () =>
+    setForm({
+      titulo: "",
+      video_url: "",
+      duracao: "",
+      descricao: "",
+      tipo: "premium",
+    });
+
+  const salvar = async () => {
+    if (!form.titulo) return alert("Título obrigatório.");
+    if (editando) {
+      await api(token).patch("/api/admin/aulas", { id: editando._id, ...form });
+      setEditando(null);
+    } else {
+      await api(token).post("/api/admin/aulas", {
+        ...form,
+        conteudo_id: conteudo._id,
+      });
+    }
+    resetForm();
+    await load();
+    onReloadConteudos();
+  };
+
+  const deletar = async (id: string, titulo: string) => {
+    if (!confirm(`Deletar "${titulo}"?`)) return;
+    await api(token).del("/api/admin/aulas", { id });
+    await load();
+    onReloadConteudos();
+  };
+
+  const iniciarEdicao = (a: Aula) => {
+    setEditando(a);
+    setForm({
+      titulo: a.titulo,
+      video_url: a.video_url,
+      duracao: a.duracao,
+      descricao: a.descricao,
+      tipo: a.tipo,
+    });
+  };
+
+  const innerCard: React.CSSProperties = {
+    background: "#0d1426",
+    border: "1px solid rgba(55,138,221,.1)",
+    borderRadius: 10,
+    padding: "1rem",
+    marginBottom: ".75rem",
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: ".5rem",
+        border: "1px solid rgba(55,138,221,.22)",
+        borderRadius: 12,
+        padding: "1.25rem",
+        background: "#101828",
+      }}
+    >
+      <h4
+        style={{
+          fontFamily: "'Syne',sans-serif",
+          fontWeight: 700,
+          fontSize: ".88rem",
+          marginBottom: "1rem",
+          color: "#378ADD",
+        }}
+      >
+        🎬 Aulas de &ldquo;{conteudo.nome}&rdquo;
+        <span
+          style={{ fontWeight: 400, color: "#4d6380", marginLeft: ".5rem" }}
+        >
+          ({aulas.length} cadastradas)
+        </span>
+      </h4>
+
+      {/* Mini formulário */}
+      <div style={innerCard}>
+        <div
+          style={{
+            fontSize: ".72rem",
+            color: "#8fa4c8",
+            marginBottom: ".6rem",
+            fontWeight: 600,
+          }}
+        >
+          {editando ? `✏️ Editando: ${editando.titulo}` : "➕ Nova aula"}
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: ".5rem",
+            marginBottom: ".5rem",
+          }}
+        >
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label
+              style={{
+                fontSize: ".68rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".2rem",
+              }}
+            >
+              Título *
+            </label>
+            <input
+              style={S.input}
+              placeholder="Ex: Introdução ao tema"
+              value={form.titulo}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, titulo: e.target.value }))
+              }
+            />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label
+              style={{
+                fontSize: ".68rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".2rem",
+              }}
+            >
+              URL do vídeo (YouTube)
+            </label>
+            <input
+              style={S.input}
+              placeholder="https://youtube.com/watch?v=..."
+              value={form.video_url}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, video_url: e.target.value }))
+              }
+            />
+          </div>
+          <div>
+            <label
+              style={{
+                fontSize: ".68rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".2rem",
+              }}
+            >
+              Duração
+            </label>
+            <input
+              style={S.input}
+              placeholder="14:32"
+              value={form.duracao}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, duracao: e.target.value }))
+              }
+            />
+          </div>
+          <div>
+            <label
+              style={{
+                fontSize: ".68rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".2rem",
+              }}
+            >
+              Tipo
+            </label>
+            <select
+              style={{ ...S.select, width: "100%" }}
+              value={form.tipo}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  tipo: e.target.value as "free" | "premium",
+                }))
+              }
+            >
+              <option value="premium">⭐ Premium</option>
+              <option value="free">🆓 Gratuita</option>
+            </select>
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label
+              style={{
+                fontSize: ".68rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".2rem",
+              }}
+            >
+              Descrição (opcional)
+            </label>
+            <input
+              style={S.input}
+              placeholder="Breve descrição da aula..."
+              value={form.descricao}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, descricao: e.target.value }))
+              }
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: ".4rem" }}>
+          <button style={S.btn("primary")} onClick={salvar}>
+            {editando ? "Salvar alterações" : "Adicionar aula"}
+          </button>
+          {editando && (
+            <button
+              style={S.btn("ghost")}
+              onClick={() => {
+                setEditando(null);
+                resetForm();
+              }}
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Lista de aulas */}
+      {loadingAulas ? (
+        <div
+          style={{
+            color: "#4d6380",
+            fontSize: ".8rem",
+            textAlign: "center",
+            padding: ".75rem",
+          }}
+        >
+          Carregando aulas...
+        </div>
+      ) : aulas.length === 0 ? (
+        <div
+          style={{
+            color: "#4d6380",
+            fontSize: ".8rem",
+            textAlign: "center",
+            padding: ".75rem",
+          }}
+        >
+          Nenhuma aula cadastrada ainda.
+        </div>
+      ) : (
+        <div style={innerCard}>
+          {aulas.map((a, idx) => (
+            <div
+              key={a._id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: ".75rem",
+                padding: ".6rem 0",
+                borderBottom:
+                  idx < aulas.length - 1
+                    ? "1px solid rgba(55,138,221,.07)"
+                    : "none",
+                flexWrap: "wrap",
+              }}
+            >
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: "50%",
+                  background: "rgba(55,138,221,.12)",
+                  color: "#378ADD",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: ".68rem",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {a.ordem}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: ".83rem",
+                    marginBottom: ".12rem",
+                  }}
+                >
+                  {a.titulo}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: ".6rem",
+                    fontSize: ".68rem",
+                    color: "#4d6380",
+                  }}
+                >
+                  <span>⏱ {a.duracao || "—"}</span>
+                  <span style={S.badge(a.tipo === "free" ? "free" : "premium")}>
+                    {a.tipo === "free" ? "Gratuita" : "Premium"}
+                  </span>
+                  {a.video_url && (
+                    <span style={{ color: "#3fcf8e" }}>✓ Vídeo</span>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: ".3rem", flexShrink: 0 }}>
+                <button
+                  style={{
+                    ...S.btn("ghost"),
+                    padding: ".35rem .65rem",
+                    fontSize: ".75rem",
+                  }}
+                  onClick={() => iniciarEdicao(a)}
+                >
+                  ✏️ Editar
+                </button>
+                <button
+                  style={{
+                    ...S.btn("danger"),
+                    padding: ".35rem .65rem",
+                    fontSize: ".75rem",
+                  }}
+                  onClick={() => deletar(a._id, a.titulo)}
+                >
+                  🗑
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ABA: CONTEÚDOS
+// ═══════════════════════════════════════════════════════════════════════════════
+function Conteudos({ token }: { token: string }) {
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
   const [form, setForm] = useState({
     nome: "",
     categoria: CATEGORIAS[0],
     descricao: "",
     icone: "📚",
+    aulasGratuitas: 2,
   });
   const [editando, setEditando] = useState<Conteudo | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const data = await api(token).get("/api/admin/conteudos");
@@ -773,7 +1145,13 @@ function Conteudos({
     } else {
       await api(token).post("/api/admin/conteudos", form);
     }
-    setForm({ nome: "", categoria: CATEGORIAS[0], descricao: "", icone: "📚" });
+    setForm({
+      nome: "",
+      categoria: CATEGORIAS[0],
+      descricao: "",
+      icone: "📚",
+      aulasGratuitas: 2,
+    });
     load();
   };
 
@@ -790,7 +1168,9 @@ function Conteudos({
       categoria: c.categoria,
       descricao: c.descricao,
       icone: c.icone,
+      aulasGratuitas: c.aulasGratuitas ?? 2,
     });
+    setExpandedId(null);
   };
 
   return (
@@ -886,6 +1266,31 @@ function Conteudos({
               }
             />
           </div>
+          <div>
+            <label
+              style={{
+                fontSize: ".72rem",
+                color: "#8fa4c8",
+                display: "block",
+                marginBottom: ".3rem",
+              }}
+            >
+              Aulas gratuitas
+            </label>
+            <input
+              style={S.input}
+              type="number"
+              min={0}
+              placeholder="2"
+              value={form.aulasGratuitas}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  aulasGratuitas: Number(e.target.value),
+                }))
+              }
+            />
+          </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label
               style={{
@@ -907,7 +1312,14 @@ function Conteudos({
             />
           </div>
         </div>
-        <div style={{ display: "flex", gap: ".5rem" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: ".5rem",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
           <button style={S.btn("primary")} onClick={salvar}>
             {editando ? "Salvar alterações" : "Criar conteúdo"}
           </button>
@@ -921,11 +1333,18 @@ function Conteudos({
                   categoria: CATEGORIAS[0],
                   descricao: "",
                   icone: "📚",
+                  aulasGratuitas: 2,
                 });
               }}
             >
               Cancelar
             </button>
+          )}
+          {!editando && (
+            <span style={{ fontSize: ".72rem", color: "#4d6380" }}>
+              💡 &ldquo;Aulas gratuitas&rdquo; define quantas primeiras aulas
+              ficam acessíveis para usuários free.
+            </span>
           )}
         </div>
       </div>
@@ -941,13 +1360,21 @@ function Conteudos({
         >
           <thead>
             <tr style={{ color: "#4d6380" }}>
-              {["Ícone", "Nome", "Categoria", "Aulas", "Ações"].map((h) => (
+              {[
+                "Ícone",
+                "Nome",
+                "Categoria",
+                "Gratuitas",
+                "Total",
+                "Ações",
+              ].map((h) => (
                 <th
                   key={h}
                   style={{
                     textAlign: "left",
                     padding: ".5rem .75rem",
-                    borderBottom: "1px solid rgba(79,142,247,.1)",
+                    borderBottom: "1px solid rgba(55,138,221,.1)",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {h}
@@ -957,58 +1384,98 @@ function Conteudos({
           </thead>
           <tbody>
             {conteudos.map((c) => (
-              <tr
-                key={c._id}
-                style={{ borderBottom: "1px solid rgba(79,142,247,.06)" }}
-              >
-                <td style={{ padding: ".6rem .75rem", fontSize: "1.3rem" }}>
-                  {c.icone}
-                </td>
-                <td style={{ padding: ".6rem .75rem", fontWeight: 600 }}>
-                  {c.nome}
-                </td>
-                <td style={{ padding: ".6rem .75rem", color: "#8fa4c8" }}>
-                  {c.categoria}
-                </td>
-                <td
+              <React.Fragment key={c._id}>
+                <tr
                   style={{
-                    padding: ".6rem .75rem",
-                    color: "#4f8ef7",
-                    fontWeight: 600,
+                    borderBottom:
+                      expandedId === c._id
+                        ? "none"
+                        : "1px solid rgba(55,138,221,.06)",
                   }}
                 >
-                  {c.totalAulas}
-                </td>
-                <td style={{ padding: ".6rem .75rem" }}>
-                  <div
-                    style={{ display: "flex", gap: ".4rem", flexWrap: "wrap" }}
+                  <td style={{ padding: ".6rem .75rem", fontSize: "1.3rem" }}>
+                    {c.icone}
+                  </td>
+                  <td style={{ padding: ".6rem .75rem", fontWeight: 600 }}>
+                    {c.nome}
+                  </td>
+                  <td style={{ padding: ".6rem .75rem", color: "#8fa4c8" }}>
+                    {c.categoria}
+                  </td>
+                  <td
+                    style={{
+                      padding: ".6rem .75rem",
+                      color: "#3fcf8e",
+                      fontWeight: 600,
+                    }}
                   >
-                    <button
-                      style={S.btn("ghost")}
-                      onClick={() => iniciarEdicao(c)}
+                    {c.aulasGratuitas ?? 0}
+                  </td>
+                  <td
+                    style={{
+                      padding: ".6rem .75rem",
+                      color: "#378ADD",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {c.totalAulas}
+                  </td>
+                  <td style={{ padding: ".6rem .75rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: ".4rem",
+                        flexWrap: "wrap",
+                      }}
                     >
-                      Editar
-                    </button>
-                    <button
-                      style={S.btn("primary")}
-                      onClick={() => onSelectConteudo(c)}
-                    >
-                      Ver aulas
-                    </button>
-                    <button
-                      style={S.btn("danger")}
-                      onClick={() => deletar(c._id, c.nome)}
-                    >
-                      Deletar
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                      <button
+                        style={S.btn("ghost")}
+                        onClick={() => iniciarEdicao(c)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        style={{
+                          ...S.btn("primary"),
+                          background:
+                            expandedId === c._id
+                              ? "rgba(55,138,221,.2)"
+                              : "linear-gradient(135deg,#378ADD,#185FA5)",
+                        }}
+                        onClick={() =>
+                          setExpandedId(expandedId === c._id ? null : c._id)
+                        }
+                      >
+                        {expandedId === c._id
+                          ? "▲ Fechar aulas"
+                          : "▼ Gerenciar aulas"}
+                      </button>
+                      <button
+                        style={S.btn("danger")}
+                        onClick={() => deletar(c._id, c.nome)}
+                      >
+                        Deletar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {expandedId === c._id && (
+                  <tr>
+                    <td colSpan={6} style={{ padding: ".25rem .75rem 1rem" }}>
+                      <ConteudoAulasPanel
+                        token={token}
+                        conteudo={c}
+                        onReloadConteudos={load}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
             {conteudos.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   style={{
                     padding: "1.5rem",
                     color: "#4d6380",
@@ -1027,7 +1494,7 @@ function Conteudos({
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ABA: AULAS
+// ABA: AULAS (mantida para retrocompatibilidade)
 // ═══════════════════════════════════════════════════════════════════════════════
 function Aulas({
   token,
@@ -1292,7 +1759,7 @@ function Aulas({
                 alignItems: "center",
                 gap: "1rem",
                 padding: ".85rem 0",
-                borderBottom: "1px solid rgba(79,142,247,.07)",
+                borderBottom: "1px solid rgba(55,138,221,.07)",
                 flexWrap: "wrap",
               }}
             >
@@ -1301,8 +1768,8 @@ function Aulas({
                   width: 28,
                   height: 28,
                   borderRadius: "50%",
-                  background: "rgba(79,142,247,.12)",
-                  color: "#4f8ef7",
+                  background: "rgba(55,138,221,.12)",
+                  color: "#378ADD",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -1364,13 +1831,11 @@ function Aulas({
 // ═══════════════════════════════════════════════════════════════════════════════
 function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
   const [aba, setAba] = useState<Aba>("overview");
-  const [conteudoSelecionado, setConteudoSelecionado] =
-    useState<Conteudo | null>(null);
 
   const abas: { id: Aba; label: string; icon: string }[] = [
     { id: "overview", label: "Visão Geral", icon: "📊" },
     { id: "usuarios", label: "Usuários", icon: "👥" },
-    { id: "conteudos", label: "Conteúdos", icon: "📚" },
+    { id: "conteudos", label: "Conteúdos & Aulas", icon: "📚" },
   ];
 
   return (
@@ -1386,19 +1851,16 @@ function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: aba === a.id ? "#4f8ef7" : "#4d6380",
+                color: aba === a.id ? "#378ADD" : "#4d6380",
                 fontWeight: aba === a.id ? 700 : 500,
                 fontSize: ".85rem",
                 fontFamily: "'DM Sans',sans-serif",
                 borderBottom:
-                  aba === a.id ? "2px solid #4f8ef7" : "2px solid transparent",
+                  aba === a.id ? "2px solid #378ADD" : "2px solid transparent",
                 paddingBottom: ".25rem",
                 transition: ".15s",
               }}
-              onClick={() => {
-                setAba(a.id);
-                setConteudoSelecionado(null);
-              }}
+              onClick={() => setAba(a.id)}
             >
               {a.icon} {a.label}
             </button>
@@ -1413,25 +1875,7 @@ function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
       <div style={{ padding: "2rem", maxWidth: 1200, margin: "0 auto" }}>
         {aba === "overview" && <Overview token={token} />}
         {aba === "usuarios" && <Usuarios token={token} />}
-        {aba === "conteudos" && !conteudoSelecionado && (
-          <Conteudos
-            token={token}
-            onSelectConteudo={(c) => {
-              setConteudoSelecionado(c);
-              setAba("aulas");
-            }}
-          />
-        )}
-        {aba === "aulas" && conteudoSelecionado && (
-          <Aulas
-            token={token}
-            conteudo={conteudoSelecionado}
-            onVoltar={() => {
-              setConteudoSelecionado(null);
-              setAba("conteudos");
-            }}
-          />
-        )}
+        {aba === "conteudos" && <Conteudos token={token} />}
       </div>
     </div>
   );

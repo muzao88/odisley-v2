@@ -11,6 +11,9 @@ export async function POST(req: NextRequest) {
     if (!email || !senha) {
       return NextResponse.json({ error: 'Preencha todos os campos.' }, { status: 400 });
     }
+    if (typeof email !== 'string' || typeof senha !== 'string') {
+      return NextResponse.json({ error: 'Formato de dados inválido.' }, { status: 400 });
+    }
 
     await connectDB();
 

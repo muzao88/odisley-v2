@@ -1,14 +1,39 @@
-'use client';
+"use client";
 
-import type { Page } from '@/types';
-import { CONTEUDOS_SEED, CATEGORIAS_ORDER, CATEGORIA_CORES } from '@/data/conteudos';
+import type { Page } from "@/types";
+import {
+  CONTEUDOS_SEED,
+  CATEGORIAS_ORDER,
+  CATEGORIA_CORES,
+} from "@/data/conteudos";
 
-interface Props { onNavigate: (p: Page) => void; onOpenAuth: (tab: 'login' | 'register') => void; }
+interface Props {
+  onNavigate: (p: Page) => void;
+  onOpenAuth: (tab: "login" | "register") => void;
+}
 
 const DEPOIMENTOS = [
-  { text: 'As aulas de Matemática foram decisivas para minha aprovação na UFPR. O Odisley explica de um jeito que finalmente faz sentido!', nome: 'Lucas Mendes', role: 'Aprovado em Engenharia Civil — UFPR', ini: 'LM', av: 'av-blue' },
-  { text: 'Consegui tirar 920 em Matemática no ENEM depois de estudar pela plataforma. O acompanhamento de progresso me ajudou muito.', nome: 'Ana Sofia Rocha', role: 'ENEM 2024 · Nota 920 em Mat.', ini: 'AS', av: 'av-purple' },
-  { text: 'Plataforma incrível! Estudo pelo celular no ônibus. As videoaulas são curtas e objetivas. Valeu cada centavo!', nome: 'Pedro Oliveira', role: 'Aprovado em Medicina — UEL', ini: 'PO', av: 'av-green' },
+  {
+    text: "As aulas de Matemática foram decisivas para minha aprovação na UFPR. O Odisley explica de um jeito que finalmente faz sentido!",
+    nome: "Lucas Mendes",
+    role: "Aprovado em Engenharia Civil — UFPR",
+    ini: "LM",
+    av: "av-blue",
+  },
+  {
+    text: "Consegui tirar 920 em Matemática no ENEM depois de estudar pela plataforma. O acompanhamento de progresso me ajudou muito.",
+    nome: "Ana Sofia Rocha",
+    role: "ENEM 2024 · Nota 920 em Mat.",
+    ini: "AS",
+    av: "av-purple",
+  },
+  {
+    text: "Plataforma incrível! Estudo pelo celular no ônibus. As videoaulas são curtas e objetivas. Valeu cada centavo!",
+    nome: "Pedro Oliveira",
+    role: "Aprovado em Medicina — UEL",
+    ini: "PO",
+    av: "av-green",
+  },
 ];
 
 export default function HomePage({ onNavigate, onOpenAuth }: Props) {
@@ -24,24 +49,47 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
           <div className="hero-grid" />
         </div>
         <div className="hero-content">
-          <div className="hero-badge"><span />Netflix de Matemática para o ENEM</div>
-          <h1>Matemática que<br /><em>te aprova</em></h1>
+          <div className="hero-badge">
+            <span />
+            Netflix de Matemática para o ENEM
+          </div>
+          <h1>
+            Matemática que
+            <br />
+            <em>te aprova</em>
+          </h1>
           <p className="hero-sub">
-            Trilha completa de matemática para vestibular e ENEM. Videoaulas objetivas,
-            progresso rastreado aula por aula e acesso de onde quiser.
+            Trilha completa de matemática para vestibular e ENEM. Videoaulas
+            objetivas, progresso rastreado aula por aula e acesso de onde
+            quiser.
           </p>
           <div className="hero-btns">
-            <button className="btn btn-primary btn-lg" onClick={() => onOpenAuth('register')}>
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => onOpenAuth("register")}
+            >
               Começar grátis agora
             </button>
-            <button className="btn btn-ghost btn-lg" onClick={() => onNavigate('cursos')}>
+            <button
+              className="btn btn-ghost btn-lg"
+              onClick={() => onNavigate("cursos")}
+            >
               Ver todos os cursos
             </button>
           </div>
           <div className="hero-stats">
-            <div className="stat"><div className="stat-num">+1.200</div><div className="stat-label">Alunos ativos</div></div>
-            <div className="stat"><div className="stat-num">24</div><div className="stat-label">Conteúdos</div></div>
-            <div className="stat"><div className="stat-num">200+</div><div className="stat-label">Videoaulas</div></div>
+            <div className="stat">
+              <div className="stat-num">+1.200</div>
+              <div className="stat-label">Alunos ativos</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num">24</div>
+              <div className="stat-label">Conteúdos</div>
+            </div>
+            <div className="stat">
+              <div className="stat-num">200+</div>
+              <div className="stat-label">Videoaulas</div>
+            </div>
           </div>
         </div>
 
@@ -52,10 +100,10 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
               <span className="dc-badge">Em andamento</span>
             </div>
             {[
-              { label: '📐 Função Quadrática', pct: 78, bar: 'pf-blue' },
-              { label: '🔢 Potenciação', pct: 100, bar: 'pf-green' },
-              { label: '⚖️ Razão e Proporção', pct: 55, bar: 'pf-orange' },
-              { label: '📏 Geometria Plana', pct: 30, bar: 'pf-purple' },
+              { label: "📐 Função Quadrática", pct: 78, bar: "pf-blue" },
+              { label: "🔢 Potenciação", pct: 100, bar: "pf-green" },
+              { label: "⚖️ Razão e Proporção", pct: 55, bar: "pf-orange" },
+              { label: "📏 Geometria Plana", pct: 30, bar: "pf-purple" },
             ].map(({ label, pct, bar }) => (
               <div className="dc-pi" key={label}>
                 <div className="dc-pi-header">
@@ -63,7 +111,10 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
                   <span className="dc-pi-pct">{pct}%</span>
                 </div>
                 <div className="progress-bar">
-                  <div className={`progress-fill ${bar}`} style={{ width: `${pct}%` }} />
+                  <div
+                    className={`progress-fill ${bar}`}
+                    style={{ width: `${pct}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -82,14 +133,28 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
       </section>
 
       {/* PREVIEW DE CONTEÚDOS */}
-      <section style={{ background: 'var(--bg2)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <section style={{ background: "var(--bg2)" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginBottom: "2.5rem",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
+        >
           <div>
             <div className="section-tag">Trilha completa</div>
             <h2 className="section-title">24 conteúdos de matemática</h2>
-            <p className="section-sub">Do básico ao avançado, tudo que cai no ENEM e vestibulares.</p>
+            <p className="section-sub">
+              Do básico ao avançado, tudo que cai no ENEM e vestibulares.
+            </p>
           </div>
-          <button className="btn btn-ghost btn-md" onClick={() => onNavigate('cursos')}>
+          <button
+            className="btn btn-ghost btn-md"
+            onClick={() => onNavigate("cursos")}
+          >
             Ver todos os conteúdos →
           </button>
         </div>
@@ -97,18 +162,41 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
           {preview.map((c) => {
             const cor = CATEGORIA_CORES[c.categoria];
             return (
-              <div key={c.nome} className="conteudo-card" onClick={() => onNavigate('cursos')}
-                style={{ '--card-color': cor } as any}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: cor, opacity: 0, transition: '.25s' }}
-                  className="card-top-bar" />
+              <div
+                key={c.nome}
+                className="conteudo-card"
+                onClick={() => onNavigate("cursos")}
+                style={{ "--card-color": cor } as any}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: cor,
+                    opacity: 0,
+                    transition: ".25s",
+                  }}
+                  className="card-top-bar"
+                />
                 <div className="cc-icon">{c.icone}</div>
                 <div className="cc-name">{c.nome}</div>
-                <div className="cc-aulas">{c.totalAulas} aulas · {c.aulasGratuitas} gratuitas</div>
+                <div className="cc-aulas">
+                  {c.totalAulas} aulas · {c.aulasGratuitas} gratuitas
+                </div>
                 <div className="cc-bar-wrap">
                   <div className="cc-bar-label">
-                    <span>Progresso</span><span>0%</span>
+                    <span>Progresso</span>
+                    <span>0%</span>
                   </div>
-                  <div className="cc-bar"><div className="cc-bar-fill" style={{ width: '0%', background: cor }} /></div>
+                  <div className="cc-bar">
+                    <div
+                      className="cc-bar-fill"
+                      style={{ width: "0%", background: cor }}
+                    />
+                  </div>
                 </div>
               </div>
             );
@@ -118,26 +206,85 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
 
       {/* DEPOIMENTOS */}
       <section>
-        <div className="centered" style={{ marginBottom: '3rem' }}>
+        <div className="centered" style={{ marginBottom: "3rem" }}>
           <div className="section-tag">Depoimentos</div>
           <h2 className="section-title">Alunos que foram aprovados</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1.25rem' }}>
-          {DEPOIMENTOS.map(t => (
-            <div key={t.nome} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '1.6rem' }}>
-              <div style={{ color: 'var(--gold)', marginBottom: '1rem', letterSpacing: '.1em' }}>★★★★★</div>
-              <p style={{ color: 'var(--text2)', fontSize: '.88rem', lineHeight: 1.7, marginBottom: '1.25rem', fontStyle: 'italic' }}>"{t.text}"</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem' }}>
-                <div style={{
-                  width: 38, height: 38, borderRadius: '50%',
-                  background: t.av === 'av-blue' ? 'rgba(79,142,247,.15)' : t.av === 'av-purple' ? 'rgba(124,94,247,.15)' : 'rgba(63,207,142,.15)',
-                  color: t.av === 'av-blue' ? 'var(--accent)' : t.av === 'av-purple' ? 'var(--accent2)' : 'var(--green)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: '.85rem', flexShrink: 0,
-                }}>{t.ini}</div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
+            gap: "1.25rem",
+          }}
+        >
+          {DEPOIMENTOS.map((t) => (
+            <div
+              key={t.nome}
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
+                padding: "1.6rem",
+              }}
+            >
+              <div
+                style={{
+                  color: "var(--gold)",
+                  marginBottom: "1rem",
+                  letterSpacing: ".1em",
+                }}
+              >
+                ★★★★★
+              </div>
+              <p
+                style={{
+                  color: "var(--text2)",
+                  fontSize: ".88rem",
+                  lineHeight: 1.7,
+                  marginBottom: "1.25rem",
+                  fontStyle: "italic",
+                }}
+              >
+                "{t.text}"
+              </p>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: ".7rem" }}
+              >
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    background:
+                      t.av === "av-blue"
+                        ? "rgba(55,138,221,.15)"
+                        : t.av === "av-purple"
+                          ? "rgba(24,95,165,.18)"
+                          : "rgba(63,207,142,.15)",
+                    color:
+                      t.av === "av-blue"
+                        ? "var(--accent)"
+                        : t.av === "av-purple"
+                          ? "var(--accent2)"
+                          : "var(--green)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "'Syne',sans-serif",
+                    fontWeight: 700,
+                    fontSize: ".85rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  {t.ini}
+                </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '.88rem' }}>{t.nome}</div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--text3)' }}>{t.role}</div>
+                  <div style={{ fontWeight: 600, fontSize: ".88rem" }}>
+                    {t.nome}
+                  </div>
+                  <div style={{ fontSize: ".72rem", color: "var(--text3)" }}>
+                    {t.role}
+                  </div>
                 </div>
               </div>
             </div>
@@ -146,15 +293,33 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
       </section>
 
       {/* CTA FINAL */}
-      <section style={{ background: 'var(--bg2)', textAlign: 'center' }}>
+      <section style={{ background: "var(--bg2)", textAlign: "center" }}>
         <div className="section-tag centered">Comece hoje</div>
         <h2 className="section-title">Pronto para ser aprovado?</h2>
-        <p className="section-sub centered" style={{ marginBottom: '2rem' }}>
-          Junte-se a mais de 1.200 alunos que já estudam com o professor Odisley.
+        <p className="section-sub centered" style={{ marginBottom: "2rem" }}>
+          Junte-se a mais de 1.200 alunos que já estudam com o professor
+          Odisley.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary btn-lg" onClick={() => onOpenAuth('register')}>Criar conta gratuita</button>
-          <button className="btn btn-ghost btn-lg" onClick={() => onNavigate('planos')}>Ver planos e preços</button>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={() => onOpenAuth("register")}
+          >
+            Criar conta gratuita
+          </button>
+          <button
+            className="btn btn-ghost btn-lg"
+            onClick={() => onNavigate("planos")}
+          >
+            Ver planos e preços
+          </button>
         </div>
       </section>
     </>

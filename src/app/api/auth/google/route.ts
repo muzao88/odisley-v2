@@ -62,13 +62,15 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    // Busca usuário existente pelo email ou pelo providerId
     let user = await UserModel.findOne({
       $or: [{ email }, { providerId: googleId, provider: "google" }],
     });
 
+    let isNewUser = false;
+
     if (!user) {
       // Cria novo usuário via Google
+      isNewUser = true;
       user = await UserModel.create({
         nome: name || email.split("@")[0],
         email,
@@ -94,6 +96,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       token,
+      isNewUser,
       user: {
         _id: user._id,
         nome: user.nome,

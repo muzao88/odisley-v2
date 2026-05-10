@@ -299,9 +299,9 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
           top: 12,
           right: 12,
           zIndex: 3,
-          background: "rgba(124,94,247,.15)",
-          border: "1px solid rgba(124,94,247,.4)",
-          color: "#a78bfa",
+          background: "rgba(247,201,79,.15)",
+          border: "1px solid rgba(247,201,79,.4)",
+          color: "#f7c94f",
           fontSize: ".62rem",
           fontWeight: 800,
           letterSpacing: ".1em",
@@ -385,7 +385,7 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
               width: 18,
               height: 18,
               borderRadius: "50%",
-              background: "rgba(79,142,247,.12)",
+              background: "rgba(55,138,221,.12)",
               fontSize: ".7rem",
             }}
           >
@@ -395,7 +395,7 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
           <span style={{ color: "var(--border2)", margin: "0 .15rem" }}>·</span>
           <span
             style={{
-              color: "rgba(124,94,247,.9)",
+              color: "var(--accent)",
               fontWeight: 600,
             }}
           >
@@ -429,8 +429,8 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
               width: 52,
               height: 52,
               borderRadius: "50%",
-              background: "rgba(124,94,247,.18)",
-              border: "1px solid rgba(124,94,247,.4)",
+              background: "rgba(55,138,221,.15)",
+              border: "1px solid rgba(55,138,221,.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -521,7 +521,7 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
             padding: ".55rem 1.1rem",
             background: canAccess
               ? `linear-gradient(135deg, ${cor}, ${cor}99)`
-              : "linear-gradient(135deg, #7c5ef7, #4f8ef7)",
+              : "linear-gradient(135deg, #185FA5, #378ADD)",
             borderRadius: 10,
             color: "#fff",
             fontWeight: 700,
@@ -558,7 +558,7 @@ function UpsellBanner({
         borderRadius: "var(--radius)",
         overflow: "hidden",
         position: "relative",
-        border: "1px solid rgba(124,94,247,.3)",
+        border: "1px solid rgba(55,138,221,.3)",
       }}
     >
       {/* Fundo gradiente */}
@@ -567,7 +567,7 @@ function UpsellBanner({
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, rgba(124,94,247,.12) 0%, rgba(79,142,247,.08) 50%, rgba(63,207,142,.06) 100%)",
+            "linear-gradient(135deg, rgba(24,95,165,.12) 0%, rgba(55,138,221,.08) 50%, rgba(63,207,142,.06) 100%)",
           zIndex: 0,
         }}
       />
@@ -581,7 +581,7 @@ function UpsellBanner({
           height: 300,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(124,94,247,.2) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(55,138,221,.15) 0%, transparent 70%)",
           zIndex: 0,
           pointerEvents: "none",
         }}
@@ -605,7 +605,7 @@ function UpsellBanner({
             style={{
               fontSize: ".68rem",
               fontWeight: 800,
-              color: "#a78bfa",
+              color: "var(--accent)",
               letterSpacing: ".12em",
               textTransform: "uppercase",
               marginBottom: ".5rem",
@@ -626,7 +626,7 @@ function UpsellBanner({
             Desbloqueie todos os{" "}
             <span
               style={{
-                background: "linear-gradient(90deg, #7c5ef7, #4f8ef7)",
+                background: "linear-gradient(90deg, #185FA5, #378ADD)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -763,9 +763,9 @@ function CategoriaSecao({
             color: cor,
           }}
         >
-          {cor === "#4f8ef7"
+          {cor === "#378ADD"
             ? "🔢"
-            : cor === "#7c5ef7"
+            : cor === "#185FA5"
               ? "🔡"
               : cor === "#3fcf8e"
                 ? "📈"
@@ -963,13 +963,13 @@ export default function CoursesPage({
                 num: `${totalConteudos}`,
                 label: "Conteúdos",
                 icon: "📚",
-                cor: "#4f8ef7",
+                cor: "#378ADD",
               },
               {
                 num: `${totalAulas}+`,
                 label: "Aulas em vídeo",
                 icon: "🎬",
-                cor: "#7c5ef7",
+                cor: "#185FA5",
               },
               { num: "6", label: "Categorias", icon: "🗂️", cor: "#3fcf8e" },
               { num: "ENEM", label: "Alinhado", icon: "🎯", cor: "#f7934f" },
@@ -1159,7 +1159,7 @@ export default function CoursesPage({
               marginTop: "2rem",
               padding: "1.5rem 2rem",
               background:
-                "linear-gradient(135deg, rgba(63,207,142,.08), rgba(79,142,247,.05))",
+                "linear-gradient(135deg, rgba(63,207,142,.08), rgba(55,138,221,.05))",
               border: "1px solid rgba(63,207,142,.25)",
               borderRadius: "var(--radius)",
               display: "flex",

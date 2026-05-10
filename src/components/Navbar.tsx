@@ -13,20 +13,20 @@ interface Props {
 export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
   const { user, logout, isLoggedIn } = useAuth();
   const [dropOpen, setDropOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
 
   // Restaura preferência salva ao montar
   useEffect(() => {
     const saved = localStorage.getItem("odisley_theme");
-    const dark = saved !== "light";
+    const dark = saved === "dark";
     setIsDark(dark);
-    document.documentElement.classList.toggle("light", !dark);
+    document.documentElement.classList.toggle("dark", dark);
   }, []);
 
   const toggleTheme = () => {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.classList.toggle("light", !next);
+    document.documentElement.classList.toggle("dark", next);
     localStorage.setItem("odisley_theme", next ? "dark" : "light");
   };
 

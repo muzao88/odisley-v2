@@ -10,17 +10,19 @@ interface AuthCtx {
   logout: () => void;
   isLoggedIn: boolean;
   isPremium: boolean;
+  isInitialized: boolean;
 }
 
 const Ctx = createContext<AuthCtx>({
   user: null, token: null,
   login: () => {}, logout: () => {},
-  isLoggedIn: false, isPremium: false,
+  isLoggedIn: false, isPremium: false, isInitialized: false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     // Restore session from localStorage
@@ -29,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const u = localStorage.getItem('odisley_user');
       if (t && u) { setToken(t); setUser(JSON.parse(u)); }
     } catch {}
+    setIsInitialized(true);
   }, []);
 
   const login = (u: User, t: string) => {
@@ -48,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user, token, login, logout,
       isLoggedIn: !!user,
       isPremium: user?.plano === 'premium',
+      isInitialized
     }}>
       {children}
     </Ctx.Provider>

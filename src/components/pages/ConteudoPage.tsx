@@ -325,7 +325,7 @@ function PremiumLockScreen({
         width: "100%",
         aspectRatio: "16/9",
         background:
-          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1a1040 100%)",
+          "linear-gradient(135deg, #0a0f1e 0%, #0d1426 50%, #0f1a30 100%)",
         borderRadius: "var(--radius)",
         display: "flex",
         flexDirection: "column",
@@ -335,7 +335,7 @@ function PremiumLockScreen({
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
-        border: "1px solid rgba(124,94,247,.25)",
+        border: "1px solid rgba(55,138,221,.25)",
       }}
     >
       {/* Glow de fundo decorativo */}
@@ -348,7 +348,7 @@ function PremiumLockScreen({
           width: 320,
           height: 320,
           background:
-            "radial-gradient(circle, rgba(124,94,247,.18) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(24,95,165,.15) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -360,16 +360,16 @@ function PremiumLockScreen({
           height: 72,
           borderRadius: "50%",
           background:
-            "linear-gradient(135deg, rgba(79,142,247,.2), rgba(124,94,247,.3))",
-          border: "1px solid rgba(124,94,247,.4)",
+            "linear-gradient(135deg, rgba(55,138,221,.25), rgba(24,95,165,.35))",
+          border: "1px solid rgba(55,138,221,.4)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: "1.25rem",
-          boxShadow: "0 0 32px rgba(124,94,247,.25)",
+          boxShadow: "0 0 32px rgba(55,138,221,.2)",
         }}
       >
-        <LockIcon size={32} color="#a78bfa" />
+        <LockIcon size={32} color="#B5D4F4" />
       </div>
 
       {/* Título da aula selecionada ou nome do curso */}
@@ -475,7 +475,7 @@ function PremiumLockScreen({
         className="btn btn-primary"
         onClick={() => onNavigate("planos")}
         style={{
-          background: "linear-gradient(90deg, #4f8ef7, #7c5ef7)",
+          background: "linear-gradient(90deg, #185FA5, #378ADD)",
           border: "none",
           padding: ".75rem 2rem",
           fontSize: ".95rem",
@@ -484,7 +484,7 @@ function PremiumLockScreen({
           cursor: "pointer",
           color: "#fff",
           letterSpacing: ".02em",
-          boxShadow: "0 4px 20px rgba(124,94,247,.4)",
+          boxShadow: "0 4px 20px rgba(55,138,221,.35)",
           marginBottom: ".75rem",
         }}
       >
@@ -576,7 +576,8 @@ export default function ConteudoPage({
 
   // ── Marcar aula como concluída ──────────────────────────────────────────────
   const marcarConcluida = async () => {
-    if (!aulaAtiva || !token) return;
+    // Nunca marca como concluída se a aula estiver bloqueada (proteção dupla)
+    if (!aulaAtiva || !token || aulaAtiva.bloqueada) return;
     setMarcando(true);
     try {
       await fetch("/api/progresso", {
@@ -661,8 +662,8 @@ export default function ConteudoPage({
               padding: ".85rem 1.25rem",
               marginBottom: "1.5rem",
               background:
-                "linear-gradient(90deg, rgba(124,94,247,.12), rgba(79,142,247,.08))",
-              border: "1px solid rgba(124,94,247,.3)",
+                "linear-gradient(90deg, rgba(24,95,165,.12), rgba(55,138,221,.08))",
+              border: "1px solid rgba(55,138,221,.3)",
               borderRadius: "var(--radius)",
               flexWrap: "wrap",
             }}
@@ -675,7 +676,7 @@ export default function ConteudoPage({
                 flex: 1,
               }}
             >
-              <LockIcon size={16} color="#a78bfa" />
+              <LockIcon size={16} color="#B5D4F4" />
               <span
                 style={{
                   fontSize: ".85rem",
@@ -740,9 +741,9 @@ export default function ConteudoPage({
                   borderRadius: 20,
                   fontSize: ".7rem",
                   fontWeight: 700,
-                  background: "rgba(79,142,247,.13)",
-                  color: "#4f8ef7",
-                  border: "1px solid rgba(79,142,247,.3)",
+                  background: "rgba(55,138,221,.13)",
+                  color: "#378ADD",
+                  border: "1px solid rgba(55,138,221,.3)",
                   letterSpacing: ".03em",
                 }}
               >
@@ -810,7 +811,8 @@ export default function ConteudoPage({
           {/* ── LEFT: Player / Tela de bloqueio + info da aula ──────────────── */}
           <div>
             {/* Player ou tela de bloqueio */}
-            {isPremiumLocked ? (
+            {/* Bloqueia se: (1) curso inteiro é premium-locked, OU (2) a aula selecionada está bloqueada individualmente */}
+            {isPremiumLocked || aulaAtiva?.bloqueada === true ? (
               <div style={{ marginBottom: "1.25rem" }}>
                 <PremiumLockScreen
                   conteudoNome={conteudoNome}
@@ -895,7 +897,9 @@ export default function ConteudoPage({
                     >
                       <span>⏱ {aulaAtiva.duracao}</span>
                       {isPremiumLocked ? (
-                        <span style={{ color: "#a78bfa" }}>⭐ Premium</span>
+                        <span style={{ color: "var(--accent)" }}>
+                          ⭐ Premium
+                        </span>
                       ) : (
                         <span>
                           {aulaAtiva.tipo === "free"
@@ -1005,11 +1009,11 @@ export default function ConteudoPage({
                   style={{
                     fontSize: ".68rem",
                     fontWeight: 600,
-                    color: "#a78bfa",
-                    background: "rgba(124,94,247,.12)",
+                    color: "#B5D4F4",
+                    background: "rgba(24,95,165,.15)",
                     padding: "2px 8px",
                     borderRadius: 20,
-                    border: "1px solid rgba(124,94,247,.25)",
+                    border: "1px solid rgba(55,138,221,.25)",
                     fontFamily: "inherit",
                   }}
                 >
@@ -1080,7 +1084,7 @@ export default function ConteudoPage({
                           aula.concluida && !isPremiumLocked
                             ? "rgba(63,207,142,.18)"
                             : isLocked
-                              ? "rgba(124,94,247,.12)"
+                              ? "rgba(24,95,165,.15)"
                               : isActive
                                 ? `${cor}22`
                                 : "var(--bg3)",
@@ -1088,7 +1092,7 @@ export default function ConteudoPage({
                           aula.concluida && !isPremiumLocked
                             ? "#3fcf8e"
                             : isLocked
-                              ? "#a78bfa"
+                              ? "#B5D4F4"
                               : isActive
                                 ? cor
                                 : "var(--text3)",
@@ -1096,14 +1100,14 @@ export default function ConteudoPage({
                           aula.concluida && !isPremiumLocked
                             ? "1px solid rgba(63,207,142,.3)"
                             : isLocked
-                              ? "1px solid rgba(124,94,247,.2)"
+                              ? "1px solid rgba(55,138,221,.25)"
                               : "none",
                       }}
                     >
                       {aula.concluida && !isPremiumLocked ? (
                         "✓"
                       ) : isLocked ? (
-                        <LockIcon size={13} color="#a78bfa" />
+                        <LockIcon size={13} color="#B5D4F4" />
                       ) : (
                         aula.ordem
                       )}
@@ -1138,8 +1142,8 @@ export default function ConteudoPage({
                         {isLocked ? (
                           <span
                             style={{
-                              color: "#a78bfa",
-                              background: "rgba(124,94,247,.1)",
+                              color: "#B5D4F4",
+                              background: "rgba(24,95,165,.12)",
                               padding: "1px 6px",
                               borderRadius: 4,
                               fontSize: ".65rem",
@@ -1153,11 +1157,11 @@ export default function ConteudoPage({
                           <span
                             style={{
                               color:
-                                aula.tipo === "free" ? "#3fcf8e" : "#4f8ef7",
+                                aula.tipo === "free" ? "#3fcf8e" : "#378ADD",
                               background:
                                 aula.tipo === "free"
                                   ? "rgba(63,207,142,.1)"
-                                  : "rgba(79,142,247,.1)",
+                                  : "rgba(55,138,221,.1)",
                               padding: "1px 6px",
                               borderRadius: 4,
                               fontSize: ".65rem",
@@ -1183,8 +1187,8 @@ export default function ConteudoPage({
                   padding: "1.25rem",
                   textAlign: "center",
                   background:
-                    "linear-gradient(135deg, rgba(79,142,247,.07), rgba(124,94,247,.1))",
-                  border: "1px solid rgba(124,94,247,.25)",
+                    "linear-gradient(135deg, rgba(24,95,165,.07), rgba(55,138,221,.08))",
+                  border: "1px solid rgba(55,138,221,.2)",
                   borderRadius: 14,
                 }}
               >
@@ -1269,8 +1273,8 @@ export default function ConteudoPage({
                     padding: "1.25rem",
                     textAlign: "center",
                     background:
-                      "linear-gradient(135deg, rgba(79,142,247,.08), rgba(124,94,247,.08))",
-                    border: "1px solid rgba(79,142,247,.25)",
+                      "linear-gradient(135deg, rgba(24,95,165,.07), rgba(55,138,221,.08))",
+                    border: "1px solid rgba(55,138,221,.2)",
                     borderRadius: 14,
                   }}
                 >

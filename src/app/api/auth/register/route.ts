@@ -11,6 +11,9 @@ export async function POST(req: NextRequest) {
     if (!nome || !email || !senha) {
       return NextResponse.json({ error: 'Preencha todos os campos.' }, { status: 400 });
     }
+    if (typeof nome !== 'string' || typeof email !== 'string' || typeof senha !== 'string') {
+      return NextResponse.json({ error: 'Formato de dados inválido.' }, { status: 400 });
+    }
     if (senha.length < 6) {
       return NextResponse.json({ error: 'Senha deve ter pelo menos 6 caracteres.' }, { status: 400 });
     }

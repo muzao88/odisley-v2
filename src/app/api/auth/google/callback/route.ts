@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
     }
     .spinner {
       width: 36px; height: 36px;
-      border: 3px solid rgba(79,142,247,.2);
-      border-top-color: #4f8ef7;
+      border: 3px solid rgba(55,138,221,.2);
+      border-top-color: #378ADD;
       border-radius: 50%;
       animation: spin .8s linear infinite;
     }

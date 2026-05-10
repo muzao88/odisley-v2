@@ -12,10 +12,12 @@ import ConteudoPage from "./pages/ConteudoPage";
 import PlansPage from "./pages/PlansPage";
 import AboutPage from "./pages/AboutPage";
 import DashboardPage from "./pages/DashboardPage";
+import WelcomePage from "./pages/WelcomePage";
 import type { Page, AuthTab, PlanType } from "@/types";
 
 function AppInner() {
   const [page, setPage] = useState<Page>("home");
+  const [hasEntered, setHasEntered] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<AuthTab>("login");
   const [payOpen, setPayOpen] = useState(false);
@@ -24,7 +26,7 @@ function AppInner() {
     id: string;
     nome: string;
   } | null>(null);
-  const { isLoggedIn, login } = useAuth();
+  const { isLoggedIn, login, isInitialized } = useAuth();
 
   const navigate = (p: Page) => {
     setPage(p);
@@ -80,12 +82,24 @@ function AppInner() {
     })
       .then((r) => r.json())
       .then((data) => {
-        if (data.token) login(data.user, data.token);
+        if (data.token) {
+           login(data.user, data.token);
+           if (data.isNewUser) {
+              // TODO: Abrir modal de atualização de nome
+              setAuthOpen(true);
+           }
+        }
       })
       .catch(() => {});
   }, []);
 
-  return (
+  if (!isInitialized) return null;
+
+  const content = (!isLoggedIn && !hasEntered) ? (
+    <WelcomePage 
+      onContinue={() => setHasEntered(true)} 
+    />
+  ) : (
     <>
       <Navbar currentPage={page} onNavigate={navigate} onOpenAuth={openAuth} />
 
@@ -152,6 +166,12 @@ function AppInner() {
       )}
 
       <Footer onNavigate={navigate} />
+    </>
+  );
+
+  return (
+    <>
+      {content}
 
       <AuthModal
         isOpen={authOpen}
