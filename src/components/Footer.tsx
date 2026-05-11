@@ -7,7 +7,18 @@ interface Props { onNavigate: (p: Page) => void; }
 export default function Footer({ onNavigate }: Props) {
   return (
     <footer>
-      <div className="footer-logo">Odisley</div>
+      <div className="footer-logo">
+        <img 
+          src="/logo.png" 
+          alt="Odisley" 
+          style={{ 
+            width: "180px", 
+            filter: "brightness(0) invert(1)",
+            cursor: "pointer"
+          }} 
+          onClick={() => onNavigate('home')}
+        />
+      </div>
       <div className="footer-tagline">Matemática do zero à aprovação.</div>
       <ul className="footer-links">
         <li><a onClick={() => onNavigate('home')}>Início</a></li>

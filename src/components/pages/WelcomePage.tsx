@@ -11,11 +11,10 @@ export default function WelcomePage({ onContinue }: Props) {
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   
   // UI states
   const [showPassword, setShowPassword] = useState(false);
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passFocused, setPassFocused] = useState(false);
   
   // Login states
   const [loginEmail, setLoginEmail] = useState("");
@@ -93,24 +92,7 @@ export default function WelcomePage({ onContinue }: Props) {
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   };
 
-  const oauthBtnStyle: React.CSSProperties = {
-    width: "100%",
-    padding: ".85rem 1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: ".75rem",
-    background: "#fff",
-    border: "1px solid #e0e0e0",
-    borderRadius: 12,
-    cursor: "pointer",
-    transition: "all .2s ease",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: ".95rem",
-    fontWeight: 600,
-    color: "#444",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.02)"
-  };
+  const mathSymbols = ["∑", "π", "∫", "x²", "√", "∞", "θ", "Δ", "≠"];
 
   const GoogleIcon = () => (
     <svg width="20" height="20" viewBox="0 0 48 48">
@@ -122,134 +104,191 @@ export default function WelcomePage({ onContinue }: Props) {
   );
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "row",
+      fontFamily: "sans-serif",
+      backgroundColor: "#fff"
+    }}>
+      {/* Lado Esquerdo - Azul Royal */}
+      <div style={{
+        flex: 1,
+        backgroundColor: "#1a4fd6",
+        color: "#fff",
         display: "flex",
-        flexWrap: "wrap",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px",
         position: "relative",
-        overflowX: "hidden",
-        overflowY: "auto",
-        background: "#F0F7FF",
-      }}
-    >
-      {/* Background elements omitted for brevity but they should be kept in real code */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.08, zIndex: 1 }}>
-         {/* Math symbols here */}
-      </div>
-
-      {/* Login Section */}
-      <div
-        style={{
-          flex: "1 1 500px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "4rem 2.5rem",
-          background: "white",
-          zIndex: 2,
-          position: "relative",
-          minHeight: "100vh"
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: "420px" }}>
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-            <div className="logo" style={{ fontSize: "3.2rem", color: "#378ADD", marginBottom: "0.2rem" }}>
-              Odisley
-            </div>
-            <div style={{ color: "#888", fontSize: "1.1rem", fontWeight: 500, letterSpacing: "0.5px" }}>
-              Bem-vindo
-            </div>
+        overflow: "hidden"
+      }}>
+        <div style={{ maxWidth: "400px", width: "100%", zIndex: 2 }}>
+          <img 
+            src="/logo.png" 
+            alt="Odisley" 
+            style={{ 
+              width: "260px", 
+              display: "block", 
+              margin: "0 auto 20px auto", 
+              filter: "brightness(0) invert(1)",
+              cursor: "pointer"
+            }} 
+            onClick={onContinue}
+          />
+          <p style={{ fontSize: "1.2rem", opacity: 0.9, marginBottom: "40px" }}>A plataforma definitiva para o seu aprendizado.</p>
+          
+          {/* Grid 3x3 de Símbolos Matemáticos */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "15px",
+            marginBottom: "40px"
+          }}>
+            {mathSymbols.map((sym, i) => (
+              <div key={i} style={{
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+                height: "80px",
+                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.5rem",
+                fontWeight: "bold"
+              }}>
+                {sym}
+              </div>
+            ))}
           </div>
 
-          <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.8rem", fontWeight: 800, marginBottom: "2rem", color: "#222" }}>
-            Entrar
+          {/* Card de Social Proof */}
+          <div style={{
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            padding: "20px",
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            gap: "15px"
+          }}>
+            <div style={{
+              width: "40px",
+              height: "40px",
+              backgroundColor: "#fff",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#1a4fd6",
+              fontSize: "1.2rem"
+            }}>
+              ✓
+            </div>
+            <div>
+              <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Mais de 10.000</div>
+              <div style={{ opacity: 0.8, fontSize: "0.9rem" }}>estudantes ativos na plataforma</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Elemento Decorativo de Fundo */}
+        <div style={{
+          position: "absolute",
+          top: "-10%",
+          right: "-10%",
+          width: "300px",
+          height: "300px",
+          backgroundColor: "rgba(255, 255, 255, 0.03)",
+          borderRadius: "50%",
+          zIndex: 1
+        }} />
+      </div>
+
+      {/* Lado Direito - Branco */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px",
+        backgroundColor: "#fff"
+      }}>
+        <div style={{ maxWidth: "400px", width: "100%" }}>
+          <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "30px", color: "#333" }}>
+            {isLogin ? "Entrar na conta" : "Criar sua conta"}
           </h2>
-          
-          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            {/* Campo E-mail */}
-            <div className="form-group">
-              <label className="form-label" style={{ color: "#444", fontWeight: 600, fontSize: "0.9rem", marginBottom: "0.6rem", display: "block" }}>
-                E-mail
-              </label>
-              <div style={{ 
-                position: "relative", 
-                display: "flex", 
-                alignItems: "center",
-                transition: "all 0.2s ease"
-              }}>
-                <span style={{ position: "absolute", left: "12px", color: emailFocused ? "#378ADD" : "#aaa" }}>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/>
-                  </svg>
-                </span>
+
+          <form onSubmit={isLogin ? handleLogin : handleRegister} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {!isLogin && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>Nome completo</label>
                 <input
-                  type="email"
-                  className="form-input"
-                  placeholder="seu@email.com"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  onFocus={() => setEmailFocused(true)}
-                  onBlur={() => setEmailFocused(false)}
-                  required
-                  style={{ 
-                    paddingLeft: "42px", 
-                    borderColor: emailFocused ? "#378ADD" : "#e2e8f0",
-                    boxShadow: emailFocused ? "0 0 0 3px rgba(55, 138, 221, 0.15)" : "none",
-                    borderRadius: "12px",
-                    height: "50px",
-                    fontSize: "1rem"
+                  type="text"
+                  placeholder="Seu nome"
+                  value={regNome}
+                  onChange={(e) => setRegNome(e.target.value)}
+                  required={!isLogin}
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "8px",
+                    border: "1px solid #ddd",
+                    fontSize: "1rem",
+                    outline: "none"
                   }}
                 />
               </div>
+            )}
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>E-mail</label>
+              <input
+                type="email"
+                placeholder="seu@email.com"
+                value={isLogin ? loginEmail : regEmail}
+                onChange={(e) => isLogin ? setLoginEmail(e.target.value) : setRegEmail(e.target.value)}
+                required
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  fontSize: "1rem",
+                  outline: "none"
+                }}
+              />
             </div>
 
-            {/* Campo Senha */}
-            <div className="form-group">
-              <label className="form-label" style={{ color: "#444", fontWeight: 600, fontSize: "0.9rem", marginBottom: "0.6rem", display: "block" }}>
-                Senha
-              </label>
-              <div style={{ 
-                position: "relative", 
-                display: "flex", 
-                alignItems: "center"
-              }}>
-                <span style={{ position: "absolute", left: "12px", color: passFocused ? "#378ADD" : "#aaa" }}>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>Senha</label>
+              <div style={{ position: "relative" }}>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="form-input"
                   placeholder="••••••••"
-                  value={loginSenha}
-                  onChange={(e) => setLoginSenha(e.target.value)}
-                  onFocus={() => setPassFocused(true)}
-                  onBlur={() => setPassFocused(false)}
+                  value={isLogin ? loginSenha : regSenha}
+                  onChange={(e) => isLogin ? setLoginSenha(e.target.value) : setRegSenha(e.target.value)}
                   required
-                  style={{ 
-                    paddingLeft: "42px", 
-                    paddingRight: "45px",
-                    borderColor: passFocused ? "#378ADD" : "#e2e8f0",
-                    boxShadow: passFocused ? "0 0 0 3px rgba(55, 138, 221, 0.15)" : "none",
-                    borderRadius: "12px",
-                    height: "50px",
-                    fontSize: "1rem"
+                  style={{
+                    padding: "12px 45px 12px 16px",
+                    borderRadius: "8px",
+                    border: "1px solid #ddd",
+                    fontSize: "1rem",
+                    outline: "none",
+                    width: "100%",
+                    boxSizing: "border-box"
                   }}
                 />
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: "absolute",
                     right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
                     background: "none",
                     border: "none",
-                    color: "#aaa",
                     cursor: "pointer",
-                    padding: "4px"
+                    color: "#888"
                   }}
                 >
                   {showPassword ? (
@@ -263,164 +302,133 @@ export default function WelcomePage({ onContinue }: Props) {
                   )}
                 </button>
               </div>
-              
-              <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <a 
-                  href="#" 
-                  style={{ color: "#378ADD", fontSize: "0.85rem", textDecoration: "none", fontWeight: 700 }}
+            </div>
+
+            {isLogin && (
+              <div style={{ textAlign: "left" }}>
+                <a
+                  href="#"
                   onClick={(e) => { e.preventDefault(); alert("Em breve: recuperação de senha."); }}
+                  style={{ color: "#1a4fd6", fontSize: "0.85rem", textDecoration: "none", fontWeight: "600" }}
                 >
                   Esqueci minha senha
                 </a>
-                <a 
-                  href="#" 
-                  style={{ color: "#888", fontSize: "0.85rem", textDecoration: "none", fontWeight: 500 }}
-                  onClick={(e) => { e.preventDefault(); onContinue(); }}
-                >
-                  Continuar sem login
-                </a>
               </div>
-            </div>
-            
-            {error && <div className="form-error" style={{ textAlign: "center", background: "#fee2e2", color: "#ef4444", padding: "0.75rem", borderRadius: "8px", fontSize: "0.9rem" }}>{error}</div>}
-            
+            )}
+
+            {error && (
+              <div style={{ backgroundColor: "#fee2e2", color: "#ef4444", padding: "10px", borderRadius: "8px", fontSize: "0.9rem", textAlign: "center" }}>
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="btn btn-primary"
-              style={{ 
-                width: "100%", 
-                height: "54px",
-                justifyContent: "center", 
-                marginTop: "0.5rem", 
-                background: "#378ADD", 
-                color: "white",
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                borderRadius: "14px",
-                boxShadow: "0 4px 12px rgba(55, 138, 221, 0.3)",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease"
-              }}
               disabled={loading}
-              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(55, 138, 221, 0.4)"; }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(55, 138, 221, 0.3)"; }}
+              style={{
+                backgroundColor: "#1a4fd6",
+                color: "#fff",
+                padding: "14px",
+                borderRadius: "8px",
+                border: "none",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginTop: "10px",
+                transition: "opacity 0.2s"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = "0.9"}
+              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
             >
-              {loading ? "Entrando..." : "Entrar na plataforma"}
+              {loading ? "Processando..." : isLogin ? "Entrar na plataforma" : "Criar minha conta"}
             </button>
           </form>
 
-          {/* Separador e Social */}
-          <div style={{ marginTop: "2.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-              <div style={{ flex: 1, height: "1px", background: "#f1f5f9" }} />
-              <span style={{ fontSize: "0.85rem", color: "#94a3b8", fontWeight: 500 }}>ou entrar com</span>
-              <div style={{ flex: 1, height: "1px", background: "#f1f5f9" }} />
-            </div>
-            
-            <button style={oauthBtnStyle} onClick={handleGoogleClick}>
-              <GoogleIcon />
-              Entrar com Google
-            </button>
+          {/* Divisor "ou" */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "25px 0" }}>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
+            <span style={{ fontSize: "0.8rem", color: "#999", fontWeight: "500" }}>ou</span>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
           </div>
-        </div>
-      </div>
 
-      {/* Register Section - Omitted/Kept as is but ensured it doesn't break */}
-      <div
-        style={{
-          flex: "1 1 500px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "4rem 2rem",
-          background: "#E6F1FB",
-          zIndex: 2,
-          position: "relative",
-          minHeight: "100vh",
-          borderLeft: "1px solid rgba(0,0,0,0.05)"
-        }}
-      >
-        {/* ... (Registration content remains similar to previous turn but consistent in text) */}
-        <div style={{ width: "100%", maxWidth: "400px" }}>
-          <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "2.2rem", fontWeight: 800, marginBottom: "1rem", textAlign: "center", color: "#378ADD" }}>
-            Criar Conta
-          </h2>
-          <p style={{ color: "#5a7fa0", textAlign: "center", marginBottom: "2.5rem", fontSize: "1rem", fontWeight: 500 }}>
-            Junte-se a milhares de estudantes e domine a matemática.
-          </p>
+          {/* Botão Google */}
+          <button
+            onClick={handleGoogleClick}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              backgroundColor: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+              cursor: "pointer",
+              fontSize: "0.95rem",
+              fontWeight: "600",
+              color: "#444"
+            }}
+          >
+            <GoogleIcon />
+            {isLogin ? "Entrar com Google" : "Cadastrar com Google"}
+          </button>
 
-          <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            <div className="form-group">
-              <label className="form-label" style={{ color: "#378ADD", fontWeight: 600 }}>Nome Completo</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Seu nome"
-                value={regNome}
-                onChange={(e) => setRegNome(e.target.value)}
-                required
-                style={{ background: "white", borderColor: "#cbd5e1", borderRadius: "12px", height: "50px" }}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label" style={{ color: "#378ADD", fontWeight: 600 }}>E-mail</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="seu@email.com"
-                value={regEmail}
-                onChange={(e) => setRegEmail(e.target.value)}
-                required
-                style={{ background: "white", borderColor: "#cbd5e1", borderRadius: "12px", height: "50px" }}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label" style={{ color: "#378ADD", fontWeight: 600 }}>Senha</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Mínimo 6 caracteres"
-                value={regSenha}
-                onChange={(e) => setRegSenha(e.target.value)}
-                required
-                minLength={6}
-                style={{ background: "white", borderColor: "#cbd5e1", borderRadius: "12px", height: "50px" }}
-              />
-            </div>
-            
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{ 
-                width: "100%", 
-                height: "54px",
-                justifyContent: "center", 
-                marginTop: "1rem",
-                background: "#378ADD",
-                color: "white",
-                fontWeight: 700,
-                borderRadius: "14px"
-              }}
-              disabled={loading}
+          {/* Link para alternar entre Login/Register */}
+          <div style={{ marginTop: "30px", textAlign: "center", fontSize: "0.9rem", color: "#666" }}>
+            {isLogin ? (
+              <>
+                Não tem uma conta?{" "}
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); setIsLogin(false); setError(""); }}
+                  style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}
+                >
+                  Criar conta
+                </a>
+              </>
+            ) : (
+              <>
+                Já tem uma conta?{" "}
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); setIsLogin(true); setError(""); }}
+                  style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}
+                >
+                  Fazer login
+                </a>
+              </>
+            )}
+          </div>
+          
+          {/* Link para continuar sem login (mantendo funcionalidade) */}
+          <div style={{ marginTop: "15px", textAlign: "center" }}>
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); onContinue(); }}
+              style={{ color: "#999", fontSize: "0.8rem", textDecoration: "none" }}
             >
-              {loading ? "Criando conta..." : "Começar Agora Grátis"}
-            </button>
-          </form>
-
-          <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-              <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.05)" }} />
-              <span style={{ fontSize: "0.8rem", color: "#5a7fa0" }}>ou cadastrar com</span>
-              <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.05)" }} />
-            </div>
-            
-            <button style={{ ...oauthBtnStyle, background: "rgba(255,255,255,0.7)" }} onClick={handleGoogleClick}>
-              <GoogleIcon />
-              Cadastrar com Google
-            </button>
+              Continuar sem login
+            </a>
           </div>
         </div>
       </div>
+      
+      <style jsx global>{`
+        body {
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+        }
+        @media (max-width: 768px) {
+          div[style*="flex-direction: row"] {
+            flex-direction: column !important;
+          }
+          div[style*="background-color: #1a4fd6"] {
+            padding: 60px 20px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

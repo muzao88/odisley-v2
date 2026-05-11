@@ -42,9 +42,17 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
       <div
         className="logo"
         onClick={() => onNavigate("home")}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
       >
-        Odisley
+        <img 
+          src="/logo.png" 
+          alt="Odisley" 
+          style={{ 
+            width: "240px", 
+            filter: isDark ? "brightness(0) invert(1)" : "none",
+            transition: "filter 0.3s ease"
+          }} 
+        />
       </div>
 
       <ul className="nav-links">

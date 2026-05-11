@@ -21,6 +21,12 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
   const [regEmail, setRegEmail] = useState("");
   const [regSenha, setRegSenha] = useState("");
   const [newName, setNewName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    setTab(initialTab);
+    setError("");
+  }, [initialTab, isOpen]);
 
   // Captura o token do Google quando volta do redirect
   useEffect(() => {
@@ -32,10 +38,8 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
     const id_token = params.get("id_token");
     if (!id_token) return;
 
-    // Limpa o hash da URL
     window.history.replaceState({}, "", window.location.pathname);
 
-    // Faz login com o token do Google
     fetch("/api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -58,11 +62,9 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
   const handleGoogleClick = () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId || clientId === "SEU_GOOGLE_CLIENT_ID") {
-      setError("Configure NEXT_PUBLIC_GOOGLE_CLIENT_ID no .env.local.");
+      setError("Configure NEXT_PUBLIC_GOOGLE_CLIENT_ID.");
       return;
     }
-
-    // Redireciona a página inteira — sem popup, sem bloqueio
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: `${window.location.origin}/api/auth/google/callback`,
@@ -71,11 +73,11 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
       nonce: Math.random().toString(36).slice(2),
       prompt: "select_account",
     });
-
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setError("");
     setLoading(true);
     try {
@@ -98,18 +100,15 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
     }
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: regNome,
-          email: regEmail,
-          senha: regSenha,
-        }),
+        body: JSON.stringify({ nome: regNome, email: regEmail, senha: regSenha }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -155,281 +154,262 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
 
   if (!isOpen) return null;
 
-  const oauthBtn: React.CSSProperties = {
-    width: "100%",
-    padding: ".75rem 1rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: ".75rem",
-    background: "var(--bg3)",
-    border: "1px solid var(--border2)",
-    borderRadius: 10,
-    cursor: "pointer",
-    transition: ".2s",
-    fontFamily: "'DM Sans', sans-serif",
-    fontSize: ".9rem",
-    fontWeight: 500,
-    color: "var(--text)",
-  };
+  const mathSymbols = ["∑", "π", "∫", "x²", "√", "∞", "θ", "Δ", "≠"];
+
+  const GoogleIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 48 48">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </svg>
+  );
 
   return (
     <div
-      className={`modal-overlay ${isOpen ? "active" : ""}`}
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        padding: "20px"
+      }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="modal">
-        <button className="modal-close" onClick={onClose}>
-          ✕
-        </button>
-        <div className="modal-logo">Odisley</div>
-
-        <div className="modal-tabs">
-          <button
-            className={`mtab ${tab === "login" ? "active" : ""}`}
-            onClick={() => {
-              setTab("login");
-              setError("");
-            }}
-          >
-            Entrar
-          </button>
-          <button
-            className={`mtab ${tab === "register" ? "active" : ""}`}
-            onClick={() => {
-              setTab("register");
-              setError("");
-            }}
-          >
-            Criar conta
-          </button>
-          {tab === "update_name" && (
-            <button className="mtab active">
-              Escolher Username
-            </button>
-          )}
-        </div>
-
-        {/* OAuth e Divider só aparecem se não estiver na aba de update_name */}
-        {tab !== "update_name" && (
-          <>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: ".6rem",
-                marginBottom: "1.25rem",
-              }}
-            >
-              {/* Google — redireciona a página, sem popup */}
-              <button
-                style={oauthBtn}
-                onClick={handleGoogleClick}
-                onMouseOver={(e) => (e.currentTarget.style.borderColor = "#378ADD")}
-                onMouseOut={(e) =>
-                  (e.currentTarget.style.borderColor = "var(--border2)")
-                }
-              >
-                <svg width="18" height="18" viewBox="0 0 48 48">
-                  <path
-                    fill="#EA4335"
-                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                  />
-                  <path
-                    fill="#4285F4"
-                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                  />
-                </svg>
-                {`${tab === "login" ? "Entrar" : "Cadastrar"} com Google`}
-              </button>
-
-              {/* Apple */}
-              <button
-                style={{ ...oauthBtn, opacity: 0.4, cursor: "not-allowed" }}
-                disabled
-              >
-                <svg
-                  width="15"
-                  height="17"
-                  viewBox="0 0 814 1000"
-                  fill="currentColor"
-                >
-                  <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-107.9C58.3 645.1 36 506.7 36 372.8c0-194.3 126.4-297.5 250.8-297.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z" />
-                </svg>
-                {tab === "login" ? "Entrar" : "Cadastrar"} com Apple
-                <span style={{ fontSize: ".68rem", color: "var(--text3)" }}>
-                  (em breve)
-                </span>
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: ".75rem",
-                marginBottom: "1.1rem",
-              }}
-            >
-              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-              <span style={{ fontSize: ".72rem", color: "var(--text3)" }}>
-                ou com e-mail
-              </span>
-              <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-            </div>
-          </>
-        )}
-
-        {/* Formulário */}
-        {tab === "update_name" ? (
-          <>
-            <div className="form-group" style={{ marginTop: "1rem" }}>
-              <label className="form-label">Como quer ser chamado?</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Seu nome ou apelido"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleUpdateName()}
-              />
-            </div>
-            {error && <div className="form-error">{error}</div>}
-            <button
-              className="form-submit"
-              onClick={handleUpdateName}
-              disabled={loading || !newName.trim()}
-            >
-              {loading ? "Salvando..." : "Confirmar e Entrar"}
-            </button>
-          </>
-        ) : tab === "login" ? (
-          <>
-            <div className="form-group">
-              <label className="form-label">E-mail</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="seu@email.com"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Senha</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="••••••••"
-                value={loginSenha}
-                onChange={(e) => setLoginSenha(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              />
-            </div>
-            {error && <div className="form-error">{error}</div>}
-            <button
-              className="form-submit"
-              onClick={handleLogin}
-              disabled={loading}
-            >
-              {loading ? "Entrando..." : "Entrar na plataforma"}
-            </button>
-            <div className="modal-switch">
-              Não tem conta?{" "}
-              <a
-                onClick={() => {
-                  setTab("register");
-                  setError("");
-                }}
-              >
-                Criar gratuitamente
-              </a>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="form-group">
-              <label className="form-label">Nome completo</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Seu nome"
-                value={regNome}
-                onChange={(e) => setRegNome(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">E-mail</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="seu@email.com"
-                value={regEmail}
-                onChange={(e) => setRegEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Senha</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Mínimo 6 caracteres"
-                value={regSenha}
-                onChange={(e) => setRegSenha(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleRegister()}
-              />
-            </div>
-            {error && <div className="form-error">{error}</div>}
-            <button
-              className="form-submit"
-              onClick={handleRegister}
-              disabled={loading}
-            >
-              {loading ? "Criando conta..." : "Criar conta grátis"}
-            </button>
-            <div className="modal-switch">
-              Já tem conta?{" "}
-              <a
-                onClick={() => {
-                  setTab("login");
-                  setError("");
-                }}
-              >
-                Entrar
-              </a>
-            </div>
-          </>
-        )}
-
-        <div
+      <div style={{
+        maxWidth: "900px",
+        width: "100%",
+        height: "600px",
+        backgroundColor: "#fff",
+        borderRadius: "16px",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "row",
+        position: "relative",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
+      }}>
+        <button
+          onClick={onClose}
           style={{
-            fontSize: ".67rem",
-            color: "var(--text3)",
-            textAlign: "center",
-            marginTop: ".85rem",
-            lineHeight: 1.5,
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "none",
+            border: "none",
+            fontSize: "1.5rem",
+            cursor: "pointer",
+            color: "#888",
+            zIndex: 10
           }}
         >
-          Ao continuar, você concorda com os{" "}
-          <span style={{ color: "var(--accent)", cursor: "pointer" }}>
-            Termos de uso
-          </span>{" "}
-          e{" "}
-          <span style={{ color: "var(--accent)", cursor: "pointer" }}>
-            Política de privacidade
-          </span>
-          .
+          ✕
+        </button>
+
+        {/* Lado Esquerdo - Azul */}
+        <div style={{
+          flex: 1,
+          backgroundColor: "#1a4fd6",
+          color: "#fff",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "40px",
+          position: "relative"
+        }}>
+          <img 
+            src="/logo.png" 
+            alt="Odisley" 
+            style={{ 
+              width: "260px", 
+              display: "block", 
+              margin: "0 auto 20px auto", 
+              filter: "brightness(0) invert(1)",
+              cursor: "pointer"
+            }} 
+            onClick={onClose}
+          />
+          <p style={{ opacity: 0.9, marginBottom: "30px" }}>Acesse sua plataforma de estudos.</p>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "10px",
+            marginBottom: "30px"
+          }}>
+            {mathSymbols.map((sym, i) => (
+              <div key={i} style={{
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+                height: "60px",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.2rem",
+                fontWeight: "bold"
+              }}>
+                {sym}
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            padding: "15px",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+          }}>
+            <div style={{ width: "30px", height: "30px", backgroundColor: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#1a4fd6", fontWeight: "bold" }}>✓</div>
+            <div>
+              <div style={{ fontWeight: "bold" }}>10.000+ estudantes</div>
+              <div style={{ fontSize: "0.8rem", opacity: 0.8 }}>já fazem parte da Odisley</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Lado Direito - Branco */}
+        <div style={{
+          flex: 1,
+          padding: "40px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          backgroundColor: "#fff"
+        }}>
+          <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", marginBottom: "25px" }}>
+            {tab === "login" ? "Entrar" : tab === "register" ? "Criar conta" : "Escolher Nome"}
+          </h2>
+
+          {tab === "update_name" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "#555" }}>Como quer ser chamado?</label>
+                <input
+                  type="text"
+                  placeholder="Seu nome"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  style={{ padding: "12px", borderRadius: "8px", border: "1px solid #ddd", outline: "none" }}
+                />
+              </div>
+              {error && <div style={{ color: "#ef4444", fontSize: "0.85rem" }}>{error}</div>}
+              <button
+                onClick={handleUpdateName}
+                disabled={loading || !newName.trim()}
+                style={{ backgroundColor: "#1a4fd6", color: "#fff", padding: "12px", borderRadius: "8px", border: "none", fontWeight: "bold", cursor: "pointer" }}
+              >
+                {loading ? "Salvando..." : "Confirmar e Entrar"}
+              </button>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={tab === "login" ? handleLogin : handleRegister} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                {tab === "register" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "#555" }}>Nome completo</label>
+                    <input
+                      type="text"
+                      placeholder="Seu nome"
+                      value={regNome}
+                      onChange={(e) => setRegNome(e.target.value)}
+                      required
+                      style={{ padding: "12px", borderRadius: "8px", border: "1px solid #ddd", outline: "none" }}
+                    />
+                  </div>
+                )}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "#555" }}>E-mail</label>
+                  <input
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={tab === "login" ? loginEmail : regEmail}
+                    onChange={(e) => tab === "login" ? setLoginEmail(e.target.value) : setRegEmail(e.target.value)}
+                    required
+                    style={{ padding: "12px", borderRadius: "8px", border: "1px solid #ddd", outline: "none" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "#555" }}>Senha</label>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={tab === "login" ? loginSenha : regSenha}
+                      onChange={(e) => tab === "login" ? setLoginSenha(e.target.value) : setRegSenha(e.target.value)}
+                      required
+                      style={{ padding: "12px", borderRadius: "8px", border: "1px solid #ddd", outline: "none", width: "100%", boxSizing: "border-box" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#888", cursor: "pointer" }}
+                    >
+                      {showPassword ? "👁️" : "👁️‍🗨️"}
+                    </button>
+                  </div>
+                </div>
+
+                {tab === "login" && (
+                  <a href="#" onClick={(e) => { e.preventDefault(); alert("Em breve."); }} style={{ color: "#1a4fd6", fontSize: "0.8rem", fontWeight: "bold", textDecoration: "none" }}>
+                    Esqueci minha senha
+                  </a>
+                )}
+
+                {error && <div style={{ color: "#ef4444", fontSize: "0.85rem", textAlign: "center" }}>{error}</div>}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{ backgroundColor: "#1a4fd6", color: "#fff", padding: "12px", borderRadius: "8px", border: "none", fontWeight: "bold", cursor: "pointer", marginTop: "10px" }}
+                >
+                  {loading ? "Processando..." : tab === "login" ? "Entrar na plataforma" : "Criar conta grátis"}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "20px 0" }}>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
+                <span style={{ fontSize: "0.8rem", color: "#999" }}>ou</span>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
+              </div>
+
+              <button
+                onClick={handleGoogleClick}
+                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ddd", backgroundColor: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", cursor: "pointer", fontWeight: "600", color: "#444" }}
+              >
+                <GoogleIcon />
+                {tab === "login" ? "Entrar com Google" : "Cadastrar com Google"}
+              </button>
+
+              <div style={{ marginTop: "20px", textAlign: "center", fontSize: "0.85rem" }}>
+                {tab === "login" ? (
+                  <>Não tem conta? <a href="#" onClick={(e) => { e.preventDefault(); setTab("register"); }} style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}>Criar gratuitamente</a></>
+                ) : (
+                  <>Já tem conta? <a href="#" onClick={(e) => { e.preventDefault(); setTab("login"); }} style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}>Fazer login</a></>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          div[style*="flex-direction: row"] {
+            flex-direction: column !important;
+            height: auto !important;
+            max-height: 90vh;
+            overflow-y: auto !important;
+          }
+          div[style*="background-color: #1a4fd6"] {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
