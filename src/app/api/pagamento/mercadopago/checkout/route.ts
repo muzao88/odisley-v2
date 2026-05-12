@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
           failure: `${process.env.NEXT_PUBLIC_URL}/planos?status=failure`,
           pending: `${process.env.NEXT_PUBLIC_URL}/planos?status=pending`,
         },
-        auto_approve: true,
+        auto_return: 'approved',
         metadata: { userId, plano },
         notification_url: `${process.env.NEXT_PUBLIC_URL}/api/pagamento/mercadopago/webhook`,
       },
