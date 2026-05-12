@@ -28,41 +28,100 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const { userId, plano } = session.metadata as any;
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const { userId, plano } = session.metadata as any;
 
-      const expira = plano === 'anual'
-        ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        if (!userId) break;
 
-      await UserModel.findByIdAndUpdate(userId, {
-        plano: 'premium',
-        stripeCustomerId: session.customer as string,
-        assinaturaStatus: 'ativa',
-        assinaturaExpira: expira,
-      });
+        const expira = plano === 'anual'
+          ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-      await AssinaturaModel.create({
-        user_id: userId,
-        plano,
-        status: 'ativa',
-        gateway: 'stripe',
-        gatewaySubscriptionId: session.subscription as string,
-        valor: plano === 'anual' ? 348 : 39,
-        expira,
-      });
+        // Atualiza usuário
+        await UserModel.findByIdAndUpdate(userId, {
+          plano: 'premium',
+          stripeCustomerId: session.customer as string,
+          assinaturaStatus: 'ativa',
+          assinaturaExpira: expira,
+          dataCompra: new Date(),
+        });
 
-      console.log(`[stripe/webhook] Pagamento confirmado para o usuário ${userId}`);
-    }
+        // Registra assinatura
+        await AssinaturaModel.findOneAndUpdate(
+          { user_id: userId, gateway: 'stripe' },
+          {
+            plano,
+            status: 'ativa',
+            gatewaySubscriptionId: session.subscription as string,
+            valor: plano === 'anual' ? 348 : 39,
+            expira,
+          },
+          { upsert: true, new: true }
+        );
 
-    if (event.type === 'customer.subscription.deleted') {
-      const subscription = event.data.object as Stripe.Subscription;
-      await UserModel.findOneAndUpdate(
-        { stripeCustomerId: subscription.customer as string },
-        { plano: 'free', assinaturaStatus: 'cancelada' }
-      );
-      console.log(`[stripe/webhook] Assinatura cancelada para o cliente ${subscription.customer}`);
+        console.log(`[stripe/webhook] Checkout finalizado. Plano liberado para: ${userId}`);
+        break;
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        if (invoice.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const userId = subscription.metadata.userId;
+
+          if (userId) {
+            const expira = new Date(subscription.current_period_end * 1000);
+            
+            await UserModel.findByIdAndUpdate(userId, {
+              plano: 'premium',
+              assinaturaStatus: 'ativa',
+              assinaturaExpira: expira,
+            });
+
+            await AssinaturaModel.findOneAndUpdate(
+              { user_id: userId, gateway: 'stripe' },
+              { status: 'ativa', expira },
+              { upsert: true }
+            );
+            
+            console.log(`[stripe/webhook] Renovação confirmada para o usuário ${userId}`);
+          }
+        }
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+        
+        await UserModel.findOneAndUpdate(
+          { stripeCustomerId: customerId },
+          { assinaturaStatus: 'cancelada' } // Poderia ser 'atrasada' se preferir
+        );
+        console.log(`[stripe/webhook] Falha no pagamento da fatura para o cliente ${customerId}`);
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        await UserModel.findOneAndUpdate(
+          { stripeCustomerId: subscription.customer as string },
+          { plano: 'free', assinaturaStatus: 'cancelada' }
+        );
+        
+        await AssinaturaModel.findOneAndUpdate(
+          { gatewaySubscriptionId: subscription.id },
+          { status: 'expirada' }
+        );
+
+        console.log(`[stripe/webhook] Assinatura cancelada para o cliente ${subscription.customer}`);
+        break;
+      }
+
+      default:
+        console.log(`[stripe/webhook] Evento não tratado: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });

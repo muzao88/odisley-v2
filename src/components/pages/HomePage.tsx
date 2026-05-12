@@ -155,7 +155,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
               <span className="dc-badge">Em andamento</span>
             </div>
             {displayProgress.map((p) => {
-              const cor = CATEGORIA_CORES[p.categoria as any] || "var(--accent)";
+              const cor = CATEGORIA_CORES[p.categoria as import('@/types').Categoria] || "var(--accent)";
               return (
                 <div className="dc-pi" key={p.nome}>
                   <div className="dc-pi-header">

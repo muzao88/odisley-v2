@@ -6,6 +6,12 @@ export interface User {
   plano: 'free' | 'premium';
   progresso_total: number;
   createdAt: string;
+  // Pagamento
+  assinaturaStatus?: 'ativa' | 'cancelada' | 'expirada' | null;
+  assinaturaExpira?: string | null;
+  dataCompra?: string | null;
+  stripeCustomerId?: string | null;
+  mercadopagoId?: string | null;
 }
 
 export interface AuthState {

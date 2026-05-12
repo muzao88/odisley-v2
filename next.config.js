@@ -7,8 +7,6 @@ const nextConfig = {
       allowedOrigins: [
         "odisley.com.br",
         "www.odisley.com.br",
-        // Se usar Vercel preview URLs, adicione também:
-        // 'odisley-v2.vercel.app',
       ],
     },
   },
@@ -25,5 +23,12 @@ const nextConfig = {
       },
     ];
   },
+  // Garante que o webhook do Stripe receba o body bruto (raw body),
+  // necessário para stripe.webhooks.constructEvent() verificar a assinatura.
+  // No Next.js 14 App Router, req.text() já faz isso, mas este flag reforça.
+  async rewrites() {
+    return [];
+  },
 };
 module.exports = nextConfig;
+

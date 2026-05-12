@@ -26,7 +26,8 @@ function AppInner() {
     id: string;
     nome: string;
   } | null>(null);
-  const { isLoggedIn, login, isInitialized } = useAuth();
+  const { isLoggedIn, login, refreshUser, isInitialized } = useAuth();
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const navigate = (p: Page) => {
     setPage(p);
@@ -64,10 +65,14 @@ function AppInner() {
     const status = params.get("status");
     const sessionId = params.get("session_id");
 
-    // Lógica para Pagamento
+    // Lógica para Pagamento — atualiza plano do usuário via banco de dados
     if (status === "success" || sessionId) {
       setPage("dashboard");
-      // Você pode adicionar um toast de sucesso aqui futuramente
+      setPaymentSuccess(true);
+      // Aguarda o webhook processar (~3s) antes de buscar dados atualizados
+      setTimeout(() => {
+        refreshUser().finally(() => setPaymentSuccess(false));
+      }, 3000);
     }
 
     // Limpa a URL em qualquer caso de retorno
@@ -184,6 +189,31 @@ function AppInner() {
   return (
     <>
       {content}
+
+      {/* Banner de confirmação de pagamento */}
+      {paymentSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: '1.2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 9999,
+          background: 'linear-gradient(135deg, #1db954, #17a045)',
+          color: '#fff',
+          padding: '0.85rem 1.8rem',
+          borderRadius: '12px',
+          fontFamily: "'Syne', sans-serif",
+          fontWeight: 700,
+          fontSize: '1rem',
+          boxShadow: '0 8px 30px rgba(29,185,84,0.35)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.6rem',
+          animation: 'slideDown 0.4s ease',
+        }}>
+          ⭐ Pagamento confirmado! Liberando seu acesso Premium…
+        </div>
+      )}
 
       <AuthModal
         isOpen={authOpen}

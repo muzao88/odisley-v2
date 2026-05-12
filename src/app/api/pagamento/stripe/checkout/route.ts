@@ -27,7 +27,12 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}/?status=cancelled`,
+      // Metadados na sessão (para checkout.session.completed)
       metadata: { userId, plano },
+      // Metadados na subscription (para invoice.paid em renovações)
+      subscription_data: {
+        metadata: { userId, plano },
+      },
       locale: 'pt-BR',
     });
 

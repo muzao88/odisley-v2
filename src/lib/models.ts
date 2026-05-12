@@ -18,6 +18,7 @@ const UserSchema = new Schema(
     mercadopagoId: { type: String, default: null },
     assinaturaStatus: { type: String, enum: ['ativa', 'cancelada', 'expirada', null], default: null },
     assinaturaExpira: { type: Date, default: null },
+    dataCompra: { type: Date, default: null },
   },
   { timestamps: true }
 );
