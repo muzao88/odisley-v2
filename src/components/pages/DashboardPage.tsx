@@ -13,6 +13,12 @@ interface ProgressoItem {
   total: number;
   concluidas: number;
   percentual: number;
+  proximaAula?: {
+    id: string;
+    titulo: string;
+    duracao: string;
+    ordem: number;
+  } | null;
 }
 
 interface Props {
@@ -27,7 +33,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
 
   useEffect(() => {
     if (!isLoggedIn || !token || !user) {
-      // Fallback: show empty state
       setProgresso(
         CONTEUDOS_SEED.map((c) => ({
           conteudo_id: c.nome,
@@ -60,34 +65,59 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
   const totalConcluidas = progresso.reduce((s, p) => s + p.concluidas, 0);
   const totalPct =
     totalAulas > 0 ? Math.round((totalConcluidas / totalAulas) * 100) : 0;
+  
   const emAndamento = progresso.filter(
     (p) => p.concluidas > 0 && p.percentual < 100,
   );
+  
+  // Encontra a aula mais prioritária para continuar (primeira de um curso em andamento)
+  const sugestao = emAndamento.find(p => p.proximaAula) || progresso.find(p => p.proximaAula);
+
   const concluidos = progresso.filter((p) => p.percentual === 100);
 
   return (
     <div className="page">
       <section>
-        <div style={{ marginBottom: "2.5rem" }}>
-          <div className="section-tag">Área do aluno</div>
-          <h2 className="section-title">
-            Olá, {user?.nome?.split(" ")[0] ?? "Aluno"}! 👋
-          </h2>
-          <p style={{ color: "var(--text2)", fontSize: ".95rem" }}>
-            Plano {user?.plano === "premium" ? "⭐ Premium" : "Gratuito"} ·{" "}
-            {user?.plano === "free" && (
-              <span
-                style={{
-                  color: "var(--accent)",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-                onClick={() => onNavigate("planos")}
-              >
-                Fazer upgrade →
-              </span>
-            )}
-          </p>
+        <div style={{ marginBottom: "2.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1.5rem" }}>
+          <div>
+            <div className="section-tag">Área do aluno</div>
+            <h2 className="section-title">
+              Olá, {user?.nome?.split(" ")[0] ?? "Aluno"}! 👋
+            </h2>
+            <p style={{ color: "var(--text2)", fontSize: ".95rem" }}>
+              Plano {user?.plano === "premium" ? "⭐ Premium" : "Gratuito"} ·{" "}
+              {user?.plano === "free" && (
+                <span
+                  style={{
+                    color: "var(--accent)",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                  onClick={() => onNavigate("planos")}
+                >
+                  Fazer upgrade →
+                </span>
+              )}
+            </p>
+          </div>
+
+          {/* Card Próxima Aula */}
+          {sugestao?.proximaAula && (
+             <div className="dashboard-card" style={{ maxWidth: 380, margin: 0, padding: '1rem', flex: '1 1 300px' }}>
+                <div className="dc-header" style={{ marginBottom: '0.75rem' }}>
+                   <span className="dc-title" style={{ fontSize: '0.85rem' }}>Próxima aula</span>
+                   <span className="dc-badge">Continuar</span>
+                </div>
+                <div className="dc-lesson" onClick={() => onSelectConteudo(sugestao.conteudo_id, sugestao.nome)} style={{ cursor: 'pointer' }}>
+                   <div className="dc-lesson-icon">{sugestao.icone}</div>
+                   <div className="dc-lesson-info">
+                      <div className="dc-lesson-title">{sugestao.proximaAula.titulo}</div>
+                      <div className="dc-lesson-sub">{sugestao.nome} · {sugestao.proximaAula.duracao}</div>
+                   </div>
+                   <div className="dc-lesson-play" />
+                </div>
+             </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -109,6 +139,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             <div className="dash-stat-label">Conteúdos finalizados</div>
           </div>
         </div>
+
 
         {/* Em andamento */}
         {emAndamento.length > 0 && (

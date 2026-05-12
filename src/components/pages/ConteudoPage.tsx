@@ -620,7 +620,31 @@ export default function ConteudoPage({
     setAulaAtiva(aula);
   };
 
+  // ── Integração simplificada para conclusão automática ──────────────────────
+  useEffect(() => {
+    const handleYoutubeMessage = (event: MessageEvent) => {
+      // Verifica se a mensagem vem do YouTube
+      if (!event.origin.includes("youtube.com")) return;
+
+      try {
+        const data = JSON.parse(event.data);
+        // O evento "onStateChange" com data 0 significa que o vídeo acabou
+        if (data.event === "infoDelivery" && data.info && data.info.playerState === 0) {
+          console.log("YouTube: Vídeo finalizado!");
+          marcarConcluida();
+        }
+      } catch (e) {
+        // Ignora mensagens que não sejam JSON (comum em extensões do browser)
+      }
+    };
+
+    window.addEventListener("message", handleYoutubeMessage);
+    return () => window.removeEventListener("message", handleYoutubeMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aulaAtiva]);
+
   // ── Loading ─────────────────────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div
@@ -640,6 +664,7 @@ export default function ConteudoPage({
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className="page">
       <section>
@@ -827,7 +852,8 @@ export default function ConteudoPage({
               <div className="video-wrap" style={{ marginBottom: "1.25rem" }}>
                 {aulaAtiva?.video_url && getYouTubeId(aulaAtiva.video_url) ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${getYouTubeId(aulaAtiva.video_url)}`}
+                    id={`yt-player-${aulaAtiva._id}`}
+                    src={`https://www.youtube.com/embed/${getYouTubeId(aulaAtiva.video_url)}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
                     allowFullScreen
                     title={aulaAtiva.titulo}
                   />
@@ -849,6 +875,7 @@ export default function ConteudoPage({
                 )}
               </div>
             )}
+
 
             {/* Info da aula ativa — exibe sempre (mesmo bloqueada, mostra título) */}
             {aulaAtiva && (

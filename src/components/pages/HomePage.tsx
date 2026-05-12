@@ -1,5 +1,5 @@
-"use client";
-
+import { useState, useEffect } from "react";
+import { useAuth } from "../AuthContext";
 import type { Page } from "@/types";
 import {
   CONTEUDOS_SEED,
@@ -10,6 +10,7 @@ import {
 interface Props {
   onNavigate: (p: Page) => void;
   onOpenAuth: (tab: "login" | "register") => void;
+  onSelectConteudo: (id: string, nome: string) => void;
 }
 
 const DEPOIMENTOS = [
@@ -36,8 +37,60 @@ const DEPOIMENTOS = [
   },
 ];
 
-export default function HomePage({ onNavigate, onOpenAuth }: Props) {
+export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: Props) {
+  const { user, isLoggedIn, token } = useAuth();
+  const [stats, setStats] = useState({
+    totalUsers: 1200,
+    totalConteudos: 24,
+    totalAulas: 200,
+  });
+  const [userProgress, setUserProgress] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Busca estatísticas gerais
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.totalUsers) setStats(data);
+      })
+      .catch(console.error);
+
+    // Se logado, busca progresso real para o card do Hero
+    if (isLoggedIn && user && token) {
+      fetch(`/api/progresso/${user._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            // Ordena por percentual (maior primeiro) e pega os top 4
+            const sorted = [...data]
+              .sort((a, b) => b.percentual - a.percentual)
+              .slice(0, 4);
+            setUserProgress(sorted);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [isLoggedIn, user, token]);
+
   const preview = CONTEUDOS_SEED.slice(0, 6);
+
+  // Dados padrão APENAS para visitantes deslogados
+  const defaultHeroProgress = [
+    { nome: "Função Quadrática", percentual: 78, categoria: "Álgebra", icone: "📐" },
+    { nome: "Potenciação", percentual: 100, categoria: "Fundamentos", icone: "🔢" },
+    { nome: "Razão e Proporção", percentual: 55, categoria: "Fundamentos", icone: "⚖️" },
+    { nome: "Geometria Plana", percentual: 30, categoria: "Geometria", icone: "📏" },
+  ];
+
+  const isUsingRealData = isLoggedIn && userProgress.length > 0;
+  const displayProgress = isUsingRealData ? userProgress : defaultHeroProgress;
+
 
   return (
     <>
@@ -66,9 +119,9 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
           <div className="hero-btns">
             <button
               className="btn btn-primary btn-lg"
-              onClick={() => onOpenAuth("register")}
+              onClick={() => isLoggedIn ? onNavigate("cursos") : onOpenAuth("register")}
             >
-              Começar grátis agora
+              {isLoggedIn ? "Continuar estudando" : "Começar grátis agora"}
             </button>
             <button
               className="btn btn-ghost btn-lg"
@@ -79,15 +132,15 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
           </div>
           <div className="hero-stats">
             <div className="stat">
-              <div className="stat-num">+1.200</div>
+              <div className="stat-num">+{stats.totalUsers.toLocaleString('pt-BR')}</div>
               <div className="stat-label">Alunos ativos</div>
             </div>
             <div className="stat">
-              <div className="stat-num">24</div>
+              <div className="stat-num">{stats.totalConteudos}</div>
               <div className="stat-label">Conteúdos</div>
             </div>
             <div className="stat">
-              <div className="stat-num">200+</div>
+              <div className="stat-num">{stats.totalAulas}+</div>
               <div className="stat-label">Videoaulas</div>
             </div>
           </div>
@@ -96,41 +149,63 @@ export default function HomePage({ onNavigate, onOpenAuth }: Props) {
         <div className="hero-visual">
           <div className="dashboard-card">
             <div className="dc-header">
-              <span className="dc-title">Meu progresso</span>
+              <span className="dc-title">
+                {isLoggedIn ? "Seu progresso real" : "Meu progresso"}
+              </span>
               <span className="dc-badge">Em andamento</span>
             </div>
-            {[
-              { label: "📐 Função Quadrática", pct: 78, bar: "pf-blue" },
-              { label: "🔢 Potenciação", pct: 100, bar: "pf-green" },
-              { label: "⚖️ Razão e Proporção", pct: 55, bar: "pf-orange" },
-              { label: "📏 Geometria Plana", pct: 30, bar: "pf-purple" },
-            ].map(({ label, pct, bar }) => (
-              <div className="dc-pi" key={label}>
-                <div className="dc-pi-header">
-                  <span className="dc-pi-label">{label}</span>
-                  <span className="dc-pi-pct">{pct}%</span>
+            {displayProgress.map((p) => {
+              const cor = CATEGORIA_CORES[p.categoria as any] || "var(--accent)";
+              return (
+                <div className="dc-pi" key={p.nome}>
+                  <div className="dc-pi-header">
+                    <span className="dc-pi-label">{p.icone} {p.nome}</span>
+                    <span className="dc-pi-pct">{p.percentual}%</span>
+                  </div>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ 
+                        width: `${p.percentual}%`,
+                        background: cor
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="progress-bar">
-                  <div
-                    className={`progress-fill ${bar}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
             <div className="dc-divider" />
             <div className="dc-next">Próxima aula</div>
-            <div className="dc-lesson">
-              <div className="dc-lesson-icon">📐</div>
-              <div className="dc-lesson-info">
-                <div className="dc-lesson-title">Vértice da parábola</div>
-                <div className="dc-lesson-sub">Função Quadrática · 14 min</div>
+            {isLoggedIn && userProgress.length > 0 ? (
+              // Pega o primeiro curso que tem uma próxima aula
+              (() => {
+                const p = userProgress.find(item => item.proximaAula) || userProgress[0];
+                return (
+                  <div className="dc-lesson" onClick={() => onSelectConteudo(p.conteudo_id, p.nome)} style={{ cursor: 'pointer' }}>
+                    <div className="dc-lesson-icon">{p.icone}</div>
+                    <div className="dc-lesson-info">
+                      <div className="dc-lesson-title">{p.proximaAula?.titulo || "Continuar curso"}</div>
+                      <div className="dc-lesson-sub">{p.nome} {p.proximaAula?.duracao ? `· ${p.proximaAula.duracao}` : ""}</div>
+                    </div>
+                    <div className="dc-lesson-play" />
+                  </div>
+                );
+              })()
+            ) : (
+              <div className="dc-lesson">
+                <div className="dc-lesson-icon">📐</div>
+                <div className="dc-lesson-info">
+                  <div className="dc-lesson-title">Vértice da parábola</div>
+                  <div className="dc-lesson-sub">Função Quadrática · 14 min</div>
+                </div>
+                <div className="dc-lesson-play" />
               </div>
-              <div className="dc-lesson-play" />
-            </div>
+            )}
           </div>
         </div>
       </section>
+
+
 
       {/* PREVIEW DE CONTEÚDOS */}
       <section style={{ background: "var(--bg2)" }}>

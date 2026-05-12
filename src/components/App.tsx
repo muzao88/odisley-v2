@@ -56,14 +56,22 @@ function AppInner() {
     };
   }, [authOpen, payOpen]);
 
-  // Captura o token do Google após o redirect de volta ao site
+  // Captura o token do Google e o retorno do pagamento após o redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const google_token = params.get("google_token");
     const google_error = params.get("google_error");
+    const status = params.get("status");
+    const sessionId = params.get("session_id");
 
-    // Limpa a URL em qualquer caso
-    if (google_token || google_error) {
+    // Lógica para Pagamento
+    if (status === "success" || sessionId) {
+      setPage("dashboard");
+      // Você pode adicionar um toast de sucesso aqui futuramente
+    }
+
+    // Limpa a URL em qualquer caso de retorno
+    if (google_token || google_error || status || sessionId) {
       window.history.replaceState({}, "", "/");
     }
 
@@ -85,13 +93,13 @@ function AppInner() {
         if (data.token) {
            login(data.user, data.token);
            if (data.isNewUser) {
-              // TODO: Abrir modal de atualização de nome
               setAuthOpen(true);
            }
         }
       })
       .catch(() => {});
   }, []);
+
 
   if (!isInitialized) return null;
 
@@ -113,7 +121,11 @@ function AppInner() {
       ) : (
         <>
           {page === "home" && (
-            <HomePage onNavigate={navigate} onOpenAuth={openAuth} />
+            <HomePage 
+              onNavigate={navigate} 
+              onOpenAuth={openAuth} 
+              onSelectConteudo={selectConteudo}
+            />
           )}
           {page === "cursos" && (
             <CoursesPage

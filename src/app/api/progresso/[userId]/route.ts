@@ -29,9 +29,13 @@ export async function GET(
     const conteudos = await ConteudoModel.find().lean();
     const result = await Promise.all(
       conteudos.map(async (c: any) => {
-        const aulas = await AulaModel.find({ conteudo_id: c._id }).select('_id').lean();
+        const aulas = await AulaModel.find({ conteudo_id: c._id }).sort({ ordem: 1 }).lean();
         const total = aulas.length;
         const concluidas = aulas.filter((a: any) => aulasConcluidas.has(a._id.toString())).length;
+        
+        // Encontra a primeira aula não concluída
+        const proxima = aulas.find((a: any) => !aulasConcluidas.has(a._id.toString()));
+
         return {
           conteudo_id: c._id,
           nome: c.nome,
@@ -40,11 +44,18 @@ export async function GET(
           total,
           concluidas,
           percentual: total > 0 ? Math.round((concluidas / total) * 100) : 0,
+          proximaAula: proxima ? {
+            id: proxima._id,
+            titulo: proxima.titulo,
+            duracao: proxima.duracao,
+            ordem: proxima.ordem
+          } : null
         };
       })
     );
 
     return NextResponse.json(result);
+
   } catch (err) {
     console.error('[GET /progresso/:userId]', err);
     return NextResponse.json({ error: 'Erro ao buscar progresso.' }, { status: 500 });
