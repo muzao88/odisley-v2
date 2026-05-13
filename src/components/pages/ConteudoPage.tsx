@@ -561,6 +561,7 @@ export default function ConteudoPage({
           ).map<AulaComStatus>((a) => ({
             ...a,
             // Para cursos premium, todas as aulas ficam bloqueadas para não-assinantes
+            // Premium users have access to everything
             bloqueada: !isGratuito && !isPremium,
           }));
           setAulas(mock);
@@ -677,8 +678,64 @@ export default function ConteudoPage({
           <span>{conteudoNome}</span>
         </div>
 
-        {/* ── Banner de aviso premium ────────────────────────────────────────── */}
-        {isPremiumLocked && (
+        {/* ── Banner de aviso / confirmação de acesso ──────────────────────── */}
+        {isPremium && !isGratuito ? (
+          // ✅ Banner verde para usuários premium
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              padding: ".85rem 1.25rem",
+              marginBottom: "1.5rem",
+              background:
+                "linear-gradient(90deg, rgba(63,207,142,.1), rgba(63,207,142,.06))",
+              border: "1px solid rgba(63,207,142,.35)",
+              borderRadius: "var(--radius)",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: ".6rem",
+                flex: 1,
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>✅</span>
+              <span
+                style={{
+                  fontSize: ".85rem",
+                  color: "var(--text2)",
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong style={{ color: "#3fcf8e" }}>
+                  Premium ativo — Acesso livre a este conteúdo.
+                </strong>{" "}
+                Todas as aulas estão liberadas para você.
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: ".72rem",
+                fontWeight: 700,
+                color: "#3fcf8e",
+                background: "rgba(63,207,142,.15)",
+                padding: "3px 10px",
+                borderRadius: 20,
+                border: "1px solid rgba(63,207,142,.3)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                letterSpacing: ".04em",
+              }}
+            >
+              ✓ LIBERADO
+            </span>
+          </div>
+        ) : isPremiumLocked ? (
+          // 🔒 Banner de bloqueio para usuários não-premium
           <div
             style={{
               display: "flex",
@@ -723,7 +780,7 @@ export default function ConteudoPage({
               ⭐ Assinar Premium
             </button>
           </div>
-        )}
+        ) : null}
 
         {/* ── Header do conteúdo ─────────────────────────────────────────────── */}
         <div style={{ marginBottom: "2rem" }}>
@@ -758,6 +815,22 @@ export default function ConteudoPage({
                 }}
               >
                 🟢 GRATUITO
+              </span>
+            ) : isPremium ? (
+              // ✅ Badge verde para usuário premium em conteúdo premium
+              <span
+                style={{
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  fontSize: ".7rem",
+                  fontWeight: 700,
+                  background: "rgba(63,207,142,.15)",
+                  color: "#3fcf8e",
+                  border: "1px solid rgba(63,207,142,.35)",
+                  letterSpacing: ".03em",
+                }}
+              >
+                ✅ ACESSO LIVRE
               </span>
             ) : (
               <span
@@ -1031,7 +1104,23 @@ export default function ConteudoPage({
               }}
             >
               <span>Aulas ({aulas.length})</span>
-              {isPremiumLocked && (
+              {isPremium && !isGratuito ? (
+                // ✅ Badge verde de acesso liberado para premium
+                <span
+                  style={{
+                    fontSize: ".68rem",
+                    fontWeight: 600,
+                    color: "#3fcf8e",
+                    background: "rgba(63,207,142,.12)",
+                    padding: "2px 8px",
+                    borderRadius: 20,
+                    border: "1px solid rgba(63,207,142,.3)",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  ✓ Todas liberadas
+                </span>
+              ) : isPremiumLocked ? (
                 <span
                   style={{
                     fontSize: ".68rem",
@@ -1046,7 +1135,7 @@ export default function ConteudoPage({
                 >
                   🔒 Bloqueadas
                 </span>
-              )}
+              ) : null}
             </div>
 
             <div
@@ -1180,6 +1269,21 @@ export default function ConteudoPage({
                           >
                             PREMIUM
                           </span>
+                        ) : isPremium && aula.tipo !== "free" ? (
+                          // ✅ Indicador verde de aula liberada para assinante premium
+                          <span
+                            style={{
+                              color: "#3fcf8e",
+                              background: "rgba(63,207,142,.1)",
+                              padding: "1px 6px",
+                              borderRadius: 4,
+                              fontSize: ".65rem",
+                              fontWeight: 700,
+                              letterSpacing: ".03em",
+                            }}
+                          >
+                            LIBERADO
+                          </span>
                         ) : (
                           <span
                             style={{
@@ -1206,8 +1310,48 @@ export default function ConteudoPage({
               })}
             </div>
 
-            {/* ── Card de upsell na lista — para cursos premium bloqueados ──── */}
-            {isPremiumLocked && (
+            {/* ── Card premium ativo (verde) ou upsell (azul) ─────────────── */}
+            {isPremium && !isGratuito ? (
+              // ✅ Card de confirmação premium — visível somente para assinantes
+              <div
+                style={{
+                  marginTop: "1rem",
+                  padding: "1.25rem",
+                  textAlign: "center",
+                  background:
+                    "linear-gradient(135deg, rgba(63,207,142,.08), rgba(63,207,142,.04))",
+                  border: "1px solid rgba(63,207,142,.25)",
+                  borderRadius: 14,
+                }}
+              >
+                <div style={{ fontSize: "1.4rem", marginBottom: ".5rem" }}>
+                  🏆
+                </div>
+                <div
+                  style={{
+                    fontSize: ".88rem",
+                    fontWeight: 700,
+                    marginBottom: ".3rem",
+                    fontFamily: "'Syne', sans-serif",
+                    color: "#3fcf8e",
+                  }}
+                >
+                  Premium ativo
+                </div>
+                <div
+                  style={{
+                    fontSize: ".75rem",
+                    color: "var(--text2)",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  Você tem acesso livre a todas as{" "}
+                  <strong style={{ color: "#3fcf8e" }}>{aulas.length} aulas</strong>{" "}
+                  deste conteúdo.
+                </div>
+              </div>
+            ) : isPremiumLocked ? (
+              // 🔒 Card de upsell — somente para não-assinantes
               <div
                 style={{
                   marginTop: "1rem",
@@ -1288,7 +1432,7 @@ export default function ConteudoPage({
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
 
             {/* ── Card de upsell — para logados sem premium com aulas bloqueadas (cursos mistos) */}
             {!isPremiumLocked &&
