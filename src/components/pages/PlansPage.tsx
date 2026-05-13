@@ -1,10 +1,20 @@
 'use client';
 
+import { useEffect } from 'react';
 import type { PlanType } from '@/types';
+import { useAuth } from '@/components/AuthContext';
 
 interface Props { onOpenAuth: (tab: 'login' | 'register') => void; onOpenPayment: (plan: PlanType) => void; }
 
 export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
+  const { user, isLoggedIn, isPremium, refreshUser } = useAuth();
+
+  // Revalida o plano ao entrar na página para garantir dados frescos
+  useEffect(() => {
+    if (isLoggedIn) {
+      refreshUser();
+    }
+  }, [isLoggedIn, refreshUser]);
   return (
     <div className="page">
       <section style={{ textAlign: 'center' }}>
@@ -31,7 +41,15 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
               <li><span className="cross">✗</span><span className="feat-disabled">Todas as videoaulas</span></li>
               <li><span className="cross">✗</span><span className="feat-disabled">Simulados e exercícios</span></li>
             </ul>
-            <button className="btn-plan outline" onClick={() => onOpenAuth('register')}>Criar conta grátis</button>
+            {!isLoggedIn ? (
+              <button className="btn-plan outline" onClick={() => onOpenAuth('register')}>
+                Criar conta grátis
+              </button>
+            ) : user?.plano === 'free' ? (
+              <div className="plan-status">Seu plano atual</div>
+            ) : (
+              <div className="plan-status active">Você já possui acesso premium</div>
+            )}
           </div>
 
           {/* MONTHLY featured */}
@@ -51,7 +69,13 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
               <li><span className="check">✓</span><span>Acompanhamento de progresso</span></li>
               <li><span className="check">✓</span><span>Certificado de conclusão</span></li>
             </ul>
-            <button className="btn-plan solid" onClick={() => onOpenPayment('mensal')}>Assinar agora</button>
+            {isPremium ? (
+              <div className="plan-status active">Plano ativo</div>
+            ) : (
+              <button className="btn-plan solid" onClick={() => onOpenPayment('mensal')}>
+                Assinar agora
+              </button>
+            )}
             <div className="plan-pix">🟢 Pix · Cartão · Boleto</div>
           </div>
 
@@ -71,7 +95,13 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
               <li><span className="check">✓</span><span>Suporte via WhatsApp</span></li>
               <li><span className="check">✓</span><span>Prioridade em novos conteúdos</span></li>
             </ul>
-            <button className="btn-plan solid" onClick={() => onOpenPayment('anual')}>Assinar anual</button>
+            {isPremium ? (
+              <div className="plan-status active">Plano ativo</div>
+            ) : (
+              <button className="btn-plan solid" onClick={() => onOpenPayment('anual')}>
+                Assinar anual
+              </button>
+            )}
             <div className="plan-pix">🟢 Pix · Cartão · Boleto</div>
           </div>
         </div>

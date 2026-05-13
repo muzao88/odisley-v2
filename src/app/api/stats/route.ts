@@ -8,17 +8,17 @@ export async function GET() {
   try {
     await connectDB();
     
-    const [totalUsers, totalConteudos, totalAulas] = await Promise.all([
+    const [activeStudents, contents, videoLessons] = await Promise.all([
       UserModel.countDocuments(),
       ConteudoModel.countDocuments(),
       AulaModel.countDocuments(),
     ]);
 
-    // Retornamos os dados reais, mas mantendo a estética do design
     return NextResponse.json({
-      totalUsers: totalUsers > 0 ? totalUsers : 1247, // Fallback marketing se estiver vazio
-      totalConteudos: totalConteudos > 0 ? totalConteudos : 24,
-      totalAulas: totalAulas > 0 ? totalAulas : 210,
+      activeStudents,
+      contents,
+      videoLessons,
+      averageRating: null, // Ainda não implementado no banco
     });
   } catch (err) {
     console.error('[GET /api/stats]', err);

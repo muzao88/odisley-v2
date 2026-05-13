@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import type { Categoria, Page } from "@/types";
 import { CONTEUDOS_SEED, CATEGORIA_CORES } from "@/data/conteudos";
+import FeedbackSection from "../FeedbackSection";
 
 interface ProgressoItem {
   conteudo_id: string;
@@ -25,6 +26,8 @@ interface Props {
   onNavigate: (p: Page) => void;
   onSelectConteudo: (id: string, nome: string) => void;
 }
+
+const NEW_MODULES = ["Função Modular", "Função Trigonométrica"];
 
 export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
   const { user, token, isLoggedIn } = useAuth();
@@ -213,7 +216,10 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                   <div className="eac-header">
                     <div className="eac-icon">{p.icone}</div>
                     <div>
-                      <div className="eac-name">{p.nome}</div>
+                      <div className="eac-name">
+                        {p.nome}
+                        {NEW_MODULES.includes(p.nome) && <span className="badge-new">Novo</span>}
+                      </div>
                       <div
                         className="eac-pct"
                         style={{ fontSize: ".72rem", color: "var(--text3)" }}
@@ -260,7 +266,11 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             })}
           </div>
         </div>
+
+        {/* Avaliações e Sugestões */}
+        <FeedbackSection />
       </section>
     </div>
   );
 }
+

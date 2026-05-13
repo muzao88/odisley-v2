@@ -144,6 +144,22 @@ export const CONTEUDOS_SEED: ConteudoSeed[] = [
     totalAulas: 8,
     aulasGratuitas: 2,
   },
+  {
+    nome: "Função Modular",
+    categoria: "Funções",
+    descricao: "Conceito de módulo, equações, inequações e gráficos modulares.",
+    icone: "｜x｜",
+    totalAulas: 6,
+    aulasGratuitas: 1,
+  },
+  {
+    nome: "Função Trigonométrica",
+    categoria: "Funções",
+    descricao: "Seno, cosseno, tangente e gráficos das funções circulares.",
+    icone: "〰️",
+    totalAulas: 6,
+    aulasGratuitas: 1,
+  },
   // GEOMETRIA
   {
     nome: "Geometria Plana",

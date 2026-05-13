@@ -41,7 +41,7 @@ interface Aula {
   descricao: string;
 }
 
-type Aba = "overview" | "usuarios" | "conteudos";
+type Aba = "overview" | "usuarios" | "conteudos" | "feedbacks";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const api = (token: string) => ({
@@ -1827,6 +1827,120 @@ function Aulas({
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ABA: FEEDBACKS
+// ═══════════════════════════════════════════════════════════════════════════════
+function Feedbacks({ token }: { token: string }) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [rating, setRating] = useState("");
+  const [plan, setPlan] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const res = await api(token).get(`/api/admin/feedbacks?rating=${rating}&plan=${plan}`);
+    setData(res);
+    setLoading(false);
+  }, [token, rating, plan]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  if (!data && loading) return <div style={{ color: "#4d6380", padding: "2rem" }}>Carregando...</div>;
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800 }}>Feedback dos Alunos</h2>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <select style={S.select} value={rating} onChange={e => setRating(e.target.value)}>
+            <option value="">Todas as notas</option>
+            {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Estrelas</option>)}
+          </select>
+          <select style={S.select} value={plan} onChange={e => setPlan(e.target.value)}>
+            <option value="">Todos os planos</option>
+            <option value="free">Free</option>
+            <option value="premium">Premium</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Stats cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+        <div style={S.card}>
+          <div style={{ fontSize: "0.75rem", color: "#4d6380", marginBottom: "0.25rem" }}>Média Geral</div>
+          <div style={{ fontSize: "2rem", fontWeight: 800, color: "#f7c94f" }}>{data?.stats?.averageRating || 0} ★</div>
+        </div>
+        <div style={S.card}>
+          <div style={{ fontSize: "0.75rem", color: "#4d6380", marginBottom: "0.25rem" }}>Total de Feedbacks</div>
+          <div style={{ fontSize: "2rem", fontWeight: 800, color: "#378ADD" }}>{data?.stats?.totalFeedbacks || 0}</div>
+        </div>
+        {data?.stats?.suggestions?.length > 0 && (
+          <div style={{ ...S.card, gridColumn: 'span 2' }}>
+            <div style={{ fontSize: "0.75rem", color: "#4d6380", marginBottom: "0.5rem", fontWeight: 600 }}>Sugestões Recentes</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {data.stats.suggestions.map((s: any, i: number) => (
+                <div key={i} style={{ fontSize: '0.8rem', color: '#8fa4c8', background: 'rgba(55,138,221,0.05)', padding: '0.4rem 0.75rem', borderRadius: 6 }}>
+                  "{s.text}" — <span style={{ color: '#4d6380' }}>{s.user}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={S.card}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".82rem" }}>
+            <thead>
+              <tr style={{ color: "#4d6380" }}>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Aluno</th>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Nota</th>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Satisfação</th>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Progresso</th>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Sugestão / Pedido</th>
+                <th style={{ textAlign: "left", padding: ".5rem .75rem", borderBottom: "1px solid rgba(55,138,221,.1)" }}>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.feedbacks?.map((f: any) => (
+                <tr key={f._id} style={{ borderBottom: "1px solid rgba(55,138,221,.06)" }}>
+                  <td style={{ padding: ".6rem .75rem" }}>
+                    <div style={{ fontWeight: 600 }}>{f.user_id?.nome}</div>
+                    <div style={{ fontSize: "0.7rem", color: "#4d6380" }}>{f.user_id?.email}</div>
+                    <span style={S.badge(f.user_id?.plano)}>{f.user_id?.plano}</span>
+                  </td>
+                  <td style={{ padding: ".6rem .75rem", color: "#f7c94f", fontWeight: 700 }}>{f.rating} ★</td>
+                  <td style={{ padding: ".6rem .75rem" }}>{f.likes_platform}</td>
+                  <td style={{ padding: ".6rem .75rem" }}>{f.progress_feeling}</td>
+                  <td style={{ padding: ".6rem .75rem", color: "#8fa4c8", maxWidth: 300, whiteSpace: "normal" }}>
+                    <div style={{ fontStyle: f.comment ? 'italic' : 'normal' }}>{f.comment || <em style={{opacity: 0.5}}>Sem comentário</em>}</div>
+                    {f.suggestion && (
+                      <div style={{marginTop: '0.4rem', borderLeft: '2px solid rgba(55,138,221,0.2)', paddingLeft: '0.5rem'}}>
+                        <span style={{fontSize: '0.7rem', color: '#4d6380', display: 'block'}}>Sugestão:</span>
+                        {f.suggestion}
+                      </div>
+                    )}
+                    {f.requested_content && (
+                      <div style={{marginTop: '0.4rem', color: '#378ADD', fontSize: '0.75rem'}}>
+                        🔍 Deseja ver: <strong>{f.requested_content}</strong>
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ padding: ".6rem .75rem", color: "#4d6380", whiteSpace: 'nowrap' }}>
+                    {new Date(f.createdAt).toLocaleDateString("pt-BR")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // PAINEL PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════════
 function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
@@ -1836,6 +1950,7 @@ function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
     { id: "overview", label: "Visão Geral", icon: "📊" },
     { id: "usuarios", label: "Usuários", icon: "👥" },
     { id: "conteudos", label: "Conteúdos & Aulas", icon: "📚" },
+    { id: "feedbacks", label: "Feedbacks", icon: "💬" },
   ];
 
   return (
@@ -1876,6 +1991,7 @@ function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
         {aba === "overview" && <Overview token={token} />}
         {aba === "usuarios" && <Usuarios token={token} />}
         {aba === "conteudos" && <Conteudos token={token} />}
+        {aba === "feedbacks" && <Feedbacks token={token} />}
       </div>
     </div>
   );

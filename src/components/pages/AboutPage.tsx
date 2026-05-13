@@ -1,10 +1,28 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { Page } from '@/types';
 
 interface Props { onNavigate: (p: Page) => void; }
 
 export default function AboutPage({ onNavigate }: Props) {
+  const [stats, setStats] = useState({
+    activeStudents: 0,
+    contents: 0,
+    videoLessons: 0,
+    averageRating: null as number | null,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => {
+        if (data.activeStudents !== undefined) setStats(data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
   return (
     <div className="page">
       <section style={{ background: 'var(--bg2)' }}>
@@ -22,10 +40,16 @@ export default function AboutPage({ onNavigate }: Props) {
             </div>
             <div className="about-stats-grid">
               {[
-                { num: '+1.200', label: 'Alunos formados' },
-                { num: '200+', label: 'Videoaulas' },
-                { num: '24', label: 'Conteúdos' },
-                { num: '5 ★', label: 'Avaliação média' },
+                { 
+                  num: loading ? '...' : (stats.activeStudents > 0 ? stats.activeStudents : '0'), 
+                  label: stats.activeStudents === 1 ? 'Aluno ativo' : 'Alunos ativos' 
+                },
+                { num: loading ? '...' : stats.videoLessons, label: 'Videoaulas' },
+                { num: loading ? '...' : stats.contents, label: 'Conteúdos' },
+                { 
+                  num: loading ? '...' : (stats.averageRating ? `${stats.averageRating} ★` : '—'), 
+                  label: stats.averageRating ? 'Avaliação média' : 'Ainda sem avaliações' 
+                },
               ].map(({ num, label }) => (
                 <div className="as-item" key={label}>
                   <div className="as-num">{num}</div>

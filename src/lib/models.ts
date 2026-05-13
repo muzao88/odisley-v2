@@ -93,3 +93,23 @@ const AssinaturaSchema = new Schema(
 );
 
 export const AssinaturaModel = models.Assinatura || model('Assinatura', AssinaturaSchema);
+
+// ── Feedback ──────────────────────────────────────────────────
+const FeedbackSchema = new Schema(
+  {
+    user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    rating: { type: Number, min: 1, max: 5, required: true },
+    likes_platform: { type: String, enum: ['Sim', 'Mais ou menos', 'Não'], required: true },
+    progress_feeling: { 
+      type: String, 
+      enum: ['Estou evoluindo bem', 'Estou evoluindo aos poucos', 'Estou com dificuldade', 'Ainda não comecei'], 
+      required: true 
+    },
+    comment: { type: String, default: '' },
+    suggestion: { type: String, default: '' },
+    requested_content: { type: String, default: '' },
+  },
+  { timestamps: true }
+);
+
+export const FeedbackModel = models.Feedback || model('Feedback', FeedbackSchema);

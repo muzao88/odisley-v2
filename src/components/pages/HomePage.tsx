@@ -40,10 +40,13 @@ const DEPOIMENTOS = [
 export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: Props) {
   const { user, isLoggedIn, token } = useAuth();
   const [stats, setStats] = useState({
-    totalUsers: 1200,
-    totalConteudos: 24,
-    totalAulas: 200,
+    activeStudents: 0,
+    contents: 0,
+    videoLessons: 0,
+    averageRating: null as number | null,
   });
+
+  const NEW_MODULES = ["Função Modular", "Função Trigonométrica"];
   const [userProgress, setUserProgress] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +55,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
     fetch("/api/stats")
       .then((r) => r.json())
       .then((data) => {
-        if (data.totalUsers) setStats(data);
+        if (data.activeStudents !== undefined) setStats(data);
       })
       .catch(console.error);
 
@@ -132,15 +135,19 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
           </div>
           <div className="hero-stats">
             <div className="stat">
-              <div className="stat-num">+{stats.totalUsers.toLocaleString('pt-BR')}</div>
-              <div className="stat-label">Alunos ativos</div>
+              <div className="stat-num">
+                {stats.activeStudents > 0 ? `${stats.activeStudents}` : "0"}
+              </div>
+              <div className="stat-label">
+                {stats.activeStudents === 1 ? "Aluno ativo" : "Alunos ativos"}
+              </div>
             </div>
             <div className="stat">
-              <div className="stat-num">{stats.totalConteudos}</div>
+              <div className="stat-num">{stats.contents}</div>
               <div className="stat-label">Conteúdos</div>
             </div>
             <div className="stat">
-              <div className="stat-num">{stats.totalAulas}+</div>
+              <div className="stat-num">{stats.videoLessons}</div>
               <div className="stat-label">Videoaulas</div>
             </div>
           </div>
@@ -257,7 +264,10 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                   className="card-top-bar"
                 />
                 <div className="cc-icon">{c.icone}</div>
-                <div className="cc-name">{c.nome}</div>
+                <div className="cc-name">
+                  {c.nome}
+                  {NEW_MODULES.includes(c.nome) && <span className="badge-new">Novo</span>}
+                </div>
                 <div className="cc-aulas">
                   {c.totalAulas} aulas · {c.aulasGratuitas} gratuitas
                 </div>
@@ -372,8 +382,9 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         <div className="section-tag centered">Comece hoje</div>
         <h2 className="section-title">Pronto para ser aprovado?</h2>
         <p className="section-sub centered" style={{ marginBottom: "2rem" }}>
-          Junte-se a mais de 1.200 alunos que já estudam com o professor
-          Odisley.
+          {stats.activeStudents > 0 
+            ? `Junte-se a ${stats.activeStudents} ${stats.activeStudents === 1 ? 'aluno que já estuda' : 'alunos que já estudam'} com o professor Odisley.`
+            : "Comece sua jornada hoje mesmo com o professor Odisley."}
         </p>
         <div
           style={{

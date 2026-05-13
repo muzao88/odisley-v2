@@ -19,6 +19,8 @@ interface ConteudoCard extends ConteudoComProgresso {
 
 // ─── Mapa de preview de aulas (3 primeiras por conteúdo) ─────────────────────
 
+const NEW_MODULES = ["Função Modular", "Função Trigonométrica"];
+
 const AULAS_PREVIEW: Record<string, [string, string, string]> = {
   "Matemática Básica": ["Números inteiros", "Frações", "Decimais"],
   "Razão e Proporção": [
@@ -71,6 +73,16 @@ const AULAS_PREVIEW: Record<string, [string, string, string]> = {
     "Definição de logaritmo",
     "Propriedades",
     "Equações log",
+  ],
+  "Função Modular": [
+    "Conceito de módulo",
+    "Gráfico modular",
+    "Equações modulares",
+  ],
+  "Função Trigonométrica": [
+    "Circunferência",
+    "Seno e cosseno",
+    "Gráficos trig",
   ],
   "Geometria Plana": ["Ângulos e retas", "Triângulos", "Quadriláteros"],
   "Geometria Espacial": ["Prismas", "Pirâmides", "Cilindro e cone"],
@@ -163,6 +175,27 @@ function FreeCard({ c, onSelectConteudo }: FreeCardProps) {
       >
         ✓ GRATUITO
       </div>
+
+      {/* Badge NOVO */}
+      {NEW_MODULES.includes(c.nome) && (
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            background: "#3fcf8e",
+            color: "#0a0f1e",
+            fontSize: ".62rem",
+            fontWeight: 800,
+            padding: "3px 10px",
+            borderRadius: 20,
+            textTransform: "uppercase",
+            zIndex: 10,
+          }}
+        >
+          Novo
+        </div>
+      )}
 
       {/* Ícone */}
       <div style={{ fontSize: "2rem", lineHeight: 1 }}>{c.icone}</div>
@@ -312,6 +345,27 @@ function PremiumCard({ c, cor, canAccess, onClick }: PremiumCardProps) {
       >
         ⭐ PREMIUM
       </div>
+
+      {/* Badge NOVO */}
+      {NEW_MODULES.includes(c.nome) && (
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            background: "#3fcf8e",
+            color: "#0a0f1e",
+            fontSize: ".62rem",
+            fontWeight: 800,
+            padding: "3px 10px",
+            borderRadius: 20,
+            textTransform: "uppercase",
+            zIndex: 10,
+          }}
+        >
+          Novo
+        </div>
+      )}
 
       {/* ── Conteúdo padrão (sem hover) ── */}
       <div
