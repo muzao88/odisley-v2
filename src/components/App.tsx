@@ -12,6 +12,8 @@ import ConteudoPage from "./pages/ConteudoPage";
 import PlansPage from "./pages/PlansPage";
 import AboutPage from "./pages/AboutPage";
 import DashboardPage from "./pages/DashboardPage";
+import ExercisesPage from "./pages/ExercisesPage";
+import ExerciseResolutionPage from "./pages/ExerciseResolutionPage";
 import WelcomePage from "./pages/WelcomePage";
 import type { Page, AuthTab, PlanType } from "@/types";
 
@@ -26,6 +28,7 @@ function AppInner() {
     id: string;
     nome: string;
   } | null>(null);
+  const [exercicioAtivoId, setExercicioAtivoId] = useState<string | null>(null);
   const { isLoggedIn, login, refreshUser, isInitialized } = useAuth();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -46,6 +49,12 @@ function AppInner() {
 
   const selectConteudo = (id: string, nome: string) => {
     setConteudoAtivo({ id, nome });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const startExercicio = (id: string) => {
+    setExercicioAtivoId(id);
+    setPage("resolucao");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -141,6 +150,19 @@ function AppInner() {
           )}
           {page === "planos" && (
             <PlansPage onOpenAuth={openAuth} onOpenPayment={openPayment} />
+          )}
+          {page === "exercicios" && (
+            <ExercisesPage
+              onNavigate={navigate}
+              onOpenAuth={openAuth}
+              onStartExercise={startExercicio}
+            />
+          )}
+          {page === "resolucao" && (
+            <ExerciseResolutionPage
+              exerciseId={exercicioAtivoId}
+              onBack={() => setPage("exercicios")}
+            />
           )}
           {page === "sobre" && <AboutPage onNavigate={navigate} />}
           {page === "dashboard" && isLoggedIn && (

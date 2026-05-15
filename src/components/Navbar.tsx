@@ -33,6 +33,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
   const links: { label: string; page: Page }[] = [
     { label: "Início", page: "home" },
     { label: "Cursos", page: "cursos" },
+    { label: "Exercícios", page: "exercicios" },
     { label: "Planos", page: "planos" },
     { label: "Sobre", page: "sobre" },
   ];

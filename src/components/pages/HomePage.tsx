@@ -67,9 +67,13 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         .then((r) => r.json())
         .then((data) => {
           if (Array.isArray(data)) {
+            // Filtra: apenas > 0% e < 100% (em andamento)
+            const filtered = data.filter(
+              (p: any) => p.percentual > 0 && p.percentual < 100
+            );
             // Ordena por percentual (maior primeiro) e pega os top 4
-            const sorted = [...data]
-              .sort((a, b) => b.percentual - a.percentual)
+            const sorted = filtered
+              .sort((a: any, b: any) => b.percentual - a.percentual)
               .slice(0, 4);
             setUserProgress(sorted);
           }
@@ -86,7 +90,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
   // Dados padrão APENAS para visitantes deslogados
   const defaultHeroProgress = [
     { nome: "Função Quadrática", percentual: 78, categoria: "Álgebra", icone: "📐" },
-    { nome: "Potenciação", percentual: 100, categoria: "Fundamentos", icone: "🔢" },
+    { nome: "Conjuntos", percentual: 85, categoria: "Fundamentos", icone: "🔢" },
     { nome: "Razão e Proporção", percentual: 55, categoria: "Fundamentos", icone: "⚖️" },
     { nome: "Geometria Plana", percentual: 30, categoria: "Geometria", icone: "📏" },
   ];

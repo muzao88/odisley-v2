@@ -231,11 +231,16 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                       <div
                         style={{
                           marginLeft: "auto",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.4rem",
                           color: "var(--green)",
-                          fontSize: "1.1rem",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
                         }}
                       >
-                        ✓
+                        <span>Concluído</span>
+                        <span style={{ fontSize: "1rem" }}>✓</span>
                       </div>
                     )}
                   </div>

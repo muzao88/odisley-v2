@@ -113,3 +113,29 @@ const FeedbackSchema = new Schema(
 );
 
 export const FeedbackModel = models.Feedback || model('Feedback', FeedbackSchema);
+
+// ── Exercício ────────────────────────────────────────────────
+const QuestaoSchema = new Schema({
+  enunciado: { type: String, required: true },
+  alternativas: {
+    A: { type: String, required: true },
+    B: { type: String, required: true },
+    C: { type: String, required: true },
+    D: { type: String, required: true },
+    E: { type: String, required: true },
+  },
+  respostaCorreta: { type: String, enum: ['A', 'B', 'C', 'D', 'E'], required: true },
+});
+
+const ExercicioSchema = new Schema(
+  {
+    titulo: { type: String, required: true },
+    conteudo_id: { type: Schema.Types.ObjectId, ref: 'Conteudo', required: true },
+    dificuldade: { type: String, enum: ['Fácil', 'Médio', 'Difícil'], default: 'Médio' },
+    tipoAcesso: { type: String, enum: ['free', 'premium'], default: 'premium' },
+    questoes: [QuestaoSchema],
+  },
+  { timestamps: true }
+);
+
+export const ExercicioModel = models.Exercicio || model('Exercicio', ExercicioSchema);

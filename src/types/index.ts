@@ -77,8 +77,38 @@ export interface Plano {
   beneficios: string[];
 }
 
+// ── Exercícios ──────────────────────────────────────────────
+export interface Questao {
+  _id?: string;
+  enunciado: string;
+  alternativas: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+    E: string;
+  };
+  respostaCorreta: string;
+}
+
+export interface Exercicio {
+  _id: string;
+  titulo: string;
+  conteudo_id: string;
+  dificuldade: 'Fácil' | 'Médio' | 'Difícil';
+  totalQuestoes: number;
+  premium: boolean;
+  questoes?: Questao[];
+}
+
+export interface ExercicioComProgresso extends Exercicio {
+  questoesRespondidas: number;
+  status: 'Não iniciado' | 'Em andamento' | 'Concluído';
+  percentual: number;
+}
+
 // ── UI ───────────────────────────────────────────────────────
-export type Page = 'home' | 'cursos' | 'planos' | 'sobre' | 'dashboard';
+export type Page = 'home' | 'cursos' | 'exercicios' | 'planos' | 'sobre' | 'dashboard' | 'resolucao';
 export type AuthTab = 'login' | 'register' | 'update_name';
 export type PayMethod = 'pix' | 'card' | 'boleto';
 export type PlanType = 'anual' | 'mensal';
