@@ -150,7 +150,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             <div className="dash-section-title">📚 Em andamento</div>
             <div className="em-andamento-grid">
               {emAndamento.map((p) => {
-                const cor = CATEGORIA_CORES[p.categoria] ?? "var(--accent)";
+                const cor = CATEGORIA_CORES[p.categoria as Categoria] ?? "var(--accent)";
                 return (
                   <div
                     key={p.conteudo_id}
@@ -206,7 +206,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             }}
           >
             {progresso.map((p) => {
-              const cor = CATEGORIA_CORES[p.categoria] ?? "var(--accent)";
+              const cor = CATEGORIA_CORES[p.categoria as Categoria] ?? "var(--accent)";
               return (
                 <div
                   key={p.conteudo_id}
