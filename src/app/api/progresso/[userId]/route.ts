@@ -6,22 +6,23 @@ import { verifyToken } from '@/lib/auth';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const auth = req.headers.get('authorization');
     if (!auth?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
+    const { userId } = await params;
     const payload = verifyToken(auth.slice(7));
-    if (!payload || payload.id !== params.userId) {
+    if (!payload || payload.id !== userId) {
       return NextResponse.json({ error: 'Acesso negado.' }, { status: 403 });
     }
 
     await connectDB();
 
     const progressos = await ProgressoModel.find({
-      user_id: params.userId,
+      user_id: userId,
       concluido: true,
     }).lean();
 

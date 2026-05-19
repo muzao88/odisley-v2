@@ -5,11 +5,12 @@ import { ExercicioModel } from '@/lib/models';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB();
-    const exercicio = await ExercicioModel.findById(params.id)
+    const exercicio = await ExercicioModel.findById(id)
       .populate('conteudo_id', 'nome categoria icone')
       .lean();
 
