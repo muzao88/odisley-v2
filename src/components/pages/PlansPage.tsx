@@ -72,7 +72,7 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
             {isPremium ? (
               <div className="plan-status active">Plano ativo</div>
             ) : (
-              <button className="btn-plan solid" onClick={() => onOpenPayment('mensal')}>
+              <button className="btn-plan solid" onClick={() => window.location.href = process.env.NEXT_PUBLIC_KIWIFY_LINK_MENSAL!}>
                 Assinar agora
               </button>
             )}
@@ -98,7 +98,7 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
             {isPremium ? (
               <div className="plan-status active">Plano ativo</div>
             ) : (
-              <button className="btn-plan solid" onClick={() => onOpenPayment('anual')}>
+              <button className="btn-plan solid" onClick={() => window.location.href = process.env.NEXT_PUBLIC_KIWIFY_LINK_ANUAL!}>
                 Assinar anual
               </button>
             )}

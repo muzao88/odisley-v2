@@ -10,8 +10,10 @@ export interface User {
   assinaturaStatus?: 'ativa' | 'cancelada' | 'expirada' | null;
   assinaturaExpira?: string | null;
   dataCompra?: string | null;
-  stripeCustomerId?: string | null;
-  mercadopagoId?: string | null;
+  kiwifyId?: string | null;
+  plan?: 'free' | 'mensal' | 'anual';
+  planActive?: boolean;
+  planExpiresAt?: string | null;
 }
 
 export interface AuthState {

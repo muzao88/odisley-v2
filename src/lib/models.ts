@@ -8,14 +8,16 @@ const UserSchema = new Schema(
     // senha opcional — usuários OAuth não têm senha local
     senha: { type: String, default: null },
     plano: { type: String, enum: ['free', 'premium'], default: 'free' },
+    plan: { type: String, enum: ['free', 'mensal', 'anual'], default: 'free' },
+    planActive: { type: Boolean, default: false },
+    planExpiresAt: { type: Date, default: null },
     progresso_total: { type: Number, default: 0 },
     // OAuth providers
     provider: { type: String, enum: ['local', 'google', 'apple'], default: 'local' },
     providerId: { type: String, default: null },
     avatar: { type: String, default: null },
     // Pagamento
-    stripeCustomerId: { type: String, default: null },
-    mercadopagoId: { type: String, default: null },
+    kiwifyId: { type: String, default: null },
     assinaturaStatus: { type: String, enum: ['ativa', 'cancelada', 'expirada', null], default: null },
     assinaturaExpira: { type: Date, default: null },
     dataCompra: { type: Date, default: null },
@@ -82,7 +84,7 @@ const AssinaturaSchema = new Schema(
     user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     plano: { type: String, enum: ['mensal', 'anual'], required: true },
     status: { type: String, enum: ['ativa', 'cancelada', 'expirada'], default: 'ativa' },
-    gateway: { type: String, enum: ['stripe', 'mercadopago'], required: true },
+    gateway: { type: String, enum: ['kiwify'], required: true },
     gatewaySubscriptionId: { type: String },
     valor: { type: Number, required: true },
     inicio: { type: Date, default: Date.now },

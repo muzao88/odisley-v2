@@ -25,41 +25,30 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
     : "Cobrado mensalmente · Cancele quando quiser";
   const title = isAnual ? "Plano Anual" : "Plano Completo";
 
-  const handleCheckout = async (gateway: "stripe" | "mercadopago") => {
+  const handleCheckout = async () => {
     setLoading(true);
     setFeedback("");
     try {
-      const endpoint =
-        gateway === "stripe"
-          ? "/api/pagamento/stripe/checkout"
-          : "/api/pagamento/mercadopago/checkout";
+      const link = isAnual 
+        ? process.env.NEXT_PUBLIC_KIWIFY_LINK_ANUAL 
+        : process.env.NEXT_PUBLIC_KIWIFY_LINK_MENSAL;
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          plano: plan,
-          userId: user?._id ?? "guest",
-          email: user?.email ?? "",
-          nome: user?.nome ?? "",
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.url) {
-        // Redireciona para a página de pagamento do gateway
-        window.location.href = data.url;
-      } else if (data.mock) {
-        setFeedback(`⚙️ Modo desenvolvimento: ${data.message}`);
+      if (link) {
+        let finalUrl = link;
+        if (user) {
+          const params = new URLSearchParams();
+          if (user.email) params.append("email", user.email);
+          if (user.nome) params.append("name", user.nome);
+          
+          // Verifica se a URL já tem algum parâmetro (ex: ?src=site)
+          finalUrl += finalUrl.includes("?") ? `&${params.toString()}` : `?${params.toString()}`;
+        }
+        window.location.href = finalUrl;
       } else {
-        setFeedback("Erro ao iniciar pagamento. Tente novamente.");
+        setFeedback("Link de pagamento não configurado.");
       }
     } catch {
-      setFeedback("Erro de conexão. Tente novamente.");
+      setFeedback("Erro ao redirecionar. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -188,24 +177,20 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
                   fontSize: ".78rem",
                   color: "var(--text2)",
                   marginTop: ".25rem",
+                  marginBottom: ".5rem",
                 }}
               >
                 Aprovação instantânea — sem taxa adicional
               </div>
-            </div>
-            <div
-              style={{
-                background: "var(--surface2)",
-                borderRadius: 8,
-                padding: ".6rem",
-                fontFamily: "monospace",
-                fontSize: ".7rem",
-                color: "var(--accent)",
-                wordBreak: "break-all",
-                textAlign: "center",
-              }}
-            >
-              00020126580014br.gov.bcb.pix0136odisley@email.com
+              <div
+                style={{
+                  fontSize: ".78rem",
+                  color: "var(--text2)",
+                  lineHeight: 1.5,
+                }}
+              >
+                Você será redirecionado para o checkout seguro da <strong>Kiwify</strong> para gerar seu código PIX.
+              </div>
             </div>
             <div
               style={{
@@ -215,7 +200,7 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
                 marginTop: ".6rem",
               }}
             >
-              🔒 Pagamento processado pelo MercadoPago
+              🔒 Pagamento processado pela Kiwify
             </div>
           </div>
         )}
@@ -231,8 +216,8 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
                 lineHeight: 1.5,
               }}
             >
-              Você será redirecionado para o checkout seguro do{" "}
-              <strong>Stripe</strong> ou <strong>MercadoPago</strong> para
+              Você será redirecionado para o checkout seguro da{" "}
+              <strong>Kiwify</strong> para
               inserir os dados do cartão com segurança.
             </div>
             <div
@@ -291,7 +276,7 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
                   marginTop: ".6rem",
                 }}
               >
-                🔒 Processado pelo MercadoPago
+                🔒 Processado pela Kiwify
               </div>
             </div>
           </div>
@@ -318,41 +303,15 @@ export default function PaymentModal({ isOpen, plan, onClose }: Props) {
 
         {/* Botões de checkout */}
         <div style={{ display: "flex", flexDirection: "column", gap: ".6rem" }}>
-          {method === "card" ? (
-            <>
-              <button
-                className="form-submit"
-                onClick={() => handleCheckout("stripe")}
-                disabled={loading}
-                style={{
-                  background: "linear-gradient(135deg,#635bff,#378ADD)",
-                }}
-              >
-                {loading ? "Redirecionando..." : "💳 Pagar com Stripe"}
-              </button>
-              <button
-                className="form-submit"
-                onClick={() => handleCheckout("mercadopago")}
-                disabled={loading}
-                style={{
-                  background: "linear-gradient(135deg,#00b1ea,#009ee3)",
-                  marginTop: 0,
-                }}
-              >
-                {loading ? "Redirecionando..." : "💙 Pagar com MercadoPago"}
-              </button>
-            </>
-          ) : (
-            <button
-              className="form-submit"
-              onClick={() => handleCheckout("mercadopago")}
-              disabled={loading}
-            >
-              {loading
-                ? "Processando..."
-                : `Confirmar pagamento — ${isAnual ? "R$ 348/ano" : "R$ 39/mês"}`}
-            </button>
-          )}
+          <button
+            className="form-submit"
+            onClick={handleCheckout}
+            disabled={loading}
+          >
+            {loading
+              ? "Redirecionando..."
+              : `Ir para o Checkout — ${isAnual ? "R$ 348/ano" : "R$ 39/mês"}`}
+          </button>
         </div>
 
         <div

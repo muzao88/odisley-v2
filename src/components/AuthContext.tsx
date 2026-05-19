@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider value={{
       user, token, login, logout, refreshUser,
       isLoggedIn: !!user,
-      isPremium: user?.plano === 'premium',
+      isPremium: user?.plano === 'premium' || user?.planActive === true,
       isInitialized,
     }}>
       {children}
