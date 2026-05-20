@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { AulaModel, ProgressoModel, UserModel } from "@/lib/models";
@@ -6,12 +6,13 @@ import { verifyToken } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
-    const aulas = await AulaModel.find({ conteudo_id: params.id })
+    const aulas = await AulaModel.find({ conteudo_id: id })
       .sort({ ordem: 1 })
       .lean();
 
