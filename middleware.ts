@@ -38,6 +38,7 @@ export function middleware(req: NextRequest) {
 }
 
 // Configura o matcher para onde o middleware deve rodar
+// Middleware foi movido do src/ para o root conforme novo padrão do Next.js 16
 export const config = {
   matcher: ["/api/:path*", "/admin/:path*", "/perfil/:path*"],
 };
