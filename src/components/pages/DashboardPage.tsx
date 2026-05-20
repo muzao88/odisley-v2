@@ -1,20 +1,21 @@
 "use client";
 
-// Force rebuild: v2.1.0
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import type { Categoria, Page } from "@/types";
 import { CONTEUDOS_SEED, CATEGORIA_CORES } from "@/data/conteudos";
 import FeedbackSection from "../FeedbackSection";
 
-// Helper function para acessar cores de categoria com type safety
-const getCategoriaCor = (categoria: unknown): string => {
-  // Verifica se a categoria é uma chave válida do CATEGORIA_CORES
-  if (typeof categoria === "string" && categoria in CATEGORIA_CORES) {
-    return CATEGORIA_CORES[categoria as Categoria];
+/**
+ * Type-safe helper function to access categoria colors
+ * Validates that the categoria exists in CATEGORIA_CORES before accessing
+ */
+function getCategoriaCor(cat: unknown): string {
+  if (typeof cat === "string" && cat in CATEGORIA_CORES) {
+    return CATEGORIA_CORES[cat as Categoria];
   }
   return "var(--accent)";
-};
+}
 
 interface ProgressoItem {
   conteudo_id: string;
@@ -190,7 +191,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             <div className="dash-section-title">📚 Em andamento</div>
             <div className="em-andamento-grid">
               {emAndamento.map((p) => {
-                const cor = getCategoriaCor(p?.categoria);
+                const cor = getCategoriaCor(p.categoria);
                 return (
                   <div
                     key={p.conteudo_id}
@@ -246,7 +247,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             }}
           >
             {progresso.map((p) => {
-              const cor = getCategoriaCor(p?.categoria);
+              const cor = getCategoriaCor(p.categoria);
               return (
                 <div
                   key={p.conteudo_id}

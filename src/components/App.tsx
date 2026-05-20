@@ -105,108 +105,110 @@ function AppInner() {
       .then((r) => r.json())
       .then((data) => {
         if (data.token) {
-           login(data.user, data.token);
-           if (data.isNewUser) {
-              setAuthOpen(true);
-           }
+          login(data.user, data.token);
+          if (data.isNewUser) {
+            setAuthOpen(true);
+          }
         }
       })
       .catch(() => {});
   }, []);
 
-
   if (!isInitialized) return null;
 
-  const content = (!isLoggedIn && !hasEntered) ? (
-    <WelcomePage 
-      onContinue={() => setHasEntered(true)} 
-    />
-  ) : (
-    <>
-      <Navbar currentPage={page} onNavigate={navigate} onOpenAuth={openAuth} />
-
-      {conteudoAtivo ? (
-        <ConteudoPage
-          conteudoId={conteudoAtivo.id}
-          conteudoNome={conteudoAtivo.nome}
+  const content =
+    !isLoggedIn && !hasEntered ? (
+      <WelcomePage onContinue={() => setHasEntered(true)} />
+    ) : (
+      <>
+        <Navbar
+          currentPage={page}
           onNavigate={navigate}
           onOpenAuth={openAuth}
         />
-      ) : (
-        <>
-          {page === "home" && (
-            <HomePage 
-              onNavigate={navigate} 
-              onOpenAuth={openAuth} 
-              onSelectConteudo={selectConteudo}
-            />
-          )}
-          {page === "cursos" && (
-            <CoursesPage
-              onNavigate={navigate}
-              onSelectConteudo={selectConteudo}
-              onOpenAuth={openAuth}
-            />
-          )}
-          {page === "planos" && (
-            <PlansPage onOpenAuth={openAuth} onOpenPayment={openPayment} />
-          )}
-          {page === "exercicios" && (
-            <ExercisesPage
-              onNavigate={navigate}
-              onOpenAuth={openAuth}
-              onStartExercise={startExercicio}
-            />
-          )}
-          {page === "resolucao" && (
-            <ExerciseResolutionPage
-              exerciseId={exercicioAtivoId}
-              onBack={() => setPage("exercicios")}
-            />
-          )}
-          {page === "sobre" && <AboutPage onNavigate={navigate} />}
-          {page === "dashboard" && isLoggedIn && (
-            <DashboardPage
-              onNavigate={navigate}
-              onSelectConteudo={selectConteudo}
-            />
-          )}
-          {page === "dashboard" && !isLoggedIn && (
-            <div
-              className="page"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "80vh",
-                flexDirection: "column",
-                gap: "1rem",
-              }}
-            >
-              <div style={{ fontSize: "3rem" }}>🔒</div>
+
+        {conteudoAtivo ? (
+          <ConteudoPage
+            conteudoId={conteudoAtivo.id}
+            conteudoNome={conteudoAtivo.nome}
+            onNavigate={navigate}
+            onOpenAuth={openAuth}
+          />
+        ) : (
+          <>
+            {page === "home" && (
+              <HomePage
+                onNavigate={navigate}
+                onOpenAuth={openAuth}
+                onSelectConteudo={selectConteudo}
+              />
+            )}
+            {page === "cursos" && (
+              <CoursesPage
+                onNavigate={navigate}
+                onSelectConteudo={selectConteudo}
+                onOpenAuth={openAuth}
+              />
+            )}
+            {page === "planos" && (
+              <PlansPage onOpenAuth={openAuth} onOpenPayment={openPayment} />
+            )}
+            {page === "exercicios" && (
+              <ExercisesPage
+                onNavigate={navigate}
+                onOpenAuth={openAuth}
+                onStartExercise={startExercicio}
+              />
+            )}
+            {page === "resolucao" && (
+              <ExerciseResolutionPage
+                exerciseId={exercicioAtivoId}
+                onBack={() => setPage("exercicios")}
+              />
+            )}
+            {page === "sobre" && <AboutPage onNavigate={navigate} />}
+            {page === "dashboard" && isLoggedIn && (
+              <DashboardPage
+                onNavigate={navigate}
+                onSelectConteudo={selectConteudo}
+              />
+            )}
+            {page === "dashboard" && !isLoggedIn && (
               <div
+                className="page"
                 style={{
-                  fontFamily: "'Syne',sans-serif",
-                  fontSize: "1.3rem",
-                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "80vh",
+                  flexDirection: "column",
+                  gap: "1rem",
                 }}
               >
-                Faça login para ver seu progresso
+                <div style={{ fontSize: "3rem" }}>🔒</div>
+                <div
+                  style={{
+                    fontFamily: "'Syne',sans-serif",
+                    fontSize: "1.3rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  Faça login para ver seu progresso
+                </div>
+                <button
+                  className="btn btn-primary btn-md"
+                  onClick={() => openAuth("login")}
+                >
+                  Entrar
+                </button>
               </div>
-              <button
-                className="btn btn-primary btn-md"
-                onClick={() => openAuth("login")}
-              >
-                Entrar
-              </button>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
 
-      <Footer onNavigate={navigate} />
-    </>
-  );
+        <Footer onNavigate={navigate} />
+      </>
+    );
 
   return (
     <>
@@ -214,25 +216,27 @@ function AppInner() {
 
       {/* Banner de confirmação de pagamento */}
       {paymentSuccess && (
-        <div style={{
-          position: 'fixed',
-          top: '1.2rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 9999,
-          background: 'linear-gradient(135deg, #1db954, #17a045)',
-          color: '#fff',
-          padding: '0.85rem 1.8rem',
-          borderRadius: '12px',
-          fontFamily: "'Syne', sans-serif",
-          fontWeight: 700,
-          fontSize: '1rem',
-          boxShadow: '0 8px 30px rgba(29,185,84,0.35)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.6rem',
-          animation: 'slideDown 0.4s ease',
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "1.2rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999,
+            background: "linear-gradient(135deg, #1db954, #17a045)",
+            color: "#fff",
+            padding: "0.85rem 1.8rem",
+            borderRadius: "12px",
+            fontFamily: "'Syne', sans-serif",
+            fontWeight: 700,
+            fontSize: "1rem",
+            boxShadow: "0 8px 30px rgba(29,185,84,0.35)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.6rem",
+            animation: "slideDown 0.4s ease",
+          }}
+        >
           ⭐ Pagamento confirmado! Liberando seu acesso Premium…
         </div>
       )}
