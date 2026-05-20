@@ -1,5 +1,6 @@
 "use client";
 
+// Force rebuild: v2.1.0
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import type { Categoria, Page } from "@/types";
