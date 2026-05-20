@@ -8,13 +8,13 @@ import { CONTEUDOS_SEED, CATEGORIA_CORES } from "@/data/conteudos";
 import FeedbackSection from "../FeedbackSection";
 
 // Helper function para acessar cores de categoria com type safety
-function getCategoriaCor(categoria: unknown): string {
+const getCategoriaCor = (categoria: unknown): string => {
   // Verifica se a categoria é uma chave válida do CATEGORIA_CORES
   if (typeof categoria === "string" && categoria in CATEGORIA_CORES) {
     return CATEGORIA_CORES[categoria as Categoria];
   }
   return "var(--accent)";
-}
+};
 
 interface ProgressoItem {
   conteudo_id: string;
@@ -190,7 +190,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             <div className="dash-section-title">📚 Em andamento</div>
             <div className="em-andamento-grid">
               {emAndamento.map((p) => {
-                const cor = getCategoriaCor(p.categoria);
+                const cor = getCategoriaCor(p?.categoria);
                 return (
                   <div
                     key={p.conteudo_id}
@@ -246,7 +246,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             }}
           >
             {progresso.map((p) => {
-              const cor = getCategoriaCor(p.categoria);
+              const cor = getCategoriaCor(p?.categoria);
               return (
                 <div
                   key={p.conteudo_id}
