@@ -142,3 +142,4 @@ Acesse http://localhost:3000
 - [ ] Exercícios e simulados por conteúdo
 - [ ] E-mail de boas-vindas com Resend ou Nodemailer
 - [ ] Webhook para ativar plano premium após pagamento
+"# Projeto-Plataforma-de-Matematica-" 
