@@ -7,15 +7,15 @@ import { CONTEUDOS_SEED, CATEGORIA_CORES } from "@/data/conteudos";
 import FeedbackSection from "../FeedbackSection";
 
 /**
- * Type-safe helper function to access categoria colors
- * Validates that the categoria exists in CATEGORIA_CORES before accessing
+ * Safe helper to get categoria color with proper type checking
+ * @param cat - Category value (any type)
+ * @returns CSS color string or default accent color
  */
-function getCategoriaCor(cat: unknown): string {
-  if (typeof cat === "string" && cat in CATEGORIA_CORES) {
-    return CATEGORIA_CORES[cat as Categoria];
-  }
-  return "var(--accent)";
-}
+const obterCorCategoria = (cat: any): string => {
+  if (!cat || typeof cat !== "string") return "var(--accent)";
+  if (!(cat in CATEGORIA_CORES)) return "var(--accent)";
+  return CATEGORIA_CORES[cat as Categoria];
+};
 
 interface ProgressoItem {
   conteudo_id: string;
@@ -84,7 +84,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
     (p) => p.concluidas > 0 && p.percentual < 100,
   );
 
-  // Encontra a aula mais prioritária para continuar (primeira de um curso em andamento)
   const sugestao =
     emAndamento.find((p) => p.proximaAula) ||
     progresso.find((p) => p.proximaAula);
@@ -126,7 +125,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             </p>
           </div>
 
-          {/* Card Próxima Aula */}
           {sugestao?.proximaAula && (
             <div
               className="dashboard-card"
@@ -165,7 +163,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
           )}
         </div>
 
-        {/* Stats */}
         <div className="dash-grid">
           <div className="dash-stat">
             <div className="dash-stat-num">{totalPct}%</div>
@@ -185,13 +182,12 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
           </div>
         </div>
 
-        {/* Em andamento */}
         {emAndamento.length > 0 && (
           <div style={{ marginBottom: "2.5rem" }}>
             <div className="dash-section-title">📚 Em andamento</div>
             <div className="em-andamento-grid">
               {emAndamento.map((p) => {
-                const cor = getCategoriaCor(p.categoria);
+                const cor = obterCorCategoria(p.categoria);
                 return (
                   <div
                     key={p.conteudo_id}
@@ -236,7 +232,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
           </div>
         )}
 
-        {/* All conteudos */}
         <div>
           <div className="dash-section-title">🗂 Todos os conteúdos</div>
           <div
@@ -247,7 +242,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             }}
           >
             {progresso.map((p) => {
-              const cor = getCategoriaCor(p.categoria);
+              const cor = obterCorCategoria(p.categoria);
               return (
                 <div
                   key={p.conteudo_id}
@@ -315,7 +310,6 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
           </div>
         </div>
 
-        {/* Avaliações e Sugestões */}
         <FeedbackSection />
       </section>
     </div>
