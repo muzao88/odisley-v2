@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { authRateLimit } from "@/lib/rateLimit";
 
 // Validar variáveis de ambiente obrigatórias
 const ADMIN_USER = process.env.ADMIN_USER;
@@ -20,6 +21,18 @@ const ADMIN_PASS_HASH_SAFE = ADMIN_PASS_HASH as string;
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting para brute-force protection
+    const ip =
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+    if (!authRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Muitas tentativas de login. Tente novamente em 15 minutos." },
+        { status: 429 },
+      );
+    }
+
     const { usuario, senha } = await req.json();
 
     if (!usuario || !senha) {
