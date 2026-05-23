@@ -5,20 +5,20 @@ import { connectDB } from "@/lib/mongodb";
 import { UserModel } from "@/lib/models";
 import { signToken } from "@/lib/auth";
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-if (!GOOGLE_CLIENT_ID) {
-  throw new Error(
-    "[auth/google] GOOGLE_CLIENT_ID não definido nas variáveis de ambiente.",
-  );
-}
-
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
-
 // ── POST /api/auth/google ─────────────────────────────────────
 // Recebe o token do Google (obtido no front-end via Google Identity)
 // Valida com a API do Google, cria ou busca o usuário no banco
 // e retorna nosso JWT próprio
 export async function POST(req: NextRequest) {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  if (!GOOGLE_CLIENT_ID) {
+    return NextResponse.json(
+      { error: "Configuração do servidor incompleta (GOOGLE_CLIENT_ID não definido)." },
+      { status: 500 },
+    );
+  }
+
+  const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
   try {
     const { credential } = await req.json();
 
