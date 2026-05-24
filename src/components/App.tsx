@@ -111,7 +111,10 @@ function AppInner() {
         if (data.token) {
           login(data.user, data.token);
           if (data.isNewUser) {
+            setAuthTab("update_name");
             setAuthOpen(true);
+          } else {
+            setAuthOpen(false);
           }
         }
       })
