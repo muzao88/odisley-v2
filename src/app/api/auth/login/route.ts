@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'E-mail ou senha incorretos.' }, { status: 401 });
     }
 
+    if (!user.senha) {
+      return NextResponse.json(
+        { error: 'Esta conta foi criada com o Google. Faça login usando o botão "Entrar com Google".' },
+        { status: 400 }
+      );
+    }
+
     const valido = await bcrypt.compare(senha, user.senha);
     if (!valido) {
       return NextResponse.json({ error: 'E-mail ou senha incorretos.' }, { status: 401 });

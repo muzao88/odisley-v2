@@ -102,8 +102,12 @@ function AppInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: google_token }),
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          alert("Erro no login com Google: " + (data.error || "Erro desconhecido"));
+          return;
+        }
         if (data.token) {
           login(data.user, data.token);
           if (data.isNewUser) {
@@ -111,7 +115,10 @@ function AppInner() {
           }
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Erro ao fazer login com Google:", err);
+        alert("Erro de conexão ao autenticar com o Google.");
+      });
   }, []);
 
   if (!isInitialized) return null;

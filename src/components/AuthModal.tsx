@@ -45,8 +45,13 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: id_token }),
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || "Erro no login com Google");
+          alert("Erro no login com Google: " + (data.error || "Erro desconhecido"));
+          return;
+        }
         if (data.token) {
           login(data.user, data.token);
           if (data.isNewUser) {
@@ -56,7 +61,10 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
           }
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Erro ao fazer login com Google:", err);
+        setError("Erro de conexão ao autenticar com o Google.");
+      });
   }, []);
 
   const handleGoogleClick = () => {
