@@ -95,8 +95,16 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
     { nome: "Geometria Plana", percentual: 30, categoria: "Geometria", icone: "📏" },
   ];
 
-  const isUsingRealData = isLoggedIn && userProgress.length > 0;
-  const displayProgress = isUsingRealData ? userProgress : defaultHeroProgress;
+  const zeroedProgress = [
+    { nome: "Função Quadrática", percentual: 0, categoria: "Álgebra", icone: "📐" },
+    { nome: "Conjuntos", percentual: 0, categoria: "Fundamentos", icone: "🔢" },
+    { nome: "Razão e Proporção", percentual: 0, categoria: "Fundamentos", icone: "⚖️" },
+    { nome: "Geometria Plana", percentual: 0, categoria: "Geometria", icone: "📏" },
+  ];
+
+  const displayProgress = isLoggedIn
+    ? (userProgress.length > 0 ? userProgress : zeroedProgress)
+    : defaultHeroProgress;
 
 
   return (
