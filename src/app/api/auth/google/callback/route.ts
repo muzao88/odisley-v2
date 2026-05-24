@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
 
-  return new NextResponse(
+  return new Response(
     `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>

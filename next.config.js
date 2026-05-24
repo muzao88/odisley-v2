@@ -40,7 +40,6 @@ const nextConfig = {
       {
         source: "/api/:path*",
         headers: [
-          { key: "Content-Type", value: "application/json; charset=utf-8" },
           { key: "Access-Control-Allow-Origin", value: "*" },
           {
             key: "Access-Control-Allow-Methods",
