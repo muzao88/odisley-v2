@@ -15,6 +15,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ExercisesPage from "./pages/ExercisesPage";
 import ExerciseResolutionPage from "./pages/ExerciseResolutionPage";
 import WelcomePage from "./pages/WelcomePage";
+import UpgradeModal from "./UpgradeModal";
 import type { Page, AuthTab, PlanType } from "@/types";
 
 function AppInner() {
@@ -24,6 +25,7 @@ function AppInner() {
   const [authTab, setAuthTab] = useState<AuthTab>("login");
   const [payOpen, setPayOpen] = useState(false);
   const [payPlan, setPayPlan] = useState<PlanType | null>(null);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [conteudoAtivo, setConteudoAtivo] = useState<{
     id: string;
     nome: string;
@@ -60,11 +62,11 @@ function AppInner() {
 
   // Lock scroll when modal open
   useEffect(() => {
-    document.body.style.overflow = authOpen || payOpen ? "hidden" : "";
+    document.body.style.overflow = authOpen || payOpen || upgradeOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [authOpen, payOpen]);
+  }, [authOpen, payOpen, upgradeOpen]);
 
   // Captura o token do Google e o retorno do pagamento após o redirect
   useEffect(() => {
@@ -133,6 +135,7 @@ function AppInner() {
             conteudoNome={conteudoAtivo.nome}
             onNavigate={navigate}
             onOpenAuth={openAuth}
+            onOpenUpgrade={() => setUpgradeOpen(true)}
           />
         ) : (
           <>
@@ -158,6 +161,7 @@ function AppInner() {
                 onNavigate={navigate}
                 onOpenAuth={openAuth}
                 onStartExercise={startExercicio}
+                onOpenUpgrade={() => setUpgradeOpen(true)}
               />
             )}
             {page === "resolucao" && (
@@ -250,6 +254,14 @@ function AppInner() {
         isOpen={payOpen}
         plan={payPlan}
         onClose={() => setPayOpen(false)}
+      />
+      <UpgradeModal
+        isOpen={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        onSelectPlan={(plan) => {
+          setUpgradeOpen(false);
+          openPayment(plan);
+        }}
       />
     </>
   );

@@ -15,9 +15,10 @@ interface Props {
   onNavigate: (p: Page) => void;
   onOpenAuth: (tab: "login" | "register") => void;
   onStartExercise: (id: string) => void;
+  onOpenUpgrade?: () => void;
 }
 
-export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise }: Props) {
+export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise, onOpenUpgrade }: Props) {
   const { user, isLoggedIn } = useAuth();
   const [exercises, setExercises] = useState<ExercicioComProgresso[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +125,10 @@ export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise 
                     ex={ex} 
                     cor={cor} 
                     hasAccess={canAccess(ex)} 
+                    isLoggedIn={isLoggedIn}
                     onOpenAuth={onOpenAuth}
+                    onNavigate={onNavigate}
+                    onOpenUpgrade={onOpenUpgrade}
                     onStart={onStartExercise}
                   />
                 ))}
@@ -137,7 +141,7 @@ export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise 
   );
 }
 
-function ExerciseCard({ ex, cor, hasAccess, onOpenAuth, onStart }: { ex: ExercicioComProgresso, cor: string, hasAccess: boolean, onOpenAuth: any, onStart: (id: string) => void }) {
+function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, onOpenUpgrade, onStart }: { ex: ExercicioComProgresso, cor: string, hasAccess: boolean, isLoggedIn: boolean, onOpenAuth: any, onNavigate: any, onOpenUpgrade: any, onStart: (id: string) => void }) {
   const [hovered, setHovered] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -172,7 +176,11 @@ function ExerciseCard({ ex, cor, hasAccess, onOpenAuth, onStart }: { ex: Exercic
       }}
       onClick={() => {
         if (!hasAccess) {
-          onOpenAuth("register");
+          if (!isLoggedIn) {
+            onOpenAuth("login");
+          } else {
+            onOpenUpgrade?.();
+          }
         } else {
           onStart(ex._id);
         }

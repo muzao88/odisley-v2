@@ -9,6 +9,7 @@ interface Props {
   conteudoNome: string;
   onNavigate: (p: Page) => void;
   onOpenAuth: (tab: "login" | "register") => void;
+  onOpenUpgrade?: () => void;
 }
 
 // ── Títulos realistas por conteúdo ────────────────────────────────────────────
@@ -311,6 +312,7 @@ function PremiumLockScreen({
   onNavigate,
   onOpenAuth,
   isLoggedIn,
+  onOpenUpgrade,
 }: {
   conteudoNome: string;
   totalAulas: number;
@@ -318,6 +320,7 @@ function PremiumLockScreen({
   onNavigate: (p: Page) => void;
   onOpenAuth: (tab: "login" | "register") => void;
   isLoggedIn: boolean;
+  onOpenUpgrade?: () => void;
 }) {
   return (
     <div
@@ -473,7 +476,13 @@ function PremiumLockScreen({
       {/* Botão CTA principal */}
       <button
         className="btn btn-primary"
-        onClick={() => onNavigate("planos")}
+        onClick={() => {
+          if (isLoggedIn) {
+            onOpenUpgrade?.();
+          } else {
+            onOpenAuth("login");
+          }
+        }}
         style={{
           background: "linear-gradient(90deg, #185FA5, #378ADD)",
           border: "none",
@@ -521,6 +530,7 @@ export default function ConteudoPage({
   conteudoNome,
   onNavigate,
   onOpenAuth,
+  onOpenUpgrade,
 }: Props) {
   const { token, isPremium, isLoggedIn } = useAuth();
   const [aulas, setAulas] = useState<AulaComStatus[]>([]);
@@ -614,11 +624,15 @@ export default function ConteudoPage({
   };
 
   // ── Clique em aula bloqueada ─────────────────────────────────────────────────────────
-  // Para cursos premium: seleciona a aula (mostra título/duração no painel)
-  // O player de bloqueio já está visível — o CTA de assinar está lá
   const handleAulaBloqueadaClick = (aula: AulaComStatus) => {
     // Sempre troca a aula ativa para o usuário ver o título selecionado
     setAulaAtiva(aula);
+
+    if (!isLoggedIn) {
+      onOpenAuth("login");
+    } else if (!isPremium) {
+      onOpenUpgrade?.();
+    }
   };
 
   // ── Integração simplificada para conclusão automática ──────────────────────
@@ -774,7 +788,13 @@ export default function ConteudoPage({
             </div>
             <button
               className="btn btn-primary btn-sm"
-              onClick={() => onNavigate("planos")}
+              onClick={() => {
+                if (isLoggedIn) {
+                  onOpenUpgrade?.();
+                } else {
+                  onOpenAuth("login");
+                }
+              }}
               style={{ whiteSpace: "nowrap", flexShrink: 0 }}
             >
               ⭐ Assinar Premium
@@ -919,6 +939,7 @@ export default function ConteudoPage({
                   onNavigate={onNavigate}
                   onOpenAuth={onOpenAuth}
                   isLoggedIn={isLoggedIn}
+                  onOpenUpgrade={onOpenUpgrade}
                 />
               </div>
             ) : (
@@ -1022,7 +1043,13 @@ export default function ConteudoPage({
                     {isPremiumLocked ? (
                       <button
                         className="btn btn-primary btn-md"
-                        onClick={() => onNavigate("planos")}
+                        onClick={() => {
+                          if (isLoggedIn) {
+                            onOpenUpgrade?.();
+                          } else {
+                            onOpenAuth("login");
+                          }
+                        }}
                       >
                         🔓 Desbloquear acesso
                       </button>
@@ -1390,7 +1417,13 @@ export default function ConteudoPage({
                 </div>
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() => onNavigate("planos")}
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      onOpenUpgrade?.();
+                    } else {
+                      onOpenAuth("login");
+                    }
+                  }}
                   style={{ width: "100%" }}
                 >
                   ⭐ Assinar agora
@@ -1475,7 +1508,13 @@ export default function ConteudoPage({
                   </div>
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => onNavigate("planos")}
+                    onClick={() => {
+                      if (isLoggedIn) {
+                        onOpenUpgrade?.();
+                      } else {
+                        onOpenAuth("login");
+                      }
+                    }}
                   >
                     ⭐ Assinar agora
                   </button>
