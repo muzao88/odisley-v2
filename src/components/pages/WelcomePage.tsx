@@ -104,26 +104,9 @@ export default function WelcomePage({ onContinue }: Props) {
   );
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "row",
-      fontFamily: "sans-serif",
-      backgroundColor: "#fff"
-    }}>
+    <div className="welcome-container">
       {/* Lado Esquerdo - Azul Royal */}
-      <div style={{
-        flex: 1,
-        backgroundColor: "#1a4fd6",
-        color: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "40px",
-        position: "relative",
-        overflow: "hidden"
-      }}>
+      <div className="welcome-left">
         <div style={{ maxWidth: "400px", width: "100%", zIndex: 2 }}>
           <img 
             src="/logo.png" 
@@ -205,15 +188,7 @@ export default function WelcomePage({ onContinue }: Props) {
       </div>
 
       {/* Lado Direito - Branco */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "40px",
-        backgroundColor: "#fff"
-      }}>
+      <div className="welcome-right">
         <div style={{ maxWidth: "400px", width: "100%" }}>
           <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "30px", color: "#333" }}>
             {isLogin ? "Entrar na conta" : "Criar sua conta"}
@@ -411,24 +386,8 @@ export default function WelcomePage({ onContinue }: Props) {
               Continuar sem login
             </a>
           </div>
-        </div>
       </div>
-      
-      <style jsx global>{`
-        body {
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-        }
-        @media (max-width: 768px) {
-          div[style*="flex-direction: row"] {
-            flex-direction: column !important;
-          }
-          div[style*="background-color: #1a4fd6"] {
-            padding: 60px 20px !important;
-          }
-        }
-      `}</style>
     </div>
+  </div>
   );
 }

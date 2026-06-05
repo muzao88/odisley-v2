@@ -179,18 +179,7 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
       }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div style={{
-        maxWidth: "900px",
-        width: "100%",
-        height: "600px",
-        backgroundColor: "#fff",
-        borderRadius: "16px",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "row",
-        position: "relative",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-      }}>
+      <div className="auth-modal-container">
         <button
           onClick={onClose}
           style={{
@@ -209,16 +198,7 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
         </button>
 
         {/* Lado Esquerdo - Azul */}
-        <div style={{
-          flex: 1,
-          backgroundColor: "#1a4fd6",
-          color: "#fff",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "40px",
-          position: "relative"
-        }}>
+        <div className="auth-modal-left">
           <img 
             src="/logo.png" 
             alt="Odisley" 
@@ -272,14 +252,7 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
         </div>
 
         {/* Lado Direito - Branco */}
-        <div style={{
-          flex: 1,
-          padding: "40px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          backgroundColor: "#fff"
-        }}>
+        <div className="auth-modal-right">
           <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", marginBottom: "25px" }}>
             {tab === "login" ? "Entrar" : tab === "register" ? "Criar conta" : "Escolher Nome"}
           </h2>
@@ -397,19 +370,6 @@ export default function AuthModal({ isOpen, initialTab, onClose }: Props) {
           )}
         </div>
       </div>
-      <style jsx>{`
-        @media (max-width: 768px) {
-          div[style*="flex-direction: row"] {
-            flex-direction: column !important;
-            height: auto !important;
-            max-height: 90vh;
-            overflow-y: auto !important;
-          }
-          div[style*="background-color: #1a4fd6"] {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

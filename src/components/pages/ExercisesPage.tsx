@@ -142,37 +142,38 @@ export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise,
 }
 
 function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, onOpenUpgrade, onStart }: { ex: ExercicioComProgresso, cor: string, hasAccess: boolean, isLoggedIn: boolean, onOpenAuth: any, onNavigate: any, onOpenUpgrade: any, onStart: (id: string) => void }) {
-  const [hovered, setHovered] = useState(false);
-
   const getStatusColor = (status: string) => {
-    if (status === "Concluído") return "#3fcf8e"; // dark green
-    if (status === "Em andamento") return "var(--accent)";
-    return "#4d6380"; // dark text3
+    if (status === "Concluído") return "#16a34a";
+    if (status === "Em andamento") return "#7c3aed";
+    return "#a1a1aa";
   };
+
+  const getDificuldadeColor = (dificuldade: string) => {
+    if (dificuldade === "Fácil") return { text: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" };
+    if (dificuldade === "Médio") return { text: "#ea580c", bg: "#fff7ed", border: "#fed7aa" };
+    return { text: "#dc2626", bg: "#fef2f2", border: "#fecaca" };
+  };
+
+  const diffStyles = getDificuldadeColor(ex.dificuldade);
 
   return (
     <div 
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="exercise-card"
       style={{
-        background: hovered 
-          ? `linear-gradient(145deg, #1a2235 0%, ${cor}08 100%)` 
-          : "#1a2235",
-        border: `1px solid ${hovered ? cor + "50" : "rgba(55, 138, 221, 0.12)"}`,
-        borderRadius: "var(--radius)",
-        padding: "1.4rem",
-        cursor: "pointer",
-        position: "relative",
-        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        transform: hovered ? "translateY(-6px)" : "none",
-        boxShadow: hovered 
-          ? `0 20px 40px rgba(0,0,0,0.25), 0 0 0 1px ${cor}20` 
-          : "none",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.85rem",
-        minHeight: "180px",
-        overflow: "hidden"
+        borderRadius: '12px',
+        padding: '14px',
+        cursor: 'pointer',
+        transition: 'border-color 0.15s, transform 0.15s',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        minHeight: '180px',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = '';
       }}
       onClick={() => {
         if (!hasAccess) {
@@ -186,103 +187,93 @@ function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, 
         }
       }}
     >
-      {/* Glow decorativo no hover */}
-      <div style={{
-        position: "absolute",
-        top: "-20%",
-        right: "-10%",
-        width: "120px",
-        height: "120px",
-        background: `radial-gradient(circle, ${cor}15 0%, transparent 70%)`,
-        opacity: hovered ? 1 : 0,
-        transition: "opacity 0.3s",
-        pointerEvents: "none"
-      }} />
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 1 }}>
-        <div style={{ 
-          fontSize: "0.68rem", 
-          fontWeight: 800, 
-          textTransform: "uppercase", 
-          color: cor,
-          letterSpacing: "0.1em",
-          background: `${cor}10`,
-          padding: "2px 8px",
-          borderRadius: "4px"
-        }}>
-          {ex.conteudo_id}
+      <div>
+        {/* Topo do card com seta */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+          {/* badge da categoria */}
+          <span style={{
+            fontSize: '9px',
+            fontWeight: '700',
+            letterSpacing: '0.08em',
+            background: 'rgba(139,92,246,0.08)',
+            color: '#7c3aed',
+            border: '1px solid rgba(139,92,246,0.2)',
+            padding: '2px 8px',
+            borderRadius: '999px',
+            textTransform: 'uppercase',
+          }}>
+            {ex.conteudo_id || "MATEMÁTICA"}
+          </span>
+          {!hasAccess ? (
+            <span style={{ fontSize: '12px' }}>🔒</span>
+          ) : (
+            <i className="ti ti-arrow-right" style={{ fontSize: '14px', color: '#d4d4d8' }} />
+          )}
         </div>
-        {!hasAccess && (
-          <div style={{ 
-            background: "rgba(0,0,0,0.2)", 
-            width: "28px", 
-            height: "28px", 
-            borderRadius: "50%", 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            fontSize: "0.9rem",
-            backdropFilter: "blur(4px)"
-          }}>
-            🔒
-          </div>
-        )}
-      </div>
 
-      <h4 style={{ 
-        fontFamily: "'Syne', sans-serif", 
-        fontSize: "1.05rem", 
-        fontWeight: 800, 
-        color: "#eef2ff",
-        lineHeight: 1.3,
-        zIndex: 1
-      }}>
-        {ex.titulo}
-      </h4>
+        {/* Título do card */}
+        <div style={{
+          fontSize: '14px',
+          fontWeight: '700',
+          color: 'var(--text)',
+          marginBottom: '10px',
+          letterSpacing: '-0.2px',
+        }}>
+          {ex.titulo}
+        </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", fontSize: "0.78rem", color: "#8fa4c8", zIndex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-          <span style={{ fontSize: "1rem" }}>🎯</span>
-          <span style={{ 
-            color: ex.dificuldade === "Fácil" ? "#3fcf8e" : ex.dificuldade === "Médio" ? "#f7c94f" : "#f74f6e",
-            fontWeight: 700
+        {/* Dificuldade e quantidade de questões */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            fontSize: '10px', fontWeight: '500', color: diffStyles.text,
+            background: diffStyles.bg, border: `1px solid ${diffStyles.border}`,
+            padding: '2px 8px', borderRadius: '999px',
           }}>
-            {ex.dificuldade}
+            <i className="ti ti-flame" /> {ex.dificuldade}
+          </span>
+
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            fontSize: '10px', color: '#71717a',
+          }}>
+            <i className="ti ti-file-text" /> {ex.totalQuestoes} {ex.totalQuestoes === 1 ? 'questão' : 'questões'}
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-          <span style={{ fontSize: "1rem" }}>📋</span>
-          <span style={{ fontWeight: 500 }}>{ex.totalQuestoes} questões</span>
-        </div>
       </div>
 
-      <div style={{ marginTop: "auto", paddingTop: "0.75rem", zIndex: 1 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "0.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-             <div style={{ width: 6, height: 6, borderRadius: "50%", background: getStatusColor(ex.status) }} />
-             <span style={{ color: getStatusColor(ex.status), fontWeight: 700 }}>
-               {ex.status}
-             </span>
+      <div>
+        {/* Divisor interno */}
+        <div style={{ height: '1px', background: '#f4f4f5', margin: '10px 0' }} className="exercise-card-divider" />
+
+        {/* Status */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: 'var(--text3)', fontWeight: '500' }}>
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: getStatusColor(ex.status) }} />
+            {ex.status}
           </div>
           {ex.status === "Em andamento" && (
-            <span style={{ color: "#4d6380", fontWeight: 600 }}>
+            <span style={{ fontSize: '10px', color: '#71717a', fontWeight: '500' }}>
               {ex.questoesRespondidas} / {ex.totalQuestoes}
             </span>
           )}
         </div>
-        <div style={{ height: 6, background: "#131928", borderRadius: "100px", overflow: "hidden" }}>
-          <div 
-            style={{ 
-              width: `${ex.percentual}%`, 
-              background: ex.status === "Concluído" 
-                ? "linear-gradient(90deg, var(--green), #2eb87e)" 
-                : `linear-gradient(90deg, ${cor}, ${cor}cc)`,
-              height: "100%",
-              borderRadius: "100px",
-              transition: "width 0.5s ease-out"
-            }} 
-          />
-        </div>
+
+        {/* Botão */}
+        <button style={{
+          width: '100%',
+          marginTop: '10px',
+          background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+          color: '#fff',
+          fontSize: '11px',
+          fontWeight: '600',
+          padding: '8px',
+          borderRadius: '7px',
+          border: 'none',
+          cursor: 'pointer',
+        }}>
+          {ex.status === "Não iniciado" ? "Iniciar exercício" : ex.status === "Em andamento" ? "Continuar exercício" : "Refazer exercício"}
+        </button>
       </div>
     </div>
   );

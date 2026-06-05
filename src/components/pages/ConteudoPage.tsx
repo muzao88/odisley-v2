@@ -323,24 +323,7 @@ function PremiumLockScreen({
   onOpenUpgrade?: () => void;
 }) {
   return (
-    <div
-      style={{
-        width: "100%",
-        aspectRatio: "16/9",
-        background:
-          "linear-gradient(135deg, #0a0f1e 0%, #0d1426 50%, #0f1a30 100%)",
-        borderRadius: "var(--radius)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem 1.5rem",
-        textAlign: "center",
-        position: "relative",
-        overflow: "hidden",
-        border: "1px solid rgba(55,138,221,.25)",
-      }}
-    >
+    <div className="premium-lock-screen">
       {/* Glow de fundo decorativo */}
       <div
         style={{
@@ -918,14 +901,7 @@ export default function ConteudoPage({
         </div>
 
         {/* ── Grid principal: vídeo + lista de aulas ────────────────────────── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0,1fr) 360px",
-            gap: "2rem",
-            alignItems: "start",
-          }}
-        >
+        <div className="conteudo-main-grid">
           {/* ── LEFT: Player / Tela de bloqueio + info da aula ──────────────── */}
           <div>
             {/* Player ou tela de bloqueio */}

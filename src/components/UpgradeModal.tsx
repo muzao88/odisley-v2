@@ -87,14 +87,7 @@ export default function UpgradeModal({ isOpen, onClose, onSelectPlan }: Props) {
         </div>
 
         {/* Plans Grid */}
-        <div
-          className="plans-grid"
-          style={{
-            display: "flex",
-            gap: "24px",
-            width: "100%",
-          }}
-        >
+        <div className="plans-grid">
           {/* Plano Mensal */}
           <div
             className="plan-card-mensal"
@@ -316,6 +309,11 @@ export default function UpgradeModal({ isOpen, onClose, onSelectPlan }: Props) {
       </div>
 
       <style>{`
+        .plans-grid {
+          display: flex;
+          gap: 24px;
+          width: 100%;
+        }
         .plan-card-mensal:hover {
           transform: translateY(-4px);
           border-color: rgba(255, 255, 255, 0.2) !important;
@@ -340,8 +338,8 @@ export default function UpgradeModal({ isOpen, onClose, onSelectPlan }: Props) {
             overflow-y: auto;
           }
           .plans-grid {
-            flex-direction: column !important;
-            gap: 20px !important;
+            flex-direction: column;
+            gap: 20px;
           }
           .upgrade-modal-container h2 {
             font-size: 1.6rem !important;

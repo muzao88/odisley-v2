@@ -106,6 +106,8 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         <div className="hero-bg">
           <div className="hero-glow" />
           <div className="hero-glow2" />
+          <div className="hero-glow-purple" />
+          <div className="hero-glow-blue" />
           <div className="hero-grid" />
         </div>
         <div className="hero-content">
