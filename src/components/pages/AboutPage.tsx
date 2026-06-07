@@ -80,7 +80,7 @@ export default function AboutPage({ onNavigate }: Props) {
               <button className="btn btn-primary btn-lg" onClick={() => onNavigate('cursos')}>
                 Ver os cursos
               </button>
-              <button className="btn btn-ghost btn-lg" onClick={() => onNavigate('planos')}>
+              <button className="btn btn-ghost btn-secondary btn-lg" onClick={() => onNavigate('planos')}>
                 Ver planos
               </button>
             </div>

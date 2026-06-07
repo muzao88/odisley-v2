@@ -888,7 +888,7 @@ export default function ConteudoPage({
                 {isPremiumLocked ? "0%" : `${pct}%`}
               </span>
             </div>
-            <div className="progress-bar" style={{ height: 6 }}>
+            <div className="progress-bar progress-bar-bg" style={{ height: 6 }}>
               <div
                 className="progress-fill"
                 style={{

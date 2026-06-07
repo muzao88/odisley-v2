@@ -16,6 +16,7 @@ import ExercisesPage from "./pages/ExercisesPage";
 import ExerciseResolutionPage from "./pages/ExerciseResolutionPage";
 import WelcomePage from "./pages/WelcomePage";
 import UpgradeModal from "./UpgradeModal";
+import SettingsPage from "./pages/SettingsPage";
 import type { Page, AuthTab, PlanType } from "@/types";
 
 function AppInner() {
@@ -177,7 +178,13 @@ function AppInner() {
                 onSelectConteudo={selectConteudo}
               />
             )}
-            {page === "dashboard" && !isLoggedIn && (
+            {page === "configuracoes" && isLoggedIn && (
+              <SettingsPage
+                onNavigate={navigate}
+                onOpenUpgrade={() => setUpgradeOpen(true)}
+              />
+            )}
+            {(page === "dashboard" || page === "configuracoes") && !isLoggedIn && (
               <div
                 className="page"
                 style={{
@@ -197,7 +204,7 @@ function AppInner() {
                     fontWeight: 700,
                   }}
                 >
-                  Faça login para ver seu progresso
+                  Faça login para continuar
                 </div>
                 <button
                   className="btn btn-primary btn-md"

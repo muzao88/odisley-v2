@@ -105,99 +105,125 @@ export default function WelcomePage({ onContinue }: Props) {
 
   return (
     <div className="welcome-container">
-      {/* Lado Esquerdo - Azul Royal */}
-      <div className="welcome-left">
-        <div style={{ maxWidth: "400px", width: "100%", zIndex: 2 }}>
-          <img 
-            src="/logo.png" 
-            alt="Odisley" 
-            style={{ 
-              width: "260px", 
-              display: "block", 
-              margin: "0 auto 20px auto", 
-              filter: "brightness(0) invert(1)",
-              cursor: "pointer"
-            }} 
-            onClick={onContinue}
-          />
-          <p style={{ fontSize: "1.2rem", opacity: 0.9, marginBottom: "40px" }}>A plataforma definitiva para o seu aprendizado.</p>
-          
-          {/* Grid 3x3 de Símbolos Matemáticos */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "15px",
-            marginBottom: "40px"
-          }}>
-            {mathSymbols.map((sym, i) => (
-              <div key={i} style={{
-                backgroundColor: "rgba(255, 255, 255, 0.15)",
-                height: "80px",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1.5rem",
-                fontWeight: "bold"
-              }}>
-                {sym}
-              </div>
-            ))}
+      {/* Lado Esquerdo - Novo design com gradiente */}
+      <div className="welcome-left" style={{
+        background: 'linear-gradient(145deg, #1e1b4b 0%, #3730a3 40%, #1d4ed8 100%)',
+        padding: '36px 32px',
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Glow superior direito */}
+        <div style={{
+          position: 'absolute', top: '-60px', right: '-60px',
+          width: '220px', height: '220px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.35) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Glow inferior esquerdo */}
+        <div style={{
+          position: 'absolute', bottom: '-40px', left: '-40px',
+          width: '180px', height: '180px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(99,102,241,0.25) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Logo do lado esquerdo */}
+        <div style={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+          gap: '24px', height: '100%',
+        }}>
+          {/* Logo no topo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative', zIndex: 1 }} onClick={onContinue}>
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '8px',
+              background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="16" height="16" viewBox="0 0 18 18">
+                <text x="9" y="14" textAnchor="middle" fontSize="14" fontWeight="800" fill="white" fontFamily="-apple-system,sans-serif">O</text>
+              </svg>
+            </div>
+            <span style={{ fontSize: '16px', fontWeight: '800', color: '#fff', letterSpacing: '-.3px', cursor: 'pointer' }}>Odisley</span>
           </div>
 
-          {/* Card de Social Proof */}
+          {/* Título + subtítulo + grid no meio */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h2 style={{
+              fontSize: '22px', fontWeight: '800', color: '#fff',
+              letterSpacing: '-.5px', lineHeight: 1.3, marginBottom: '10px',
+            }}>
+              A plataforma definitiva para o seu aprendizado.
+            </h2>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
+              Matemática para vestibular e ENEM com trilha completa e progresso rastreado aula por aula.
+            </p>
+
+            {/* Grid de símbolos matemáticos */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '20px' }}>
+              {['Σ', 'π', '∫', 'x²', '√', '∞', 'θ', 'Δ', '≠'].map(s => (
+                <div key={s} style={{
+                  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '10px', padding: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '18px', color: 'rgba(255,255,255,0.7)', fontWeight: '600',
+                }}>{s}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* Badge inferior — compacto */}
           <div style={{
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
-            padding: "20px",
-            borderRadius: "12px",
-            display: "flex",
-            alignItems: "center",
-            gap: "15px"
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '10px', padding: '12px 16px',
+            position: 'relative', zIndex: 1,
+            alignSelf: 'flex-start',
           }}>
             <div style={{
-              width: "40px",
-              height: "40px",
-              backgroundColor: "#fff",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#1a4fd6",
-              fontSize: "1.2rem"
-            }}>
-              ✓
-            </div>
+              width: '28px', height: '28px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '13px', color: '#fff', flexShrink: 0,
+            }}>✓</div>
             <div>
-              <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Mais de 10.000</div>
-              <div style={{ opacity: 0.8, fontSize: "0.9rem" }}>estudantes ativos na plataforma</div>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: '#fff', whiteSpace: 'nowrap' }}>
+                Mais de 10.000
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginTop: '1px', whiteSpace: 'nowrap' }}>
+                estudantes ativos na plataforma
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Elemento Decorativo de Fundo */}
-        <div style={{
-          position: "absolute",
-          top: "-10%",
-          right: "-10%",
-          width: "300px",
-          height: "300px",
-          backgroundColor: "rgba(255, 255, 255, 0.03)",
-          borderRadius: "50%",
-          zIndex: 1
-        }} />
       </div>
 
-      {/* Lado Direito - Branco */}
-      <div className="welcome-right">
-        <div style={{ maxWidth: "400px", width: "100%" }}>
-          <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "30px", color: "#333" }}>
+      {/* Lado Direito - Fundo lavanda */}
+      <div className="welcome-right" style={{
+        background: '#f3f0ff', padding: '36px 32px',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{
+          position: 'absolute', top: '-80px', right: '-80px',
+          width: '260px', height: '260px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.10) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ maxWidth: "400px", width: "100%", zIndex: 1 }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e1b4b', letterSpacing: '-.5px', marginBottom: '4px' }}>
             {isLogin ? "Entrar na conta" : "Criar sua conta"}
-          </h2>
+          </h1>
+          <p style={{ fontSize: '13px', color: '#a78bfa', marginBottom: '24px' }}>
+            {isLogin ? "Bem-vindo de volta! 👋" : "Cadastre-se para começar! 🚀"}
+          </p>
 
           <form onSubmit={isLogin ? handleLogin : handleRegister} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {!isLogin && (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>Nome completo</label>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#1e1b4b', marginBottom: '6px', display: 'block' }}>Nome completo</label>
                 <input
                   type="text"
                   placeholder="Seu nome"
@@ -205,18 +231,18 @@ export default function WelcomePage({ onContinue }: Props) {
                   onChange={(e) => setRegNome(e.target.value)}
                   required={!isLogin}
                   style={{
-                    padding: "12px 16px",
-                    borderRadius: "8px",
-                    border: "1px solid #ddd",
-                    fontSize: "1rem",
-                    outline: "none"
+                    width: '100%', padding: '10px 14px',
+                    background: 'rgba(255,255,255,0.7)',
+                    border: '1px solid rgba(139,92,246,0.2)',
+                    borderRadius: '9px', fontSize: '13px', color: '#1e1b4b',
+                    outline: 'none',
                   }}
                 />
               </div>
             )}
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>E-mail</label>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: '#1e1b4b', marginBottom: '6px', display: 'block' }}>E-mail</label>
               <input
                 type="email"
                 placeholder="seu@email.com"
@@ -224,17 +250,17 @@ export default function WelcomePage({ onContinue }: Props) {
                 onChange={(e) => isLogin ? setLoginEmail(e.target.value) : setRegEmail(e.target.value)}
                 required
                 style={{
-                  padding: "12px 16px",
-                  borderRadius: "8px",
-                  border: "1px solid #ddd",
-                  fontSize: "1rem",
-                  outline: "none"
+                  width: '100%', padding: '10px 14px',
+                  background: 'rgba(255,255,255,0.7)',
+                  border: '1px solid rgba(139,92,246,0.2)',
+                  borderRadius: '9px', fontSize: '13px', color: '#1e1b4b',
+                  outline: 'none',
                 }}
               />
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#555" }}>Senha</label>
+              <label style={{ fontSize: '12px', fontWeight: '600', color: '#1e1b4b', marginBottom: '6px', display: 'block' }}>Senha</label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -243,13 +269,12 @@ export default function WelcomePage({ onContinue }: Props) {
                   onChange={(e) => isLogin ? setLoginSenha(e.target.value) : setRegSenha(e.target.value)}
                   required
                   style={{
-                    padding: "12px 45px 12px 16px",
-                    borderRadius: "8px",
-                    border: "1px solid #ddd",
-                    fontSize: "1rem",
-                    outline: "none",
-                    width: "100%",
-                    boxSizing: "border-box"
+                    width: '100%', padding: '10px 45px 10px 14px',
+                    background: 'rgba(255,255,255,0.7)',
+                    border: '1px solid rgba(139,92,246,0.2)',
+                    borderRadius: '9px', fontSize: '13px', color: '#1e1b4b',
+                    outline: 'none',
+                    boxSizing: 'border-box'
                   }}
                 />
                 <button
@@ -281,13 +306,12 @@ export default function WelcomePage({ onContinue }: Props) {
 
             {isLogin && (
               <div style={{ textAlign: "left" }}>
-                <a
-                  href="#"
+                <span
                   onClick={(e) => { e.preventDefault(); alert("Em breve: recuperação de senha."); }}
-                  style={{ color: "#1a4fd6", fontSize: "0.85rem", textDecoration: "none", fontWeight: "600" }}
+                  style={{ fontSize: '12px', color: '#7c3aed', fontWeight: '500', cursor: 'pointer' }}
                 >
                   Esqueci minha senha
-                </a>
+                </span>
               </div>
             )}
 
@@ -301,93 +325,77 @@ export default function WelcomePage({ onContinue }: Props) {
               type="submit"
               disabled={loading}
               style={{
-                backgroundColor: "#1a4fd6",
-                color: "#fff",
-                padding: "14px",
-                borderRadius: "8px",
-                border: "none",
-                fontSize: "1rem",
-                fontWeight: "bold",
-                cursor: "pointer",
-                marginTop: "10px",
-                transition: "opacity 0.2s"
+                width: '100%', padding: '12px',
+                background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                color: '#fff', fontSize: '14px', fontWeight: '700',
+                borderRadius: '10px', border: 'none', cursor: 'pointer',
+                boxShadow: '0 4px 18px rgba(124,58,237,0.30)',
+                marginBottom: '14px',
               }}
-              onMouseOver={(e) => e.currentTarget.style.opacity = "0.9"}
-              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
             >
               {loading ? "Processando..." : isLogin ? "Entrar na plataforma" : "Criar minha conta"}
             </button>
           </form>
 
           {/* Divisor "ou" */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "25px 0" }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
-            <span style={{ fontSize: "0.8rem", color: "#999", fontWeight: "500" }}>ou</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#eee" }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(139,92,246,0.15)' }} />
+            <span style={{ fontSize: '11px', color: '#a78bfa' }}>ou</span>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(139,92,246,0.15)' }} />
           </div>
 
           {/* Botão Google */}
           <button
             onClick={handleGoogleClick}
             style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-              backgroundColor: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
-              cursor: "pointer",
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              color: "#444"
+              width: '100%', padding: '11px',
+              background: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(139,92,246,0.2)',
+              borderRadius: '10px', fontSize: '13px', fontWeight: '500',
+              color: '#1e1b4b', cursor: 'pointer', marginBottom: '16px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
             }}
           >
             <GoogleIcon />
             {isLogin ? "Entrar com Google" : "Cadastrar com Google"}
           </button>
 
-          {/* Link para alternar entre Login/Register */}
-          <div style={{ marginTop: "30px", textAlign: "center", fontSize: "0.9rem", color: "#666" }}>
+          {/* Texto de cadastro */}
+          <p style={{ fontSize: '12px', color: '#a78bfa', textAlign: 'center' }}>
             {isLogin ? (
               <>
-                Não tem uma conta?{" "}
-                <a
-                  href="#"
+                Não tem uma conta?{' '}
+                <span
                   onClick={(e) => { e.preventDefault(); setIsLogin(false); setError(""); }}
-                  style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}
+                  style={{ color: '#7c3aed', fontWeight: '600', cursor: 'pointer' }}
                 >
                   Criar conta
-                </a>
+                </span>
               </>
             ) : (
               <>
-                Já tem uma conta?{" "}
-                <a
-                  href="#"
+                Já tem uma conta?{' '}
+                <span
                   onClick={(e) => { e.preventDefault(); setIsLogin(true); setError(""); }}
-                  style={{ color: "#1a4fd6", fontWeight: "bold", textDecoration: "none" }}
+                  style={{ color: '#7c3aed', fontWeight: '600', cursor: 'pointer' }}
                 >
                   Fazer login
-                </a>
+                </span>
               </>
             )}
-          </div>
+          </p>
           
           {/* Link para continuar sem login (mantendo funcionalidade) */}
           <div style={{ marginTop: "15px", textAlign: "center" }}>
-            <a
-              href="#"
+            <span
               onClick={(e) => { e.preventDefault(); onContinue(); }}
-              style={{ color: "#999", fontSize: "0.8rem", textDecoration: "none" }}
+              style={{ color: "#a78bfa", fontSize: "11px", cursor: "pointer", fontWeight: "500" }}
             >
               Continuar sem login
-            </a>
+            </span>
           </div>
+        </div>
       </div>
     </div>
-  </div>
   );
 }

@@ -246,7 +246,7 @@ function FreeCard({ c, onSelectConteudo }: FreeCardProps) {
               {c.percentual}%
             </span>
           </div>
-          <div className="cc-bar">
+          <div className="cc-bar progress-bar-bg">
             <div
               className="cc-bar-fill"
               style={{ width: `${c.percentual}%`, background: "#3fcf8e" }}
@@ -749,7 +749,7 @@ function UpsellBanner({
           </button>
           {!isLoggedIn && onOpenAuth && (
             <button
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-secondary btn-sm"
               onClick={() => onOpenAuth("register")}
               style={{ justifyContent: "center" }}
             >
@@ -1193,7 +1193,7 @@ export default function CoursesPage({
             <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
               {!isLoggedIn && onOpenAuth && (
                 <button
-                  className="btn btn-ghost btn-md"
+                  className="btn btn-ghost btn-secondary btn-md"
                   onClick={() => onOpenAuth("register")}
                 >
                   Criar conta

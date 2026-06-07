@@ -40,10 +40,29 @@ interface Props {
 
 const NEW_MODULES = ["Função Modular", "Função Trigonométrica"];
 
+const getInitials = (nome?: string) => {
+  if (!nome) return "A";
+  const parts = nome.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
 export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
   const { user, token, isLoggedIn } = useAuth();
   const [progresso, setProgresso] = useState<ProgressoItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn || !token || !user) {
@@ -103,31 +122,82 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
             gap: "1.5rem",
           }}
         >
-          <div>
-            <div className="section-tag">Área do aluno</div>
-            <h2 className="section-title">
-              Olá, {user?.nome?.split(" ")[0] ?? "Aluno"}! 👋
-            </h2>
-            <p style={{ color: "var(--text2)", fontSize: ".95rem" }}>
-              Plano {user?.plano === "premium" ? "⭐ Premium" : "Gratuito"} ·{" "}
-              {user?.plano === "free" && (
-                <span
-                  style={{
-                    color: "var(--accent)",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                  }}
-                  onClick={() => onNavigate("planos")}
-                >
-                  Fazer upgrade →
-                </span>
-              )}
-            </p>
-          </div>
+          {!isDark ? (
+            (() => {
+              const initials = getInitials(user?.nome);
+              const nomeCompleto = user?.nome ?? "Aluno";
+              const email = user?.email ?? "";
+              const nomePlano = user?.plano === "premium" ? "Premium" : "Gratuito";
+              const streak = totalConcluidas > 0 ? Math.min(totalConcluidas, 7) : 0;
+              return (
+                <div style={{
+                  background: 'rgba(255,255,255,0.6)',
+                  border: '1px solid rgba(139,92,246,0.2)',
+                  borderRadius: '14px', padding: '18px 20px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  backdropFilter: 'blur(8px)', marginBottom: '16px',
+                  width: '100%',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    {/* Avatar com iniciais */}
+                    <div style={{
+                      width: '48px', height: '48px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '16px', fontWeight: '700', color: '#fff',
+                    }}>{initials}</div>
+                    <div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: '#1e1b4b', letterSpacing: '-.3px' }}>{nomeCompleto}</div>
+                      <div style={{ fontSize: '11px', color: '#a78bfa', marginTop: '2px' }}>{email}</div>
+                      <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px',
+                        background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                        color: '#fff', fontSize: '10px', fontWeight: '700',
+                        padding: '3px 10px', borderRadius: '999px',
+                      }}>⭐ {nomePlano}</div>
+                    </div>
+                  </div>
+                  {/* Stats */}
+                  <div style={{ display: 'flex', gap: '20px' }}>
+                    {[{ num: totalConcluidas, label: 'AULAS' }, { num: emAndamento.length, label: 'CURSOS' }, { num: `${streak}🔥`, label: 'SEQUÊNCIA' }].map(s => (
+                      <div key={s.label} style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '18px', fontWeight: '800', color: '#1e1b4b' }}>{s.num}</div>
+                        <div style={{ fontSize: '9px', color: '#a78bfa', fontWeight: '600', letterSpacing: '.06em' }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()
+          ) : (
+            <div>
+              <div className="section-tag">Área do aluno</div>
+              <h2 className="section-title">
+                Olá, {user?.nome?.split(" ")[0] ?? "Aluno"}! 👋
+              </h2>
+              <p style={{ color: "var(--text2)", fontSize: ".95rem" }}>
+                Plano {user?.plano === "premium" ? "⭐ Premium" : "Gratuito"} ·{" "}
+                {user?.plano === "free" && (
+                  <span
+                    style={{
+                      color: "var(--accent)",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                    onClick={() => onNavigate("planos")}
+                  >
+                    Fazer upgrade →
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
 
           {sugestao?.proximaAula && (
             <div
-              className="dashboard-card"
+              className="dashboard-card progress-card"
               style={{
                 maxWidth: 380,
                 margin: 0,
@@ -142,7 +212,7 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                 <span className="dc-badge">Continuar</span>
               </div>
               <div
-                className="dc-lesson"
+                className="dc-lesson next-lesson-card"
                 onClick={() =>
                   onSelectConteudo(sugestao.conteudo_id, sugestao.nome)
                 }
@@ -193,6 +263,12 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                     key={p.conteudo_id}
                     className="em-andamento-card"
                     onClick={() => onSelectConteudo(p.conteudo_id, p.nome)}
+                    style={!isDark ? {
+                      background: 'rgba(255,255,255,0.6)',
+                      border: '1px solid rgba(139,92,246,0.2)',
+                      borderRadius: '12px', padding: '14px 16px',
+                      backdropFilter: 'blur(8px)', marginBottom: '10px',
+                    } : undefined}
                   >
                     <div className="eac-header">
                       <div className="eac-icon">{p.icone}</div>
@@ -219,12 +295,22 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                         {p.percentual}%
                       </span>
                     </div>
-                    <div className="cc-bar">
-                      <div
-                        className="cc-bar-fill"
-                        style={{ width: `${p.percentual}%`, background: cor }}
-                      />
-                    </div>
+                    {!isDark ? (
+                      <div style={{ height: '5px', background: 'rgba(139,92,246,0.12)', borderRadius: '999px' }}>
+                        <div style={{
+                          height: '100%', width: `${p.percentual}%`,
+                          background: 'linear-gradient(90deg, #7c3aed, #2563eb)',
+                          borderRadius: '999px',
+                        }} />
+                      </div>
+                    ) : (
+                      <div className="cc-bar progress-bar-bg">
+                        <div
+                          className="cc-bar-fill"
+                          style={{ width: `${p.percentual}%`, background: cor }}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -235,7 +321,11 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
         <div>
           <div className="dash-section-title">🗂 Todos os conteúdos</div>
           <div
-            style={{
+            style={!isDark ? {
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: "8px",
+            } : {
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))",
               gap: "1rem",
@@ -248,6 +338,12 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                   key={p.conteudo_id}
                   className="em-andamento-card"
                   onClick={() => onSelectConteudo(p.conteudo_id, p.nome)}
+                  style={!isDark ? {
+                    background: 'rgba(255,255,255,0.6)',
+                    border: '1px solid rgba(139,92,246,0.15)',
+                    borderRadius: '10px', padding: '12px',
+                    backdropFilter: 'blur(8px)',
+                  } : undefined}
                 >
                   <div className="eac-header">
                     <div className="eac-icon">{p.icone}</div>
@@ -282,12 +378,22 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
                       </div>
                     )}
                   </div>
-                  <div className="cc-bar" style={{ marginTop: ".75rem" }}>
-                    <div
-                      className="cc-bar-fill"
-                      style={{ width: `${p.percentual}%`, background: cor }}
-                    />
-                  </div>
+                  {!isDark ? (
+                    <div style={{ height: '5px', background: 'rgba(139,92,246,0.12)', borderRadius: '999px', marginTop: '.75rem' }}>
+                      <div style={{
+                        height: '100%', width: `${p.percentual}%`,
+                        background: 'linear-gradient(90deg, #7c3aed, #2563eb)',
+                        borderRadius: '999px',
+                      }} />
+                    </div>
+                  ) : (
+                    <div className="cc-bar progress-bar-bg" style={{ marginTop: ".75rem" }}>
+                      <div
+                        className="cc-bar-fill"
+                        style={{ width: `${p.percentual}%`, background: cor }}
+                      />
+                    </div>
+                  )}
                   <div
                     style={{
                       display: "flex",

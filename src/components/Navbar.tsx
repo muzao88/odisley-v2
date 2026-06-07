@@ -113,7 +113,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
   const initials = getInitials(user?.nome);
 
   return (
-    <nav style={{ padding: '16px 32px' }}>
+    <nav style={{ padding: '16px 32px', position: 'relative' }}>
       <div
         className="logo"
         onClick={() => onNavigate("home")}
@@ -151,29 +151,38 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
       </div>
 
       <ul className="nav-links" style={{
+        position: 'absolute',
+        left: '50%',
+        transform: 'translateX(-50%)',
         display: 'flex',
         alignItems: 'center',
-        gap: '32px',
+        gap: '28px',
         listStyle: 'none',
+        margin: 0,
+        padding: 0,
       }}>
         {links.map(({ label, page }) => (
           <li key={page}>
             <a
               onClick={() => onNavigate(page)}
-              className={currentPage === page ? "active" : ""}
+              className={`nav-link ${currentPage === page ? "active" : ""}`}
               style={currentPage === page ? {
                 fontSize: '15px',
-                fontWeight: '600',
-                color: 'var(--text)',
                 letterSpacing: '-0.2px',
-                borderBottom: '2px solid #7c3aed',
                 paddingBottom: '2px',
+                ...(isDark ? {
+                  fontWeight: '600',
+                  color: 'var(--text)',
+                  borderBottom: '2px solid #7c3aed',
+                } : {})
               } : {
                 fontSize: '15px',
-                fontWeight: '500',
-                color: 'var(--text3)',
                 letterSpacing: '-0.2px',
                 transition: 'color 0.15s',
+                ...(isDark ? {
+                  fontWeight: '500',
+                  color: 'var(--text3)',
+                } : {})
               }}
             >
               {label}
@@ -184,20 +193,24 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
           <li>
             <a
               onClick={() => onNavigate("dashboard")}
-              className={currentPage === "dashboard" ? "active" : ""}
+              className={`nav-link ${currentPage === "dashboard" ? "active" : ""}`}
               style={currentPage === "dashboard" ? {
                 fontSize: '15px',
-                fontWeight: '600',
-                color: 'var(--text)',
                 letterSpacing: '-0.2px',
-                borderBottom: '2px solid #7c3aed',
                 paddingBottom: '2px',
+                ...(isDark ? {
+                  fontWeight: '600',
+                  color: 'var(--text)',
+                  borderBottom: '2px solid #7c3aed',
+                } : {})
               } : {
                 fontSize: '15px',
-                fontWeight: '500',
-                color: 'var(--text3)',
                 letterSpacing: '-0.2px',
                 transition: 'color 0.15s',
+                ...(isDark ? {
+                  fontWeight: '500',
+                  color: 'var(--text3)',
+                } : {})
               }}
             >
               Meu progresso
@@ -317,7 +330,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
 
               <div
                 className="ud-item"
-                onClick={() => { alert("Em breve: configurações da conta."); setDropOpen(false); }}
+                onClick={() => { onNavigate("configuracoes"); setDropOpen(false); }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
@@ -344,7 +357,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
         ) : (
           <div className="nav-auth-buttons" style={{ display: "flex", gap: "0.5rem" }}>
             <button
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-secondary btn-sm"
               onClick={() => onOpenAuth("login")}
             >
               Entrar
@@ -386,7 +399,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
                   onNavigate(page);
                   setMobileMenuOpen(false);
                 }}
-                className={currentPage === page ? "active" : ""}
+                className={`nav-link ${currentPage === page ? "active" : ""}`}
               >
                 {label}
               </a>
@@ -399,7 +412,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
                   onNavigate("dashboard");
                   setMobileMenuOpen(false);
                 }}
-                className={currentPage === "dashboard" ? "active" : ""}
+                className={`nav-link ${currentPage === "dashboard" ? "active" : ""}`}
               >
                 Meu progresso
               </a>
@@ -442,7 +455,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
           ) : (
             <>
               <button
-                className="btn btn-ghost btn-sm"
+                className="btn btn-ghost btn-secondary btn-sm"
                 onClick={() => {
                   onOpenAuth("login");
                   setMobileMenuOpen(false);

@@ -6,6 +6,8 @@ export interface User {
   plano: 'free' | 'premium';
   progresso_total: number;
   createdAt: string;
+  // Auth provider
+  provider?: 'local' | 'google' | 'apple';
   // Pagamento
   assinaturaStatus?: 'ativa' | 'cancelada' | 'expirada' | null;
   assinaturaExpira?: string | null;
@@ -110,7 +112,7 @@ export interface ExercicioComProgresso extends Exercicio {
 }
 
 // ── UI ───────────────────────────────────────────────────────
-export type Page = 'home' | 'cursos' | 'exercicios' | 'planos' | 'sobre' | 'dashboard' | 'resolucao';
+export type Page = 'home' | 'cursos' | 'exercicios' | 'planos' | 'sobre' | 'dashboard' | 'resolucao' | 'configuracoes';
 export type AuthTab = 'login' | 'register' | 'update_name';
 export type PayMethod = 'pix' | 'card' | 'boleto';
 export type PlanType = 'anual' | 'mensal';

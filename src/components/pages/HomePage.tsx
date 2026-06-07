@@ -102,12 +102,24 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
   return (
     <>
       {/* HERO */}
-      <section className="hero">
+      <section className="hero hero-section">
         <div className="hero-bg">
           <div className="hero-glow" />
           <div className="hero-glow2" />
           <div className="hero-glow-purple" />
           <div className="hero-glow-blue" />
+          <div className="hero-glow-light-1" style={{
+            position: 'absolute', top: '-120px', left: '-100px',
+            width: '420px', height: '420px', borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, transparent 70%)',
+            pointerEvents: 'none', zIndex: 0,
+          }} />
+          <div className="hero-glow-light-2" style={{
+            position: 'absolute', top: '-20px', right: '-100px',
+            width: '320px', height: '320px', borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(99,102,241,0.10) 0%, transparent 70%)',
+            pointerEvents: 'none', zIndex: 0,
+          }} />
           <div className="hero-grid" />
         </div>
         <div className="hero-content">
@@ -133,14 +145,14 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
               {isLoggedIn ? "Continuar estudando" : "Começar grátis agora"}
             </button>
             <button
-              className="btn btn-ghost btn-lg"
+              className="btn btn-ghost btn-secondary btn-lg"
               onClick={() => onNavigate("cursos")}
             >
               Ver todos os cursos
             </button>
           </div>
           <div className="hero-stats">
-            <div className="stat">
+            <div className="stat stat-divider">
               <div className="stat-num">
                 {stats.activeStudents > 0 ? `${stats.activeStudents}` : "0"}
               </div>
@@ -148,11 +160,11 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                 {stats.activeStudents === 1 ? "Aluno ativo" : "Alunos ativos"}
               </div>
             </div>
-            <div className="stat">
+            <div className="stat stat-divider">
               <div className="stat-num">{stats.contents}</div>
               <div className="stat-label">Conteúdos</div>
             </div>
-            <div className="stat">
+            <div className="stat stat-divider">
               <div className="stat-num">{stats.videoLessons}</div>
               <div className="stat-label">Videoaulas</div>
             </div>
@@ -160,7 +172,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         </div>
 
         <div className="hero-visual">
-          <div className="dashboard-card">
+          <div className="dashboard-card progress-card">
             <div className="dc-header">
               <span className="dc-title">
                 {isLoggedIn ? "Seu progresso real" : "Meu progresso"}
@@ -175,7 +187,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                     <span className="dc-pi-label">{p.icone} {p.nome}</span>
                     <span className="dc-pi-pct">{p.percentual}%</span>
                   </div>
-                  <div className="progress-bar">
+                  <div className="progress-bar progress-bar-bg">
                     <div
                       className="progress-fill"
                       style={{ 
@@ -194,7 +206,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
               (() => {
                 const p = userProgress.find(item => item.proximaAula) || userProgress[0];
                 return (
-                  <div className="dc-lesson" onClick={() => onSelectConteudo(p.conteudo_id, p.nome)} style={{ cursor: 'pointer' }}>
+                  <div className="dc-lesson next-lesson-card" onClick={() => onSelectConteudo(p.conteudo_id, p.nome)} style={{ cursor: 'pointer' }}>
                     <div className="dc-lesson-icon">{p.icone}</div>
                     <div className="dc-lesson-info">
                       <div className="dc-lesson-title">{p.proximaAula?.titulo || "Continuar curso"}</div>
@@ -205,7 +217,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                 );
               })()
             ) : (
-              <div className="dc-lesson">
+              <div className="dc-lesson next-lesson-card">
                 <div className="dc-lesson-icon">📐</div>
                 <div className="dc-lesson-info">
                   <div className="dc-lesson-title">Vértice da parábola</div>
@@ -240,7 +252,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
             </p>
           </div>
           <button
-            className="btn btn-ghost btn-md"
+            className="btn btn-ghost btn-secondary btn-md"
             onClick={() => onNavigate("cursos")}
           >
             Ver todos os conteúdos →
@@ -282,7 +294,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                     <span>Progresso</span>
                     <span>0%</span>
                   </div>
-                  <div className="cc-bar">
+                  <div className="cc-bar progress-bar-bg">
                     <div
                       className="cc-bar-fill"
                       style={{ width: "0%", background: cor }}
@@ -407,7 +419,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
             Criar conta gratuita
           </button>
           <button
-            className="btn btn-ghost btn-lg"
+            className="btn btn-ghost btn-secondary btn-lg"
             onClick={() => onNavigate("planos")}
           >
             Ver planos e preços

@@ -16,10 +16,21 @@
     --text: #18181b;
     --text2: #71717a;
     --text3: #a1a1aa;
-    --border: #f0f0f3;
+    --border: rgba(139, 92, 246, 0.15);
     --border2: #e4e4e7;
     --radius: 14px;
     --nav-h: 80px;
+
+    /* Lavender Theme variables */
+    --background: #f3f0ff;
+    --foreground: #1e1b4b;
+    --card: rgba(255, 255, 255, 0.75);
+    --card-border: rgba(139, 92, 246, 0.2);
+    --muted: rgba(139, 92, 246, 0.08);
+    --muted-foreground: #a78bfa;
+    --text-secondary: #6b7280;
+    --primary: #7c3aed;
+    --primary-foreground: #ffffff;
 }
 
 /* ── TEMA ESCURO ──────────────────────────────────────── */
@@ -229,6 +240,106 @@ html.dark h1 {
     color: #f1f0ff;
 }
 
+/* ── ESTILO LAVANDA LIGHT MODE ────────────────────────────────── */
+html:not(.dark) {
+    --bg: #f3f0ff;
+    --bg2: #f3f0ff;
+    --bg3: rgba(139, 92, 246, 0.08);
+    --surface: rgba(255, 255, 255, 0.75);
+    --surface2: rgba(255, 255, 255, 0.75);
+    --border: rgba(139, 92, 246, 0.15);
+    --border2: rgba(139, 92, 246, 0.2);
+    --text: #1e1b4b;
+    --text2: #6b7280;
+    --text3: #a78bfa;
+    --accent: #7c3aed;
+}
+
+html:not(.dark) body {
+    background: #f3f0ff;
+}
+
+html:not(.dark) .hero-section {
+    background: #f3f0ff;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glows de fundo no hero */
+html.dark .hero-glow-light-1,
+html.dark .hero-glow-light-2 {
+    display: none !important;
+}
+
+html:not(.dark) nav {
+    background: rgba(243, 240, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+html:not(.dark) .nav-link {
+    color: #a78bfa;
+}
+
+html:not(.dark) .nav-link.active {
+    color: #1e1b4b;
+    font-weight: 600;
+    border-bottom: 2px solid #7c3aed;
+}
+
+html:not(.dark) .theme-toggle {
+    background: rgba(139, 92, 246, 0.10);
+    border: 1px solid rgba(139, 92, 246, 0.20);
+}
+
+/* Botões */
+html:not(.dark) .btn-secondary {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    color: #4c1d95;
+}
+
+html:not(.dark) .btn-primary {
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.30);
+}
+
+/* Card de progresso e aula */
+html:not(.dark) .progress-card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(139, 92, 246, 0.20);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.10);
+}
+
+html:not(.dark) .next-lesson-card {
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+}
+
+/* Stats */
+html:not(.dark) .stat-label {
+    color: #a78bfa;
+    font-weight: 600;
+}
+
+html:not(.dark) .stat-divider {
+    border-right: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+/* Barra de progresso */
+html:not(.dark) .progress-bar-bg {
+    background: rgba(139, 92, 246, 0.12);
+}
+
+/* Textos */
+html:not(.dark) h1 {
+    color: #1e1b4b;
+}
+
+html:not(.dark) p {
+    color: #6b7280;
+}
+
 
 /* Botão de tema ────────────────────────────────────── */
 .theme-toggle {
@@ -269,6 +380,16 @@ body {
     color: var(--text);
     overflow-x: hidden;
     min-height: 100vh;
+}
+
+/* Fix autofill amarelo dos inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255,255,255,0.7) inset !important;
+    -webkit-text-fill-color: #1e1b4b !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 /* ── SCROLLBAR ─────────────────────────────── */
@@ -1841,18 +1962,17 @@ footer {
     display: flex;
     flex-direction: row;
     font-family: sans-serif;
-    background-color: #fff;
+    background-color: #f3f0ff;
 }
 
 .welcome-left {
     flex: 1;
-    background-color: #1a4fd6;
+    background: linear-gradient(145deg, #1e1b4b 0%, #3730a3 40%, #1d4ed8 100%);
     color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
+    justify-content: space-between;
+    padding: 36px 32px;
     position: relative;
     overflow: hidden;
 }
@@ -1863,15 +1983,15 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 40px;
-    background-color: #fff;
+    padding: 36px 32px;
+    background: #f3f0ff;
 }
 
 .auth-modal-container {
     max-width: 900px;
     width: 100%;
     height: 600px;
-    background-color: #fff;
+    background-color: #f3f0ff;
     border-radius: 16px;
     overflow: hidden;
     display: flex;
@@ -1882,22 +2002,23 @@ footer {
 
 .auth-modal-left {
     flex: 1;
-    background-color: #1a4fd6;
+    background: linear-gradient(145deg, #1e1b4b 0%, #3730a3 40%, #1d4ed8 100%);
     color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 40px;
+    justify-content: space-between;
+    padding: 36px 32px;
     position: relative;
+    overflow: hidden;
 }
 
 .auth-modal-right {
     flex: 1;
-    padding: 40px;
+    padding: 36px 32px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background-color: #fff;
+    background: #f3f0ff;
 }
 
 /* Conteudo Page main grid */

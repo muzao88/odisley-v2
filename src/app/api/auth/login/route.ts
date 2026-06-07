@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         plano: user.plano,
         progresso_total: user.progresso_total,
+        provider: user.provider,
       },
     });
   } catch (err: any) {

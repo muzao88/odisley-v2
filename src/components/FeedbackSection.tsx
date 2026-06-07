@@ -100,7 +100,7 @@ export default function FeedbackSection() {
             ))}
           </div>
           <button 
-            className="btn btn-ghost btn-sm" 
+            className="btn btn-ghost btn-secondary btn-sm" 
             style={{ marginTop: '0.5rem' }}
             onClick={() => setIsEditing(true)}
           >

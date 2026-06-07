@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
         plano: user.plano,
         avatar: user.avatar,
         progresso_total: user.progresso_total,
+        provider: user.provider,
       },
     });
   } catch (err) {

@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       token,
-      user: { _id: user._id, nome: user.nome, email: user.email, plano: user.plano, progresso_total: 0 },
+      user: { _id: user._id, nome: user.nome, email: user.email, plano: user.plano, progresso_total: 0, provider: user.provider },
     }, { status: 201 });
   } catch (err: any) {
     console.error('[register]', err);
