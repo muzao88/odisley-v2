@@ -79,6 +79,25 @@ export default function ExerciseResolutionPage({exerciseId,onBack}:Props){
 
   useEffect(()=>{if(exerciseId)loadExercise(exerciseId);else setLoading(false);},[exerciseId,loadExercise]);
 
+  useEffect(() => {
+    if (phase === "result" && exercise) {
+      try {
+        const total = exercise.questoes?.length || 0;
+        const pts = respostas.filter(r => r.acerto).length;
+        const perc = total ? Math.round((pts / total) * 100) : 0;
+        
+        const map = JSON.parse(localStorage.getItem('odisley_exercise_progress') || '{}');
+        map[exercise._id] = {
+          questoesRespondidas: total,
+          totalQuestoes: total,
+          percentual: perc,
+          status: "Concluído"
+        };
+        localStorage.setItem('odisley_exercise_progress', JSON.stringify(map));
+      } catch(e) {}
+    }
+  }, [phase, exercise, respostas]);
+
   const questoes=exercise?.questoes||[];
   const qAtiva=questoes[currentIdx] as Questao|undefined;
   const progress=questoes.length?((currentIdx+(showFeedback?1:0))/questoes.length)*100:0;

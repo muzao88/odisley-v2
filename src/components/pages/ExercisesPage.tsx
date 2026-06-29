@@ -41,22 +41,31 @@ export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise,
               premium: ex.tipoAcesso === "premium"
             };
             
-            // Simular progresso (mockado por enquanto)
+            // Ler progresso do localStorage
             if (!isLoggedIn) {
               return { ...baseEx, questoesRespondidas: 0, status: "Não iniciado", percentual: 0 };
             }
             
-            const hash = String(ex._id).split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-            const rand = hash % 10;
-            
-            if (rand < 2) {
-              return { ...baseEx, questoesRespondidas: baseEx.totalQuestoes, status: "Concluído", percentual: 100 };
-            } else if (rand < 5) {
-              const resp = Math.floor(baseEx.totalQuestoes * 0.4);
-              return { ...baseEx, questoesRespondidas: resp, status: "Em andamento", percentual: Math.round((resp / baseEx.totalQuestoes) * 100) };
-            } else {
-              return { ...baseEx, questoesRespondidas: 0, status: "Não iniciado", percentual: 0 };
-            }
+            let prog = { questoesRespondidas: 0, status: "Não iniciado", percentual: 0 };
+            try {
+              const map = JSON.parse(localStorage.getItem('odisley_exercise_progress') || '{}');
+              if (map[baseEx._id]) {
+                prog = map[baseEx._id];
+              } else {
+                // Mock se não houver progresso salvo
+                const hash = String(ex._id).split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+                const rand = hash % 10;
+                
+                if (rand < 2) {
+                  prog = { questoesRespondidas: baseEx.totalQuestoes, status: "Concluído", percentual: 100 };
+                } else if (rand < 5) {
+                  const resp = Math.floor(baseEx.totalQuestoes * 0.4);
+                  prog = { questoesRespondidas: resp, status: "Em andamento", percentual: Math.round((resp / baseEx.totalQuestoes) * 100) };
+                }
+              }
+            } catch (e) {}
+
+            return { ...baseEx, ...prog };
           });
           setExercises(mapped);
         } else {
@@ -168,6 +177,7 @@ function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, 
         flexDirection: 'column',
         justifyContent: 'space-between',
         minHeight: '180px',
+        borderLeft: ex.status === "Concluído" ? '3px solid #16a34a' : undefined,
       }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)';
@@ -247,13 +257,26 @@ function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, 
         <div style={{ height: '1px', background: '#f4f4f5', margin: '10px 0' }} className="exercise-card-divider" />
 
         {/* Status */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: 'var(--text3)', fontWeight: '500' }}>
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: getStatusColor(ex.status) }} />
-            {ex.status}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {ex.status === "Concluído" ? (
+              <>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', background: '#16a34a', color: '#fff', fontWeight: '700', padding: '2px 10px', borderRadius: '999px' }}>
+                  ✓ Concluído
+                </div>
+                <div style={{ fontSize: '10px', color: '#16a34a', fontWeight: '600' }}>
+                  {ex.questoesRespondidas}/{ex.totalQuestoes} questões · {ex.percentual}%
+                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', color: 'var(--text3)', fontWeight: '500' }}>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: getStatusColor(ex.status) }} />
+                {ex.status}
+              </div>
+            )}
           </div>
           {ex.status === "Em andamento" && (
-            <span style={{ fontSize: '10px', color: '#71717a', fontWeight: '500' }}>
+            <span style={{ fontSize: '10px', color: '#71717a', fontWeight: '500', marginTop: '2px' }}>
               {ex.questoesRespondidas} / {ex.totalQuestoes}
             </span>
           )}
@@ -263,13 +286,14 @@ function ExerciseCard({ ex, cor, hasAccess, isLoggedIn, onOpenAuth, onNavigate, 
         <button style={{
           width: '100%',
           marginTop: '10px',
-          background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
-          color: '#fff',
-          fontSize: '11px',
+          background: ex.status === "Concluído" ? 'transparent' : 'linear-gradient(135deg, #7c3aed, #2563eb)',
+          color: ex.status === "Concluído" ? '#16a34a' : '#fff',
+          border: ex.status === "Concluído" ? '1px solid #16a34a' : 'none',
+          fontSize: '0.9rem',
           fontWeight: '600',
+          letterSpacing: '0.02em',
           padding: '8px',
           borderRadius: '7px',
-          border: 'none',
           cursor: 'pointer',
         }}>
           {ex.status === "Não iniciado" ? "Iniciar exercício" : ex.status === "Em andamento" ? "Continuar exercício" : "Refazer exercício"}
