@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../AuthContext";
 import type { Page } from "@/types";
 
@@ -14,6 +14,17 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
   const [nome, setNome] = useState(user?.nome ?? "");
   const [savingNome, setSavingNome] = useState(false);
   const [nomeMsg, setNomeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Avatar upload
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarMsg, setAvatarMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar ?? null);
+
+  // Sync avatarPreview when user changes (e.g. on refresh)
+  useEffect(() => {
+    setAvatarPreview(user?.avatar ?? null);
+  }, [user?.avatar]);
 
   // Security Modal
   const [pwdModalOpen, setPwdModalOpen] = useState(false);
@@ -60,6 +71,59 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
     const next = !emailNotifications;
     setEmailNotifications(next);
     localStorage.setItem("odisley_email_notifications", String(next));
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setAvatarMsg({ type: 'error', text: 'Formato inválido. Use JPG, PNG ou WEBP.' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarMsg({ type: 'error', text: 'Imagem muito grande. Limite: 5MB.' });
+      return;
+    }
+
+    setAvatarLoading(true);
+    setAvatarMsg(null);
+
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const base64 = ev.target?.result as string;
+      setAvatarPreview(base64);
+      try {
+        const res = await fetch('/api/auth/upload-avatar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ avatar: base64 }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao salvar foto.');
+        await refreshUser();
+        setAvatarMsg({ type: 'success', text: 'Foto de perfil atualizada!' });
+        setTimeout(() => setAvatarMsg(null), 3000);
+      } catch (err: any) {
+        setAvatarMsg({ type: 'error', text: err.message });
+        setAvatarPreview(user?.avatar ?? null); // revert
+      } finally {
+        setAvatarLoading(false);
+        if (avatarInputRef.current) avatarInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
   const handleSaveNome = async (e: React.FormEvent) => {
@@ -243,6 +307,72 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
       <div style={cardStyle}>
         <h3 style={titleStyle}>Informações Pessoais</h3>
         <p style={subStyle}>Edite seus dados de identificação e contato.</p>
+        {/* Avatar picker */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div
+              onClick={() => !avatarLoading && avatarInputRef.current?.click()}
+              title="Clique para alterar a foto"
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                background: avatarPreview ? 'transparent' : 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: avatarLoading ? 'not-allowed' : 'pointer',
+                overflow: 'hidden',
+                border: '2px solid rgba(124,58,237,0.4)',
+                boxShadow: '0 0 0 3px rgba(124,58,237,0.1)',
+                transition: 'box-shadow 0.2s, transform 0.2s',
+                position: 'relative',
+              }}
+            >
+              {avatarLoading ? (
+                <div style={{
+                  width: 24, height: 24, borderRadius: '50%',
+                  border: '3px solid rgba(255,255,255,0.3)',
+                  borderTopColor: '#fff',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+              ) : avatarPreview ? (
+                <img src={avatarPreview} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.4rem' }}>{getInitials(user?.nome)}</span>
+              )}
+              {/* Overlay escuro no hover */}
+              {!avatarLoading && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'rgba(0,0,0,0.35)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
+                  borderRadius: '50%',
+                }} className="avatar-overlay">
+                  <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.3 }}>📷<br />Alterar</span>
+                </div>
+              )}
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: isDark ? 'var(--text)' : '#1e1b4b', marginBottom: '4px' }}>Foto de Perfil</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text3)', lineHeight: 1.5 }}>Clique na foto para alterar.<br />JPG, PNG ou WEBP · Máx. 5MB</div>
+            {avatarMsg && (
+              <div style={{ fontSize: '0.8rem', fontWeight: 500, marginTop: '6px', color: avatarMsg.type === 'success' ? 'var(--green)' : 'var(--red)' }}>
+                {avatarMsg.text}
+              </div>
+            )}
+          </div>
+        </div>
         <form onSubmit={handleSaveNome} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div>
             <label style={labelStyle}>Nome Completo</label>

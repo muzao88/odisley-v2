@@ -515,7 +515,7 @@ export default function ConteudoPage({
   onOpenAuth,
   onOpenUpgrade,
 }: Props) {
-  const { token, isPremium, isLoggedIn } = useAuth();
+  const { token, isPremium, isLoggedIn, logout } = useAuth();
   const [aulas, setAulas] = useState<AulaComStatus[]>([]);
   const [aulaAtiva, setAulaAtiva] = useState<AulaComStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -547,6 +547,21 @@ export default function ConteudoPage({
       } catch {
         // Fallback mock
         if (conteudo) {
+          let concluidasSet = new Set<string>();
+          if (token) {
+            try {
+              const r = await fetch(`/api/progresso/aulas-concluidas?t=${Date.now()}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              if (r.ok) {
+                const list = await r.json();
+                concluidasSet = new Set(list);
+              } else if (r.status === 401) {
+                logout();
+              }
+            } catch (e) {}
+          }
+
           const mock = mockAulas(
             conteudo.nome,
             conteudo.totalAulas,
@@ -554,8 +569,8 @@ export default function ConteudoPage({
           ).map<AulaComStatus>((a) => ({
             ...a,
             // Para cursos premium, todas as aulas ficam bloqueadas para não-assinantes
-            // Premium users have access to everything
             bloqueada: !isGratuito && !isPremium,
+            concluida: concluidasSet.has(a._id),
           }));
           setAulas(mock);
           setAulaAtiva(mock[0] ?? null);
@@ -574,7 +589,7 @@ export default function ConteudoPage({
     if (!aulaAtiva || !token || aulaAtiva.bloqueada) return;
     setMarcando(true);
     try {
-      await fetch("/api/progresso", {
+      const response = await fetch("/api/progresso", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -582,6 +597,18 @@ export default function ConteudoPage({
         },
         body: JSON.stringify({ aula_id: aulaAtiva._id }),
       });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert("Sua sessão expirou. Por favor, faça login novamente.");
+          logout();
+          return;
+        }
+        const errorData = await response.text();
+        alert("Erro ao salvar progresso: " + errorData);
+        return;
+      }
+
       setAulas((prev) =>
         prev.map((a) =>
           a._id === aulaAtiva._id ? { ...a, concluida: true } : a,

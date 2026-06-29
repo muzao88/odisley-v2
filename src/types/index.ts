@@ -6,6 +6,7 @@ export interface User {
   plano: 'free' | 'premium';
   progresso_total: number;
   createdAt: string;
+  avatar?: string | null;
   // Auth provider
   provider?: 'local' | 'google' | 'apple';
   // Pagamento

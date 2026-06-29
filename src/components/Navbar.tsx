@@ -248,16 +248,30 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth }: Props) {
 
         {isLoggedIn ? (
           <div className="user-menu" ref={menuRef}>
-            {/* Avatar com iniciais */}
-            <div className="ud-avatar-btn" onClick={() => setDropOpen((o) => !o)}>
-              {initials}
+            {/* Avatar com foto ou iniciais */}
+            <div className="ud-avatar-btn" onClick={() => setDropOpen((o) => !o)} style={{ padding: 0, overflow: 'hidden' }}>
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.nome}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                />
+              ) : initials}
             </div>
 
             {/* ─── Dropdown ─── */}
             <div className={`user-dropdown ${dropOpen ? "open" : ""}`}>
               {/* Header: avatar + nome + email + badge */}
               <div className="ud-header">
-                <div className="ud-header-avatar">{initials}</div>
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.nome}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                  />
+                ) : (
+                  <div className="ud-header-avatar">{initials}</div>
+                )}
                 <div className="ud-header-info">
                   <div className="ud-header-name">{user?.nome}</div>
                   <div className="ud-header-email">

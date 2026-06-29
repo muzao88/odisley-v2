@@ -2176,3 +2176,12 @@ html.light .exercise-card {
   border-color: #e4e4e7;
 }
 
+
+/* ── Avatar upload ────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+div:hover > .avatar-overlay {
+  opacity: 1 !important;
+}

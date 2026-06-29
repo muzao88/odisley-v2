@@ -67,7 +67,7 @@ export const AulaModel = models.Aula || model('Aula', AulaSchema);
 const ProgressoSchema = new Schema(
   {
     user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    aula_id: { type: Schema.Types.ObjectId, ref: 'Aula', required: true },
+    aula_id: { type: String, required: true },
     concluido: { type: Boolean, default: false },
     data_conclusao: { type: Date },
   },

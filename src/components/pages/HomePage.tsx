@@ -75,7 +75,28 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
             const sorted = filtered
               .sort((a: any, b: any) => b.percentual - a.percentual)
               .slice(0, 4);
-            setUserProgress(sorted);
+
+            let itemsToDisplay = [...sorted];
+            
+            // Se tiver menos de 4 itens em andamento, completa com os demais conteúdos marcando 0%
+            if (itemsToDisplay.length < 4) {
+              const usedNames = itemsToDisplay.map((p: any) => p.nome);
+              for (const c of CONTEUDOS_SEED) {
+                if (itemsToDisplay.length >= 4) break;
+                if (!usedNames.includes(c.nome)) {
+                  const pData = data.find((d: any) => d.nome === c.nome);
+                  itemsToDisplay.push({
+                    nome: c.nome,
+                    percentual: pData?.percentual || 0,
+                    categoria: c.categoria,
+                    icone: c.icone,
+                    conteudo_id: pData?.conteudo_id || String(c._id)
+                  });
+                }
+              }
+            }
+            
+            setUserProgress(itemsToDisplay);
           }
         })
         .catch(console.error)
@@ -95,8 +116,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
     { nome: "Geometria Plana", percentual: 30, categoria: "Geometria", icone: "📏" },
   ];
 
-  const isUsingRealData = isLoggedIn && userProgress.length > 0;
-  const displayProgress = isUsingRealData ? userProgress : defaultHeroProgress;
+  const displayProgress = (isLoggedIn && !loading) ? userProgress : defaultHeroProgress;
 
 
   return (

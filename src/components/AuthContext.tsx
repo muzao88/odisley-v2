@@ -65,7 +65,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { Authorization: `Bearer ${t}` },
       });
 
-      if (!res.ok) return;
+      if (!res.ok) {
+        if (res.status === 401) {
+          // Token expirou ou é inválido, forçar logout
+          logout();
+        }
+        return;
+      }
 
       const data = await res.json();
       if (data.user) {
