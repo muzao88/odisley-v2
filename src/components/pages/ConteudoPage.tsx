@@ -537,11 +537,32 @@ export default function ConteudoPage({
         const headers: Record<string, string> = token
           ? { Authorization: `Bearer ${token}` }
           : {};
-        const res = await fetch(`/api/conteudos/${conteudoId}/aulas`, {
+
+        let targetConteudoId = conteudoId;
+        
+        // Se viemos do HomePage com id fake, busca o id real primeiro
+        if (!targetConteudoId || targetConteudoId === 'undefined') {
+          const cRes = await fetch('/api/conteudos');
+          if (cRes.ok) {
+            const cData = await cRes.json();
+            const realC = cData.find((c: any) => c.nome === conteudoNome);
+            if (realC) {
+              targetConteudoId = realC._id;
+            }
+          }
+        }
+
+        const res = await fetch(`/api/conteudos/${targetConteudoId}/aulas`, {
           headers,
         });
         if (!res.ok) throw new Error("api-error");
         const data: AulaComStatus[] = await res.json();
+        
+        // Se a API retornou vazio mas temos aulas mockadas, joga para o fallback no ambiente de dev
+        if (data.length === 0 && conteudo && conteudo.totalAulas > 0) {
+           throw new Error("mock-fallback");
+        }
+        
         setAulas(data);
         setAulaAtiva(data[0] ?? null);
       } catch {

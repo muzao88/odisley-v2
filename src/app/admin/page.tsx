@@ -1,6 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  PieChart,
+  Pie,
+  Legend,
+} from "recharts";
+import {
+  IconLayoutDashboard,
+  IconUsers,
+  IconBook2,
+  IconPencil,
+  IconMessage2,
+  IconLogout,
+} from "@tabler/icons-react";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 interface Stats {
@@ -11,6 +31,8 @@ interface Stats {
   totalAulas: number;
   assinaturasAtivas: number;
   recentes: Usr[];
+  cadastrosPorMes?: { name: string; cadastros: number }[];
+  engajamentoCursos?: { name: string; percentual: number }[];
 }
 interface Usr {
   _id: string;
@@ -66,39 +88,51 @@ interface ExercicioAdmin {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const api = (token: string) => ({
-  get: (url: string) =>
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) =>
-      r.json(),
-    ),
-  post: (url: string, body: object) =>
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    }).then((r) => r.json()),
-  patch: (url: string, body: object) =>
-    fetch(url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    }).then((r) => r.json()),
-  del: (url: string, body: object) =>
-    fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    }).then((r) => r.json()),
-});
+const api = (token: string) => {
+  const handleResponse = async (r: Response) => {
+    if (!r.ok) {
+      if (r.status === 401 || r.status === 403) {
+        sessionStorage.removeItem("admin_token");
+        window.location.reload();
+      }
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.error || "Erro na requisição");
+    }
+    return r.json();
+  };
+
+  return {
+    get: (url: string) =>
+      fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then(handleResponse).catch(() => ({})),
+    post: (url: string, body: object) =>
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }).then(handleResponse),
+    patch: (url: string, body: object) =>
+      fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }).then(handleResponse),
+    del: (url: string, body: object) =>
+      fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      }).then(handleResponse),
+  };
+};
 
 // ─── CSS inline ───────────────────────────────────────────────────────────────
 const S = {
@@ -380,174 +414,276 @@ function Overview({ token }: { token: string }) {
 
   const statCards = [
     {
-      label: "Total de usuários",
+      label: "Usuários",
       value: stats.totalUsuarios,
       icon: "👥",
       color: "#378ADD",
     },
     {
-      label: "Assinantes Premium",
+      label: "Premium",
       value: stats.totalPremium,
       icon: "⭐",
       color: "#f7c94f",
     },
     {
-      label: "Usuários Gratuitos",
-      value: stats.totalFree,
-      icon: "🆓",
-      color: "#8fa4c8",
-    },
-    {
       label: "Conteúdos",
       value: stats.totalConteudos,
-      icon: "📚",
+      icon: "🎓",
       color: "#3fcf8e",
     },
     {
-      label: "Aulas cadastradas",
+      label: "Videoaulas",
       value: stats.totalAulas,
       icon: "🎬",
       color: "#f7934f",
     },
-    {
-      label: "Assinaturas ativas",
-      value: stats.assinaturasAtivas,
-      icon: "💳",
-      color: "#f7c94f",
-    },
   ];
 
-  return (
-    <div>
-      <h2
-        style={{
-          fontFamily: "'Syne',sans-serif",
-          fontWeight: 800,
-          marginBottom: "1.5rem",
-        }}
-      >
-        Visão Geral
-      </h2>
+  const planData = [
+    { name: "Gratuito", value: stats.totalFree, color: "#378ADD" },
+    { name: "Premium", value: stats.totalPremium, color: "#f7c94f" },
+  ];
 
-      {/* Stats grid */}
+  const conversionRate = stats.totalUsuarios > 0
+    ? ((stats.totalPremium / stats.totalUsuarios) * 100).toFixed(1)
+    : "0.0";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      {/* 4-column metric grid */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))",
+          gridTemplateColumns: "repeat(4, 1fr)",
           gap: "1rem",
-          marginBottom: "2rem",
         }}
       >
         {statCards.map((s) => (
           <div
             key={s.label}
-            style={{ ...S.card, borderLeft: `3px solid ${s.color}` }}
+            style={{
+              ...S.card,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.85rem 1.15rem",
+            }}
           >
-            <div style={{ fontSize: "1.5rem", marginBottom: ".4rem" }}>
-              {s.icon}
+            <div>
+              <div
+                style={{
+                  fontSize: "1.375rem", // 22px
+                  fontWeight: 500,
+                  color: "#e2e8f0",
+                }}
+              >
+                {s.value}
+              </div>
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#8fa4c8",
+                  marginTop: "0.15rem",
+                }}
+              >
+                {s.label}
+              </div>
             </div>
-            <div
-              style={{
-                fontFamily: "'Syne',sans-serif",
-                fontSize: "1.8rem",
-                fontWeight: 800,
-                color: s.color,
-              }}
-            >
-              {s.value}
-            </div>
-            <div
-              style={{
-                fontSize: ".73rem",
-                color: "#4d6380",
-                marginTop: ".15rem",
-              }}
-            >
-              {s.label}
-            </div>
+            <div style={{ fontSize: "1.75rem" }}>{s.icon}</div>
           </div>
         ))}
       </div>
 
-      {/* Últimos cadastrados */}
-      <div style={S.card}>
-        <h3
-          style={{
-            fontFamily: "'Syne',sans-serif",
-            fontWeight: 700,
-            marginBottom: "1rem",
-            fontSize: ".95rem",
-          }}
-        >
-          Últimos usuários cadastrados
-        </h3>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: ".82rem",
-          }}
-        >
-          <thead>
-            <tr style={{ color: "#4d6380" }}>
-              <th
+      {/* Grid de 2 colunas para os gráficos */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "2fr 1fr",
+          gap: "1.25rem",
+        }}
+      >
+        {/* Coluna da Esquerda (2/3) */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Card Engajamento por curso */}
+          <div style={S.card}>
+            <h3
+              style={{
+                fontFamily: "'Syne',sans-serif",
+                fontWeight: 700,
+                fontSize: "0.88rem",
+                color: "#e2e8f0",
+                marginBottom: "0.75rem",
+              }}
+            >
+              Engajamento por curso (média de progresso)
+            </h3>
+            <ResponsiveContainer width="100%" height={(stats.engajamentoCursos?.length || 4) * 36 + 20}>
+              <BarChart
+                data={stats.engajamentoCursos || []}
+                layout="vertical"
+                margin={{ top: 4, right: 30, left: 10, bottom: 4 }}
+              >
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  stroke="#4d6380"
+                  fontSize={9}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => `${v}%`}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  stroke="#8fa4c8"
+                  fontSize={9}
+                  width={130}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(name: string) => name.length > 18 ? name.slice(0, 17) + '…' : name}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#0d1426", borderColor: "rgba(55,138,221,.18)", borderRadius: "8px", fontSize: "12px" }}
+                  formatter={(value: any) => [`${value}%`, "Progresso Médio"]}
+                />
+                <Bar dataKey="percentual" radius={[0, 4, 4, 0]} barSize={14} minPointSize={2}>
+                  {(stats.engajamentoCursos || []).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.percentual > 0 ? (index % 2 === 0 ? "#378ADD" : "#185FA5") : "#1a2540"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Card Novos cadastros por mês */}
+          <div style={S.card}>
+            <h3
+              style={{
+                fontFamily: "'Syne',sans-serif",
+                fontWeight: 700,
+                fontSize: "0.88rem",
+                color: "#e2e8f0",
+                marginBottom: "0.75rem",
+              }}
+            >
+              Novos cadastros por mês
+            </h3>
+            <ResponsiveContainer width="100%" height={150}>
+              <BarChart
+                data={stats.cadastrosPorMes || []}
+                margin={{ top: 4, right: 12, left: -28, bottom: 0 }}
+              >
+                <XAxis
+                  dataKey="name"
+                  stroke="#4d6380"
+                  fontSize={9}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#4d6380"
+                  fontSize={9}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#0d1426", borderColor: "rgba(55,138,221,.18)", borderRadius: "8px", fontSize: "12px" }}
+                  formatter={(value: any) => [value, "Cadastros"]}
+                />
+                <Bar dataKey="cadastros" fill="#3fcf8e" radius={[4, 4, 0, 0]} barSize={22} minPointSize={2} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Coluna da Direita (1/3) */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {/* Card Distribuição de planos */}
+          <div style={{ ...S.card, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+            <div>
+              <h3
                 style={{
-                  textAlign: "left",
-                  padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(55,138,221,.1)",
+                  fontFamily: "'Syne',sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.88rem",
+                  color: "#e2e8f0",
+                  marginBottom: "1.25rem",
                 }}
               >
-                Nome
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(55,138,221,.1)",
-                }}
-              >
-                E-mail
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(55,138,221,.1)",
-                }}
-              >
-                Plano
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: ".5rem .75rem",
-                  borderBottom: "1px solid rgba(55,138,221,.1)",
-                }}
-              >
-                Cadastro
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {stats.recentes.map((u) => (
-              <tr
-                key={u._id}
-                style={{ borderBottom: "1px solid rgba(55,138,221,.06)" }}
-              >
-                <td style={{ padding: ".6rem .75rem" }}>{u.nome}</td>
-                <td style={{ padding: ".6rem .75rem", color: "#8fa4c8" }}>
-                  {u.email}
-                </td>
-                <td style={{ padding: ".6rem .75rem" }}>
-                  <span style={S.badge(u.plano)}>{u.plano}</span>
-                </td>
-                <td style={{ padding: ".6rem .75rem", color: "#4d6380" }}>
-                  {new Date(u.createdAt).toLocaleDateString("pt-BR")}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                Distribuição de planos
+              </h3>
+              <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+                <ResponsiveContainer width="100%" height={160}>
+                  <PieChart>
+                    <Pie
+                      data={planData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {planData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: "#0d1426", borderColor: "rgba(55,138,221,.18)", borderRadius: "8px" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Central conversion badge in donut chart */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    textAlign: "center",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#f7c94f" }}>
+                    {conversionRate}%
+                  </div>
+                  <div style={{ fontSize: "0.55rem", color: "#8fa4c8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Conversão
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Legend */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "1rem" }}>
+              {planData.map((p) => {
+                const percentage = stats.totalUsuarios > 0
+                  ? ((p.value / stats.totalUsuarios) * 100).toFixed(0)
+                  : "0";
+                return (
+                  <div
+                    key={p.name}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      fontSize: "0.78rem",
+                      color: "#8fa4c8",
+                      padding: "0.2rem 0",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: p.color }} />
+                      <span>{p.name}</span>
+                    </div>
+                    <span style={{ fontWeight: 600, color: "#e2e8f0" }}>
+                      {p.value} ({percentage}%)
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -2254,54 +2390,235 @@ function Exercicios({ token }: { token: string }) {
 function Painel({ token, onLogout }: { token: string; onLogout: () => void }) {
   const [aba, setAba] = useState<Aba>("overview");
 
-  const abas: { id: Aba; label: string; icon: string }[] = [
-    { id: "overview", label: "Visão Geral", icon: "📊" },
-    { id: "usuarios", label: "Usuários", icon: "👥" },
-    { id: "conteudos", label: "Conteúdos & Aulas", icon: "📚" },
-    { id: "exercicios", label: "Exercícios", icon: "📝" },
-    { id: "feedbacks", label: "Feedbacks", icon: "💬" },
+  const abas: { id: Aba; label: string; sidebarLabel: string; icon: React.ReactNode }[] = [
+    { id: "overview", label: "Visão Geral", sidebarLabel: "Geral", icon: <IconLayoutDashboard size={20} /> },
+    { id: "usuarios", label: "Alunos", sidebarLabel: "Alunos", icon: <IconUsers size={20} /> },
+    { id: "conteudos", label: "Conteúdos & Aulas", sidebarLabel: "Aulas", icon: <IconBook2 size={20} /> },
+    { id: "exercicios", label: "Exercícios", sidebarLabel: "Exercícios", icon: <IconPencil size={20} /> },
+    { id: "feedbacks", label: "Feedbacks", sidebarLabel: "Feedbacks", icon: <IconMessage2 size={20} /> },
   ];
 
   return (
-    <div style={S.page}>
-      {/* Navbar */}
-      <nav style={S.nav}>
-        <div style={S.logo}>Odisley Admin</div>
-        <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-          {abas.map((a) => (
-            <button
-              key={a.id}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: aba === a.id ? "#378ADD" : "#4d6380",
-                fontWeight: aba === a.id ? 700 : 500,
-                fontSize: ".85rem",
-                fontFamily: "'DM Sans',sans-serif",
-                borderBottom:
-                  aba === a.id ? "2px solid #378ADD" : "2px solid transparent",
-                paddingBottom: ".25rem",
-                transition: ".15s",
-              }}
-              onClick={() => setAba(a.id)}
-            >
-              {a.icon} {a.label}
-            </button>
-          ))}
-        </div>
-        <button style={S.btn("ghost")} onClick={onLogout}>
-          Sair
-        </button>
-      </nav>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        width: "100%",
+        height: "100vh",
+        overflow: "hidden",
+        background: "#0a0f1e",
+        color: "#e2e8f0",
+        fontFamily: "'DM Sans', sans-serif",
+      }}
+    >
+      {/* ── Sidebar ── */}
+      <aside
+        style={{
+          width: 68,
+          flexShrink: 0,
+          background: "#0d1426",
+          borderRight: "1px solid rgba(55,138,221,.14)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "1.25rem 0",
+          justifyContent: "space-between",
+          height: "100%",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+            gap: "1.5rem",
+          }}
+        >
+          {/* Logo */}
+          <div
+            style={{
+              fontFamily: "'Syne', sans-serif",
+              fontWeight: 800,
+              fontSize: "1.2rem",
+              background: "linear-gradient(135deg, #378ADD, #185FA5)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            }}
+            onClick={() => setAba("overview")}
+          >
+            OD
+          </div>
 
-      {/* Conteúdo */}
-      <div style={{ padding: "2rem", maxWidth: 1200, margin: "0 auto" }}>
-        {aba === "overview" && <Overview token={token} />}
-        {aba === "usuarios" && <Usuarios token={token} />}
-        {aba === "conteudos" && <Conteudos token={token} />}
-        {aba === "exercicios" && <Exercicios token={token} />}
-        {aba === "feedbacks" && <Feedbacks token={token} />}
+          {/* Nav items */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
+            {abas.map((a) => {
+              const active = aba === a.id;
+              return (
+                <button
+                  key={a.id}
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 10,
+                    background: active
+                      ? "rgba(55, 138, 221, 0.15)"
+                      : "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: active ? "#378ADD" : "#4d6380",
+                    transition: "all 0.15s ease",
+                    padding: 0,
+                    gap: "0.25rem",
+                  }}
+                  onClick={() => setAba(a.id)}
+                >
+                  <div style={{ color: active ? "#378ADD" : "#8fa4c8" }}>
+                    {a.icon}
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "9px",
+                      fontWeight: active ? 600 : 500,
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: active ? "#378ADD" : "#8fa4c8",
+                    }}
+                  >
+                    {a.sidebarLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Logout */}
+        <button
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: 10,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#f74f6e",
+            transition: "all 0.15s ease",
+            padding: 0,
+            gap: "0.25rem",
+          }}
+          onClick={onLogout}
+        >
+          <IconLogout size={20} />
+          <span
+            style={{
+              fontSize: "9px",
+              fontWeight: 500,
+              fontFamily: "'DM Sans', sans-serif",
+              color: "#f74f6e",
+            }}
+          >
+            Sair
+          </span>
+        </button>
+      </aside>
+
+      {/* ── Main pane ── */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          minWidth: 0,
+        }}
+      >
+        {/* Topbar */}
+        <header
+          style={{
+            height: 48,
+            flexShrink: 0,
+            borderBottom: "1px solid rgba(55,138,221,.14)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            padding: "0 1.5rem",
+            background: "#0d1426",
+          }}
+        >
+          <h1
+            style={{
+              fontSize: "0.95rem",
+              fontWeight: 700,
+              color: "#e2e8f0",
+              fontFamily: "'Syne', sans-serif",
+              margin: 0,
+            }}
+          >
+            {abas.find((a) => a.id === aba)?.label}
+          </h1>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.35rem",
+              fontSize: "0.68rem",
+              fontWeight: 700,
+              color: "#3fcf8e",
+              background: "rgba(63,207,142,.1)",
+              border: "1px solid rgba(63,207,142,.2)",
+              padding: "1px 6px",
+              borderRadius: 4,
+              textTransform: "uppercase",
+              letterSpacing: "0.03em",
+            }}
+          >
+            <span
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: "50%",
+                background: "#3fcf8e",
+                display: "inline-block",
+                boxShadow: "0 0 6px #3fcf8e",
+              }}
+            />
+            AO VIVO
+          </span>
+        </header>
+
+        {/* Workspace body */}
+        <main
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "1.25rem",
+          }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            {aba === "overview" && <Overview token={token} />}
+            {aba === "usuarios" && <Usuarios token={token} />}
+            {aba === "conteudos" && <Conteudos token={token} />}
+            {aba === "exercicios" && <Exercicios token={token} />}
+            {aba === "feedbacks" && <Feedbacks token={token} />}
+          </div>
+        </main>
       </div>
     </div>
   );

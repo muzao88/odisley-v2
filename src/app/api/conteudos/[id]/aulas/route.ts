@@ -37,7 +37,7 @@ export async function GET(
     if (userId) {
       const progressos = await ProgressoModel.find({
         user_id: userId,
-        aula_id: { $in: aulas.map((a: any) => a._id) },
+        aula_id: { $in: aulas.map((a: any) => a._id.toString()) },
         concluido: true,
       }).lean();
       progressos.forEach((p: any) => progressoSet.add(p.aula_id.toString()));

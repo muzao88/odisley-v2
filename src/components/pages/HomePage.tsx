@@ -90,7 +90,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                     percentual: pData?.percentual || 0,
                     categoria: c.categoria,
                     icone: c.icone,
-                    conteudo_id: pData?.conteudo_id || String(c._id)
+                    conteudo_id: pData?.conteudo_id || ""
                   });
                 }
               }
@@ -116,7 +116,18 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
     { nome: "Geometria Plana", percentual: 30, categoria: "Geometria", icone: "📏" },
   ];
 
-  const displayProgress = (isLoggedIn && !loading) ? userProgress : defaultHeroProgress;
+  // Enquanto carrega (logado), mostra itens com 0% para não exibir dados falsos
+  const loadingPlaceholder = CONTEUDOS_SEED.slice(0, 4).map((c) => ({
+    nome: c.nome,
+    percentual: 0,
+    categoria: c.categoria,
+    icone: c.icone,
+    conteudo_id: '',
+  }));
+
+  const displayProgress = isLoggedIn
+    ? (loading ? loadingPlaceholder : userProgress)
+    : defaultHeroProgress;
 
 
   return (

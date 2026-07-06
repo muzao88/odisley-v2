@@ -46,7 +46,15 @@ export default function ExercisesPage({ onNavigate, onOpenAuth, onStartExercise,
               return { ...baseEx, questoesRespondidas: 0, status: "Não iniciado", percentual: 0 };
             }
             
-            let prog = { questoesRespondidas: 0, status: "Não iniciado", percentual: 0 };
+            let prog: {
+              questoesRespondidas: number;
+              status: "Não iniciado" | "Em andamento" | "Concluído";
+              percentual: number;
+            } = {
+              questoesRespondidas: 0,
+              status: "Não iniciado",
+              percentual: 0,
+            };
             try {
               const map = JSON.parse(localStorage.getItem('odisley_exercise_progress') || '{}');
               if (map[baseEx._id]) {

@@ -82,8 +82,8 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
       setAvatarMsg({ type: 'error', text: 'Formato inválido. Use JPG, PNG ou WEBP.' });
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setAvatarMsg({ type: 'error', text: 'Imagem muito grande. Limite: 5MB.' });
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarMsg({ type: 'error', text: 'Imagem muito grande. Limite: 2MB.' });
       return;
     }
 
@@ -365,7 +365,7 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
           </div>
           <div>
             <div style={{ fontWeight: 600, fontSize: '0.9rem', color: isDark ? 'var(--text)' : '#1e1b4b', marginBottom: '4px' }}>Foto de Perfil</div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text3)', lineHeight: 1.5 }}>Clique na foto para alterar.<br />JPG, PNG ou WEBP · Máx. 5MB</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text3)', lineHeight: 1.5 }}>Clique na foto para alterar.<br />JPG, PNG ou WEBP · Máx. 2MB</div>
             {avatarMsg && (
               <div style={{ fontSize: '0.8rem', fontWeight: 500, marginTop: '6px', color: avatarMsg.type === 'success' ? 'var(--green)' : 'var(--red)' }}>
                 {avatarMsg.text}
