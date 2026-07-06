@@ -17,6 +17,7 @@ import ExerciseResolutionPage from "./pages/ExerciseResolutionPage";
 import WelcomePage from "./pages/WelcomePage";
 import UpgradeModal from "./UpgradeModal";
 import SettingsPage from "./pages/SettingsPage";
+import AnimatedBackground from "./AnimatedBackground";
 import type { Page, AuthTab, PlanType } from "@/types";
 
 function AppInner() {
@@ -123,106 +124,112 @@ function AppInner() {
     !isLoggedIn && !hasEntered ? (
       <WelcomePage onContinue={() => setHasEntered(true)} />
     ) : (
-      <>
+      <div className="app-layout">
         <Navbar
           currentPage={page}
           onNavigate={navigate}
           onOpenAuth={openAuth}
+          isConteudoAtivo={!!conteudoAtivo}
         />
 
-        {conteudoAtivo ? (
-          <ConteudoPage
-            conteudoId={conteudoAtivo.id}
-            conteudoNome={conteudoAtivo.nome}
-            onNavigate={navigate}
-            onOpenAuth={openAuth}
-            onOpenUpgrade={() => setUpgradeOpen(true)}
-          />
-        ) : (
-          <>
-            {page === "home" && (
-              <HomePage
+        <div className="main-content-container">
+          <main className="app-main">
+            {conteudoAtivo ? (
+              <ConteudoPage
+                conteudoId={conteudoAtivo.id}
+                conteudoNome={conteudoAtivo.nome}
                 onNavigate={navigate}
                 onOpenAuth={openAuth}
-                onSelectConteudo={selectConteudo}
-              />
-            )}
-            {page === "cursos" && (
-              <CoursesPage
-                onNavigate={navigate}
-                onSelectConteudo={selectConteudo}
-                onOpenAuth={openAuth}
-              />
-            )}
-            {page === "planos" && (
-              <PlansPage onOpenAuth={openAuth} onOpenPayment={openPayment} />
-            )}
-            {page === "exercicios" && (
-              <ExercisesPage
-                onNavigate={navigate}
-                onOpenAuth={openAuth}
-                onStartExercise={startExercicio}
                 onOpenUpgrade={() => setUpgradeOpen(true)}
               />
+            ) : (
+              <>
+                {page === "home" && (
+                  <HomePage
+                    onNavigate={navigate}
+                    onOpenAuth={openAuth}
+                    onSelectConteudo={selectConteudo}
+                  />
+                )}
+                {page === "cursos" && (
+                  <CoursesPage
+                    onNavigate={navigate}
+                    onSelectConteudo={selectConteudo}
+                    onOpenAuth={openAuth}
+                  />
+                )}
+                {page === "planos" && (
+                  <PlansPage onOpenAuth={openAuth} onOpenPayment={openPayment} />
+                )}
+                {page === "exercicios" && (
+                  <ExercisesPage
+                    onNavigate={navigate}
+                    onOpenAuth={openAuth}
+                    onStartExercise={startExercicio}
+                    onOpenUpgrade={() => setUpgradeOpen(true)}
+                  />
+                )}
+                {page === "resolucao" && (
+                  <ExerciseResolutionPage
+                    exerciseId={exercicioAtivoId}
+                    onBack={() => setPage("exercicios")}
+                  />
+                )}
+                {page === "sobre" && <AboutPage onNavigate={navigate} />}
+                {page === "dashboard" && isLoggedIn && (
+                  <DashboardPage
+                    onNavigate={navigate}
+                    onSelectConteudo={selectConteudo}
+                  />
+                )}
+                {page === "configuracoes" && isLoggedIn && (
+                  <SettingsPage
+                    onNavigate={navigate}
+                    onOpenUpgrade={() => setUpgradeOpen(true)}
+                  />
+                )}
+                {(page === "dashboard" || page === "configuracoes") && !isLoggedIn && (
+                  <div
+                    className="page"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minHeight: "80vh",
+                      flexDirection: "column",
+                      gap: "1rem",
+                    }}
+                  >
+                    <div style={{ fontSize: "3rem" }}>🔒</div>
+                    <div
+                      style={{
+                        fontFamily: "'Syne',sans-serif",
+                        fontSize: "1.3rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Faça login para continuar
+                    </div>
+                    <button
+                      className="btn btn-primary btn-md"
+                      onClick={() => openAuth("login")}
+                    >
+                      Entrar
+                    </button>
+                  </div>
+                )}
+              </>
             )}
-            {page === "resolucao" && (
-              <ExerciseResolutionPage
-                exerciseId={exercicioAtivoId}
-                onBack={() => setPage("exercicios")}
-              />
-            )}
-            {page === "sobre" && <AboutPage onNavigate={navigate} />}
-            {page === "dashboard" && isLoggedIn && (
-              <DashboardPage
-                onNavigate={navigate}
-                onSelectConteudo={selectConteudo}
-              />
-            )}
-            {page === "configuracoes" && isLoggedIn && (
-              <SettingsPage
-                onNavigate={navigate}
-                onOpenUpgrade={() => setUpgradeOpen(true)}
-              />
-            )}
-            {(page === "dashboard" || page === "configuracoes") && !isLoggedIn && (
-              <div
-                className="page"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: "80vh",
-                  flexDirection: "column",
-                  gap: "1rem",
-                }}
-              >
-                <div style={{ fontSize: "3rem" }}>🔒</div>
-                <div
-                  style={{
-                    fontFamily: "'Syne',sans-serif",
-                    fontSize: "1.3rem",
-                    fontWeight: 700,
-                  }}
-                >
-                  Faça login para continuar
-                </div>
-                <button
-                  className="btn btn-primary btn-md"
-                  onClick={() => openAuth("login")}
-                >
-                  Entrar
-                </button>
-              </div>
-            )}
-          </>
-        )}
 
-        <Footer onNavigate={navigate} />
-      </>
+            <Footer onNavigate={navigate} />
+          </main>
+        </div>
+      </div>
     );
 
   return (
     <>
+      <AnimatedBackground />
       {content}
 
       {/* Banner de confirmação de pagamento */}

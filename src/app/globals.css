@@ -31,6 +31,22 @@
     --text-secondary: #6b7280;
     --primary: #7c3aed;
     --primary-foreground: #ffffff;
+
+    /* Animated Background & Sidebar (Claro) */
+    --glow-opacity-1: 0.10;
+    --glow-opacity-2: 0.08;
+    --glow-opacity-3: 0.05;
+    --glow-blur: 110px;
+    --particle-color: 75, 63, 209;
+    --particle-alpha: 0.8;
+    --line-color: 75, 63, 209;
+    --line-alpha-multiplier: 0.55;
+    
+    --sidebar-bg: #ffffff;
+    --sidebar-item: #54566b;
+    --sidebar-item-hover: rgba(0, 0, 0, 0.03);
+    --sidebar-item-active-bg: #ecebfd;
+    --sidebar-item-active-text: #4b3fd1;
 }
 
 /* ── TEMA ESCURO ──────────────────────────────────────── */
@@ -51,6 +67,64 @@ html.dark {
     --text3: #4d6380;
     --border: rgba(255, 255, 255, 0.06);
     --border2: rgba(255, 255, 255, 0.12);
+
+    /* Animated Background & Sidebar (Escuro) */
+    --glow-opacity-1: 0.35;
+    --glow-opacity-2: 0.35;
+    --glow-opacity-3: 0.18;
+    --glow-blur: 90px;
+    --particle-color: 150, 160, 220;
+    --particle-alpha: 0.6;
+    --line-color: 108, 92, 231;
+    --line-alpha-multiplier: 0.25;
+    
+    --sidebar-bg: #0d1426;
+    --sidebar-item: #8fa4c8;
+    --sidebar-item-hover: rgba(255, 255, 255, 0.03);
+    --sidebar-item-active-bg: rgba(124, 58, 237, 0.15);
+    --sidebar-item-active-text: #7c3aed;
+}
+
+/* ── FUNDO ANIMADO (glow + constelação) ───────────────────── */
+.glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(var(--glow-blur));
+    pointer-events: none;
+    z-index: 0;
+}
+.glow-purple {
+    width: 520px;
+    height: 520px;
+    top: -120px;
+    left: -100px;
+    background: radial-gradient(circle, #6c5ce7 0%, transparent 70%);
+    opacity: var(--glow-opacity-1);
+}
+.glow-blue {
+    width: 620px;
+    height: 620px;
+    bottom: -180px;
+    right: -160px;
+    background: radial-gradient(circle, #4f83ff 0%, transparent 70%);
+    opacity: var(--glow-opacity-2);
+}
+.glow-purple-2 {
+    width: 380px;
+    height: 380px;
+    top: 40%;
+    right: 10%;
+    background: radial-gradient(circle, #a99bff 0%, transparent 70%);
+    opacity: var(--glow-opacity-3);
+}
+#network {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* Estilos de Nav e Scrollbar - PADRÃO (CLARO) */
@@ -242,25 +316,25 @@ html.dark h1 {
 
 /* ── ESTILO LAVANDA LIGHT MODE ────────────────────────────────── */
 html:not(.dark) {
-    --bg: #f3f0ff;
-    --bg2: #f3f0ff;
+    --bg: #f5f5fa;
+    --bg2: #f5f5fa;
     --bg3: rgba(139, 92, 246, 0.08);
-    --surface: rgba(255, 255, 255, 0.75);
-    --surface2: rgba(255, 255, 255, 0.75);
-    --border: rgba(139, 92, 246, 0.15);
-    --border2: rgba(139, 92, 246, 0.2);
+    --surface: #ffffff;
+    --surface2: #ffffff;
+    --border: #e2e2ee;
+    --border2: #e2e2ee;
     --text: #1e1b4b;
-    --text2: #6b7280;
+    --text2: #54566b;
     --text3: #a78bfa;
     --accent: #7c3aed;
 }
 
 html:not(.dark) body {
-    background: #f3f0ff;
+    background: #f5f5fa;
 }
 
 html:not(.dark) .hero-section {
-    background: #f3f0ff;
+    background: #f5f5fa;
     position: relative;
     overflow: hidden;
 }
@@ -2184,4 +2258,209 @@ html.light .exercise-card {
 
 div:hover > .avatar-overlay {
   opacity: 1 !important;
+}
+
+/* ── LAYOUT STUDENT APP ───────────────────────────────────── */
+
+/* Desktop Sidebar Layout */
+@media (min-width: 768px) {
+  .app-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .main-content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .app-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+  /* Remove o padding-top de 80px no desktop já que a sidebar está na lateral */
+  .app-main .page {
+    padding-top: 2rem !important;
+    min-height: auto;
+  }
+
+  .desktop-sidebar {
+    width: 68px;
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 0;
+    justify-content: space-between;
+    height: 100%;
+    z-index: 100;
+  }
+  
+  .mobile-topbar-wrapper {
+    display: none;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 767px) {
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .main-content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .app-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+  /* Ajusta o padding da topbar mobile */
+  .app-main .page {
+    padding-top: 2rem !important;
+  }
+
+  .desktop-sidebar {
+    display: none;
+  }
+
+  .mobile-topbar-wrapper {
+    display: block;
+    flex-shrink: 0;
+  }
+  
+  .mobile-topbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background: rgba(243, 240, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+  }
+  html.dark .mobile-topbar {
+    background: rgba(6, 6, 15, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* Sidebar Components Styles */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: center;
+}
+.sidebar-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--sidebar-item);
+  transition: all 0.15s ease;
+  padding: 0;
+  gap: 0.25rem;
+}
+.sidebar-btn:hover {
+  background: var(--sidebar-item-hover);
+}
+.sidebar-btn.active {
+  background: var(--sidebar-item-active-bg);
+  color: var(--sidebar-item-active-text);
+}
+.sidebar-icon {
+  color: var(--sidebar-item);
+}
+.sidebar-btn.active .sidebar-icon {
+  color: var(--sidebar-item-active-text);
+}
+.sidebar-label {
+  font-size: 9px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--sidebar-item);
+}
+.sidebar-btn.active .sidebar-label {
+  font-weight: 600;
+  color: var(--sidebar-item-active-text);
+}
+.sidebar-login {
+  color: #f74f6e;
+}
+.sidebar-login .sidebar-icon, .sidebar-login .sidebar-login .sidebar-label {
+  color: #f74f6e;
+}
+
+/* Mobile Navigation Components */
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--text3);
+  background: transparent;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+.mobile-nav-link.active {
+  color: var(--accent);
+  background: rgba(124, 58, 237, 0.1);
+  font-weight: 600;
+}
+.mobile-nav-icon {
+  display: flex;
+  color: inherit;
+}
+
+/* Override dropdown positioning depending on context */
+.desktop-user-menu .user-dropdown {
+  position: fixed;
+  left: 76px;
+  bottom: 1.25rem;
+  top: auto;
+  right: auto;
+}
+.mobile-user-menu .user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  left: auto;
+  bottom: auto;
+}
+
+/* Fix drawer sliding from left instead of right */
+.mobile-menu-overlay {
+  right: auto !important;
+  left: -100%;
+  border-left: none;
+  border-right: 1px solid var(--border);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4rem 1.5rem 2rem;
+}
+.mobile-menu-overlay.open {
+  right: auto !important;
+  left: 0;
 }
