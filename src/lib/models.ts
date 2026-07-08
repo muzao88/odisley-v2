@@ -21,6 +21,10 @@ const UserSchema = new Schema(
     assinaturaStatus: { type: String, enum: ['ativa', 'cancelada', 'expirada', null], default: null },
     assinaturaExpira: { type: Date, default: null },
     dataCompra: { type: Date, default: null },
+    // Streak tracking
+    streakAtual: { type: Number, default: 0 },
+    streakMaximo: { type: Number, default: 0 },
+    ultimaAtividade: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -141,3 +145,34 @@ const ExercicioSchema = new Schema(
 );
 
 export const ExercicioModel = models.Exercicio || model('Exercicio', ExercicioSchema);
+
+// ── Password Reset Token ──────────────────────────────────────
+const PasswordResetTokenSchema = new Schema(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    tokenHash: { type: String, required: true },
+    used: { type: Boolean, default: false },
+    expiresAt: { type: Date, required: true },
+  },
+  { timestamps: true }
+);
+
+PasswordResetTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+export const PasswordResetTokenModel = models.PasswordResetToken || model('PasswordResetToken', PasswordResetTokenSchema);
+
+// ── Notificações ─────────────────────────────────────────────
+const NotificationSchema = new Schema(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    titulo: { type: String, required: true },
+    mensagem: { type: String, required: true },
+    tipo: { type: String, enum: ['sistema', 'conteudo', 'lembrete'], default: 'sistema' },
+    lida: { type: Boolean, default: false },
+    link: { type: String },
+  },
+  { timestamps: true }
+);
+
+export const NotificationModel = models.Notification || model('Notification', NotificationSchema);
+

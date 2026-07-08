@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Exercicio, Questao } from "@/types";
+import { useAuth } from "../AuthContext";
 
 const CSS = `
 @keyframes exPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
@@ -38,6 +39,7 @@ export default function ExerciseResolutionPage({exerciseId,onBack}:Props){
   const [selectedModule,setSelectedModule]=useState<ModuleGroup|null>(null);
   const [exercise,setExercise]=useState<Exercicio|null>(null);
   const [loading,setLoading]=useState(true);
+  const { token } = useAuth();
   const [currentIdx,setCurrentIdx]=useState(0);
   const [selectedAlt,setSelectedAlt]=useState<string|null>(null);
   const [showFeedback,setShowFeedback]=useState(false);
@@ -90,13 +92,17 @@ export default function ExerciseResolutionPage({exerciseId,onBack}:Props){
         map[exercise._id] = {
           questoesRespondidas: total,
           totalQuestoes: total,
-          percentual: perc,
           status: "Concluído"
         };
         localStorage.setItem('odisley_exercise_progress', JSON.stringify(map));
+        
+        // Registrar atividade ao concluir exercício
+        if (token) {
+          fetch('/api/user/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(console.error);
+        }
       } catch(e) {}
     }
-  }, [phase, exercise, respostas]);
+  }, [phase, exercise, respostas, token]);
 
   const questoes=exercise?.questoes||[];
   const qAtiva=questoes[currentIdx] as Questao|undefined;

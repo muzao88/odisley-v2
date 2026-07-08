@@ -18,6 +18,7 @@ import WelcomePage from "./pages/WelcomePage";
 import UpgradeModal from "./UpgradeModal";
 import SettingsPage from "./pages/SettingsPage";
 import AnimatedBackground from "./AnimatedBackground";
+import Topbar from "./Topbar/Topbar";
 import type { Page, AuthTab, PlanType } from "@/types";
 
 function AppInner() {
@@ -134,6 +135,7 @@ function AppInner() {
 
         <div className="main-content-container">
           <main className="app-main">
+            <Topbar onNavigate={navigate} onSelectConteudo={selectConteudo} />
             {conteudoAtivo ? (
               <ConteudoPage
                 conteudoId={conteudoAtivo.id}
