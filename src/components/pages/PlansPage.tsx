@@ -20,9 +20,24 @@ export default function PlansPage({ onOpenAuth, onOpenPayment }: Props) {
       <section style={{ textAlign: 'center' }}>
         <div className="section-tag centered">Assinatura</div>
         <h2 className="section-title">Planos para cada objetivo</h2>
-        <p className="section-sub" style={{ margin: '0 auto 1rem' }}>
+        <p className="section-sub" style={{ margin: '0 auto 1.5rem' }}>
           Comece grátis. Faça upgrade quando quiser. Cancele a qualquer momento.
         </p>
+
+        <div style={{
+          maxWidth: 640,
+          margin: '0 auto 2rem',
+          padding: '1rem',
+          borderRadius: '8px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px dashed var(--border)',
+          fontSize: '0.85rem',
+          color: 'var(--text2)',
+          textAlign: 'center',
+          lineHeight: '1.5'
+        }}>
+          💡 <strong>Importante:</strong> Ao realizar o pagamento na Kiwify, utilize o <strong>mesmo e-mail</strong> cadastrado nesta conta para que seu acesso seja liberado automaticamente.
+        </div>
 
         <div className="plans-grid">
           {/* FREE */}
