@@ -116,7 +116,7 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth, isConteudo
 
   const checkActive = (page: Page) => {
     if (page === "home") return currentPage === "home";
-    if (page === "cursos") return currentPage === "cursos" || (isConteudoAtivo && currentPage === "cursos");
+    if (page === "cursos") return currentPage === "cursos" || !!isConteudoAtivo;
     if (page === "exercicios") return currentPage === "exercicios" || currentPage === "resolucao";
     if (page === "planos") return currentPage === "planos";
     if (page === "sobre") return currentPage === "sobre";
