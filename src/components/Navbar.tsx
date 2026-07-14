@@ -310,6 +310,15 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth, isConteudo
             </div>
           </div>
           <div className="mobile-topbar-right">
+            {/* Theme toggle visível diretamente na topbar mobile */}
+            <button
+              className="theme-toggle mobile-topbar-theme-btn"
+              onClick={toggleTheme}
+              title={isDark ? "Mudar para claro" : "Mudar para escuro"}
+            >
+              {isDark ? <IconSun size={16} /> : <IconMoon size={16} />}
+            </button>
+
             {isLoggedIn ? (
               <div className="user-menu mobile-user-menu" ref={menuRef}>
                 <div className="ud-avatar-btn" onClick={() => setDropOpen((o) => !o)}>
