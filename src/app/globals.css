@@ -38,9 +38,9 @@
     --glow-opacity-3: 0.05;
     --glow-blur: 110px;
     --particle-color: 75, 63, 209;
-    --particle-alpha: 0.8;
+    --particle-alpha: 0.45;
     --line-color: 75, 63, 209;
-    --line-alpha-multiplier: 0.55;
+    --line-alpha-multiplier: 0.18;
     
     --sidebar-bg: #ffffff;
     --sidebar-item: #54566b;
@@ -74,9 +74,9 @@ html.dark {
     --glow-opacity-3: 0.18;
     --glow-blur: 90px;
     --particle-color: 150, 160, 220;
-    --particle-alpha: 0.6;
+    --particle-alpha: 0.55;
     --line-color: 108, 92, 231;
-    --line-alpha-multiplier: 0.25;
+    --line-alpha-multiplier: 0.22;
     
     --sidebar-bg: #0d1426;
     --sidebar-item: #8fa4c8;
@@ -125,6 +125,22 @@ html.dark {
     height: 100%;
     z-index: 1;
     pointer-events: none;
+    overflow: hidden;
+}
+
+/* ── CONSTELAÇÃO: MOBILE (≤ 768px) ─── reduz ao mínimo para não poluir */
+@media (max-width: 768px) {
+    :root {
+        --particle-alpha: 0.06;
+        --line-alpha-multiplier: 0.04;
+    }
+    html.dark {
+        --particle-alpha: 0.05;
+        --line-alpha-multiplier: 0.03;
+    }
+    #network {
+        opacity: 0.5;
+    }
 }
 
 /* Estilos de Nav e Scrollbar - PADRÃO (CLARO) */
@@ -922,7 +938,12 @@ h1 em {
 /* ── CONTEÚDO CARDS ────────────────────────── */
 .category-section {
     margin-bottom: 3rem;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    /* Fundo sólido: bloqueia a constelação atrás dos módulos */
+    background: var(--bg);
 }
+
 .category-header {
     display: flex;
     align-items: center;
@@ -2355,6 +2376,20 @@ div:hover > .avatar-overlay {
   html.dark .mobile-topbar {
     background: rgba(6, 6, 15, 0.7);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Ajustes do theme-toggle dentro da mobile topbar */
+  .mobile-topbar-theme-btn {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  /* Garante que o lado direito da topbar mobile alinhe os itens corretamente */
+  .mobile-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 }
 

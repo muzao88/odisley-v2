@@ -12,21 +12,22 @@ export default function AnimatedBackground() {
     if (!ctx) return;
 
     // ── CONFIGURAÇÕES AJUSTÁVEIS ──────────────────────────────
-    const DOT_COUNT = 55;
-    const MAX_DIST = 150;
+    const DOT_COUNT = 40;
+    const MAX_DIST_DESKTOP = 120;
     const SPEED = 0.15;
-    const DOT_RADIUS = 1.6;
+    const DOT_RADIUS = 1.4;
     
     // Cores agora buscam dinamicamente das variáveis do CSS
     const computedStyles = getComputedStyle(document.body);
     const DOT_COLOR = computedStyles.getPropertyValue('--particle-color').trim() || "150, 160, 220";
     const LINE_COLOR = computedStyles.getPropertyValue('--line-color').trim() || "108, 92, 231";
-    const DOT_ALPHA = parseFloat(computedStyles.getPropertyValue('--particle-alpha').trim() || "0.6");
-    const LINE_ALPHA_MULTIPLIER = parseFloat(computedStyles.getPropertyValue('--line-alpha-multiplier').trim() || "0.25");
+    const DOT_ALPHA = parseFloat(computedStyles.getPropertyValue('--particle-alpha').trim() || "0.10");
+    const LINE_ALPHA_MULTIPLIER = parseFloat(computedStyles.getPropertyValue('--line-alpha-multiplier').trim() || "0.08");
     
-    // Reduz partículas em mobile pra não pesar
+    // Reduz partículas e distância de conexão em mobile
     const isMobile = window.innerWidth < 768;
-    const ACTIVE_COUNT = isMobile ? 25 : DOT_COUNT;
+    const ACTIVE_COUNT = isMobile ? 12 : DOT_COUNT;
+    const MAX_DIST = isMobile ? 80 : MAX_DIST_DESKTOP;
     // ──────────────────────────────────────────────────────────
 
     let width: number, height: number;
@@ -102,6 +103,7 @@ export default function AnimatedBackground() {
 
     const handleResize = () => {
       resize();
+      createDots(); // recria pontos para evitar acúmulo fora da tela
     };
 
     window.addEventListener("resize", handleResize);
