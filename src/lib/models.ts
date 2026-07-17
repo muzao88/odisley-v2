@@ -18,6 +18,7 @@ const UserSchema = new Schema(
     avatar: { type: String, default: null },
     // Pagamento
     kiwifyId: { type: String, default: null },
+    asaasCustomerId: { type: String, default: null },
     assinaturaStatus: { type: String, enum: ['ativa', 'cancelada', 'expirada', null], default: null },
     assinaturaExpira: { type: Date, default: null },
     dataCompra: { type: Date, default: null },
@@ -88,7 +89,7 @@ const AssinaturaSchema = new Schema(
     user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     plano: { type: String, enum: ['mensal', 'anual'], required: true },
     status: { type: String, enum: ['ativa', 'cancelada', 'expirada'], default: 'ativa' },
-    gateway: { type: String, enum: ['kiwify'], required: true },
+    gateway: { type: String, enum: ['kiwify', 'asaas'], required: true },
     gatewaySubscriptionId: { type: String },
     valor: { type: Number, required: true },
     inicio: { type: Date, default: Date.now },
@@ -99,6 +100,24 @@ const AssinaturaSchema = new Schema(
 );
 
 export const AssinaturaModel = models.Assinatura || model('Assinatura', AssinaturaSchema);
+
+// ── Pagamento (Asaas ou geral) ────────────────────────────────
+const PaymentSchema = new Schema(
+  {
+    user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    gateway: { type: String, enum: ['asaas', 'kiwify'], default: 'asaas' },
+    paymentId: { type: String, required: true },
+    subscriptionId: { type: String },
+    amount: { type: Number, required: true },
+    status: { type: String, required: true },
+    billingType: { type: String }, // PIX, CREDIT_CARD, BOLETO
+    dueDate: { type: Date },
+    paymentDate: { type: Date },
+  },
+  { timestamps: true }
+);
+
+export const PaymentModel = models.Payment || model('Payment', PaymentSchema);
 
 // ── Feedback ──────────────────────────────────────────────────
 const FeedbackSchema = new Schema(
