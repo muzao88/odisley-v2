@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
       ? Math.round((totalConcluidas / totalAulas) * 100)
       : 0;
 
-    await UserModel.findByIdAndUpdate(payload.id, { progresso_total });
+    await UserModel.findByIdAndUpdate(payload.id, {
+      progresso_total,
+      ultimoAcesso: new Date(),
+      emailInatividadeEnviado: false,
+    });
 
     return NextResponse.json({ ok: true, progresso_total });
   } catch (err) {

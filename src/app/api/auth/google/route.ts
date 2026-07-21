@@ -4,6 +4,8 @@ import { OAuth2Client } from "google-auth-library";
 import { connectDB } from "@/lib/mongodb";
 import { UserModel } from "@/lib/models";
 import { signToken } from "@/lib/auth";
+import { sendEmail } from "@/lib/resend";
+import { WelcomeEmail } from "@/lib/emails/WelcomeEmail";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 if (!GOOGLE_CLIENT_ID) {
@@ -82,13 +84,34 @@ export async function POST(req: NextRequest) {
         providerId: googleId,
         avatar: picture || null,
         plano: "free",
+        ultimoAcesso: new Date(),
+        emailBoasVindasEnviado: false,
       });
     } else if (user.provider === "local") {
       // Usuário existente com e-mail — vincula conta Google
       user.provider = "google";
       user.providerId = googleId;
       if (picture && !user.avatar) user.avatar = picture;
+      user.ultimoAcesso = new Date();
       await user.save();
+    } else {
+      user.ultimoAcesso = new Date();
+      await user.save();
+    }
+
+    // Se o e-mail de boas-vindas ainda não foi enviado para este usuário
+    if (!user.emailBoasVindasEnviado) {
+      sendEmail({
+        to: user.email,
+        subject: 'Bem-vindo(a) à Odisley Matemática! 🚀',
+        react: WelcomeEmail({ nome: user.nome }),
+      }).then(async (res) => {
+        if (res.success) {
+          await UserModel.findByIdAndUpdate(user._id, { emailBoasVindasEnviado: true });
+        }
+      }).catch((err) => {
+        console.error('[google auth email async error]', err);
+      });
     }
 
     const token = signToken({

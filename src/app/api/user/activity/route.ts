@@ -65,6 +65,8 @@ export async function POST(req: Request) {
     await UserModel.findByIdAndUpdate(user._id, {
       $set: {
         ultimaAtividade: agora,
+        ultimoAcesso: agora,
+        emailInatividadeEnviado: false,
         streakAtual: novoStreakAtual,
         streakMaximo: streakMaximo
       }

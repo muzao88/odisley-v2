@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../AuthContext";
+import { useTheme } from "../ThemeContext";
 import type { Page } from "@/types";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 
 export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
   const { user, token, refreshUser, logout } = useAuth();
+  const { isDark, toggleTheme: handleToggleTheme } = useTheme();
   const [nome, setNome] = useState(user?.nome ?? "");
   const [savingNome, setSavingNome] = useState(false);
   const [nomeMsg, setNomeMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -35,7 +37,6 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
   const [pwdMsg, setPwdMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Preferences
-  const [isDark, setIsDark] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
 
   // Danger Zone
@@ -43,29 +44,14 @@ export default function SettingsPage({ onNavigate, onOpenUpgrade }: Props) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  // Sync theme status
+  // Sync notification status
   useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
     // Load email notification setting
     const savedNotifs = localStorage.getItem("odisley_email_notifications");
     if (savedNotifs !== null) {
       setEmailNotifications(savedNotifs === "true");
     }
-
-    return () => observer.disconnect();
   }, []);
-
-  const handleToggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  };
 
   const handleToggleNotifications = () => {
     const next = !emailNotifications;

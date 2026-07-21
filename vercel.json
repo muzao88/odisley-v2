@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/check-inactive-students",
+      "schedule": "0 11 * * *"
+    }
+  ]
+}

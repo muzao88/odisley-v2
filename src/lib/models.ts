@@ -22,10 +22,13 @@ const UserSchema = new Schema(
     assinaturaStatus: { type: String, enum: ['ativa', 'cancelada', 'expirada', null], default: null },
     assinaturaExpira: { type: Date, default: null },
     dataCompra: { type: Date, default: null },
-    // Streak tracking
+    // Streak tracking & Email Tracking
     streakAtual: { type: Number, default: 0 },
     streakMaximo: { type: Number, default: 0 },
     ultimaAtividade: { type: Date, default: null },
+    ultimoAcesso: { type: Date, default: null },
+    emailBoasVindasEnviado: { type: Boolean, default: false },
+    emailInatividadeEnviado: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

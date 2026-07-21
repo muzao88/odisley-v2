@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/mongodb';
 import { UserModel } from '@/lib/models';
 import { signToken } from '@/lib/auth';
+import { sendEmail } from '@/lib/resend';
+import { WelcomeEmail } from '@/lib/emails/WelcomeEmail';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +29,26 @@ export async function POST(req: NextRequest) {
     }
 
     const hash = await bcrypt.hash(senha, 12);
-    const user = await UserModel.create({ nome, email, senha: hash });
+    const user = await UserModel.create({
+      nome,
+      email,
+      senha: hash,
+      ultimoAcesso: new Date(),
+      emailBoasVindasEnviado: false,
+    });
+
+    // Envia e-mail de boas-vindas de forma assíncrona/não-bloqueante
+    sendEmail({
+      to: user.email,
+      subject: 'Bem-vindo(a) à Odisley Matemática! 🚀',
+      react: WelcomeEmail({ nome: user.nome }),
+    }).then(async (res) => {
+      if (res.success) {
+        await UserModel.findByIdAndUpdate(user._id, { emailBoasVindasEnviado: true });
+      }
+    }).catch((err) => {
+      console.error('[register email async error]', err);
+    });
 
     const token = signToken({ id: user._id, email: user.email, plano: user.plano });
 

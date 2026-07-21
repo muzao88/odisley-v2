@@ -17,6 +17,9 @@ export interface User {
   plan?: 'free' | 'mensal' | 'anual';
   planActive?: boolean;
   planExpiresAt?: string | null;
+  ultimoAcesso?: string | Date | null;
+  emailBoasVindasEnviado?: boolean;
+  emailInatividadeEnviado?: boolean;
 }
 
 export interface AuthState {

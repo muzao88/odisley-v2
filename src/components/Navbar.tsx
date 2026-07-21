@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import { useTheme } from "./ThemeContext";
 import type { Page } from "@/types";
 import {
   IconHome,
@@ -41,9 +42,9 @@ function getInitials(nome?: string): string {
 
 export default function Navbar({ currentPage, onNavigate, onOpenAuth, isConteudoAtivo }: Props) {
   const { user, token, logout, isLoggedIn } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [dropOpen, setDropOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
 
   // --- Progress data for the dropdown ---
   const [progressData, setProgressData] = useState<ProgressoItem[]>([]);
@@ -98,21 +99,6 @@ export default function Navbar({ currentPage, onNavigate, onOpenAuth, isConteudo
   const progressoPct =
     totalAulas > 0 ? Math.round((totalAulasConcluidas / totalAulas) * 100) : 0;
   const streak = totalAulasConcluidas > 0 ? Math.min(totalAulasConcluidas, 7) : 0;
-
-  // Restaura preferência salva ao montar
-  useEffect(() => {
-    const saved = localStorage.getItem("odisley_theme");
-    const dark = saved === "dark";
-    setIsDark(dark);
-    document.documentElement.classList.toggle("dark", dark);
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("odisley_theme", next ? "dark" : "light");
-  };
 
   const checkActive = (page: Page) => {
     if (page === "home") return currentPage === "home";
