@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
-import { UserModel, ConteudoModel, AulaModel, AssinaturaModel, ProgressoModel } from '@/lib/models';
+import { UserModel, ConteudoModel, AulaModel, AssinaturaModel, ProgressoModel, ExercicioModel } from '@/lib/models';
 import { verifyAdmin } from '@/lib/adminAuth';
 
 export async function GET(req: NextRequest) {
@@ -10,13 +10,14 @@ export async function GET(req: NextRequest) {
 
   await connectDB();
 
-  const [totalUsuarios, totalPremium, totalConteudos, totalAulas, assinaturasAtivas] =
+  const [totalUsuarios, totalPremium, totalConteudos, totalAulas, assinaturasAtivas, totalExercicios] =
     await Promise.all([
       UserModel.countDocuments(),
       UserModel.countDocuments({ plano: 'premium' }),
       ConteudoModel.countDocuments(),
       AulaModel.countDocuments(),
       AssinaturaModel.countDocuments({ status: 'ativa' }),
+      ExercicioModel.countDocuments(),
     ]);
 
   // ── 1. Cadastros por mês (últimos 6 meses incluindo o mês atual) ──────────
@@ -116,6 +117,7 @@ export async function GET(req: NextRequest) {
     totalFree: totalUsuarios - totalPremium,
     totalConteudos,
     totalAulas,
+    totalExercicios,
     assinaturasAtivas,
     recentes,
     cadastrosPorMes,

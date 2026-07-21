@@ -17,6 +17,7 @@ interface Stats {
   totalFree: number;
   totalConteudos: number;
   totalAulas: number;
+  totalExercicios: number;
   assinaturasAtivas: number;
   recentes: any[];
   cadastrosPorMes?: { name: string; cadastros: number }[];
@@ -103,7 +104,8 @@ function Overview() {
     { label: "Usuários", value: stats.totalUsuarios, icon: "👥", color: "#378ADD", href: "/admin/alunos" },
     { label: "Premium", value: stats.totalPremium, icon: "⭐", color: "#f7c94f", href: "/admin/alunos" },
     { label: "Conteúdos", value: stats.totalConteudos, icon: "🎓", color: "#3fcf8e", href: "/admin/aulas" },
-    { label: "Videoaulas", value: stats.totalAulas, icon: "🎬", color: "#f7934f", href: "/admin/exercicios" },
+    { label: "Videoaulas", value: stats.totalAulas, icon: "🎬", color: "#f7934f", href: "/admin/aulas" },
+    { label: "Exercícios", value: stats.totalExercicios, icon: "📝", color: "#a78bfa", href: "/admin/exercicios" },
   ];
 
   const planData = [
@@ -115,8 +117,8 @@ function Overview() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      {/* 4-column metric grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
+      {/* 5-column metric grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem" }}>
         {statCards.map((s) => (
           <div
             key={s.label}

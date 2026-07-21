@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AuthProvider, useAuth } from "./AuthContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -36,11 +36,18 @@ function AppInner() {
   const [exercicioAtivoId, setExercicioAtivoId] = useState<string | null>(null);
   const { isLoggedIn, login, refreshUser, isInitialized } = useAuth();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Reset scroll no container real (.app-main tem overflow-y:auto, não o window)
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [page, conteudoAtivo]);
 
   const navigate = (p: Page) => {
     setPage(p);
     setConteudoAtivo(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openAuth = (tab: AuthTab) => {
@@ -54,13 +61,11 @@ function AppInner() {
 
   const selectConteudo = (id: string, nome: string) => {
     setConteudoAtivo({ id, nome });
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const startExercicio = (id: string) => {
     setExercicioAtivoId(id);
     setPage("resolucao");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Lock scroll when modal open
@@ -134,7 +139,7 @@ function AppInner() {
         />
 
         <div className="main-content-container">
-          <main className="app-main">
+          <main className="app-main" ref={mainRef}>
             <Topbar onNavigate={navigate} onSelectConteudo={selectConteudo} />
             {conteudoAtivo ? (
               <ConteudoPage

@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
         audience: GOOGLE_CLIENT_ID,
       });
       googlePayload = ticket.getPayload();
-    } catch {
+    } catch (error) {
+      console.error("[POST /api/auth/google] Erro ao verificar token:", error);
       return NextResponse.json(
         { error: "Token do Google inválido ou expirado." },
         { status: 401 },
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!googlePayload) {
+      console.error("[POST /api/auth/google] googlePayload está vazio ou nulo");
       return NextResponse.json(
         { error: "Não foi possível obter dados do Google." },
         { status: 401 },

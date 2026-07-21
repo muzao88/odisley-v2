@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { connectDB } from '@/lib/mongodb';
 import { ProgressoModel } from '@/lib/models';
 import { verifyToken } from '@/lib/auth';
@@ -18,8 +19,10 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
+    const userObjectId = new mongoose.Types.ObjectId(payload.id);
+
     const progressos = await ProgressoModel.find({
-      user_id: payload.id,
+      user_id: userObjectId,
       concluido: true,
     }).lean();
 

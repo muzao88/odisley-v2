@@ -98,7 +98,14 @@ export default function ExerciseResolutionPage({exerciseId,onBack}:Props){
         
         // Registrar atividade ao concluir exercício
         if (token) {
-          fetch('/api/user/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch(console.error);
+          fetch('/api/user/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                window.dispatchEvent(new Event('activityCompleted'));
+              }
+            })
+            .catch(console.error);
         }
       } catch(e) {}
     }

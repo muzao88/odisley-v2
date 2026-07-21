@@ -905,6 +905,9 @@ export default function CoursesPage({
       }
     };
     fetchConteudos();
+
+    window.addEventListener('activityCompleted', fetchConteudos);
+    return () => window.removeEventListener('activityCompleted', fetchConteudos);
   }, [token]);
 
   // ── REGRA DE ACESSO ─────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { connectDB } from '@/lib/mongodb';
 import { ProgressoModel, AulaModel, UserModel } from '@/lib/models';
 import { verifyToken } from '@/lib/auth';
@@ -23,9 +24,14 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
+    // Converte user_id para ObjectId explicitamente (payload.id é string do JWT,
+    // mas user_id no banco é ObjectId — sem conversão explícita o upsert cria
+    // registros duplicados com tipos diferentes)
+    const userObjectId = new mongoose.Types.ObjectId(payload.id);
+
     // Upsert progress record
     await ProgressoModel.findOneAndUpdate(
-      { user_id: payload.id, aula_id },
+      { user_id: userObjectId, aula_id },
       { concluido: true, data_conclusao: new Date() },
       { upsert: true, new: true }
     );
@@ -33,7 +39,7 @@ export async function POST(req: NextRequest) {
     // Recalculate total progress for the user
     const totalAulas = await AulaModel.countDocuments();
     const totalConcluidas = await ProgressoModel.countDocuments({
-      user_id: payload.id,
+      user_id: userObjectId,
       concluido: true,
     });
     const progresso_total = totalAulas > 0

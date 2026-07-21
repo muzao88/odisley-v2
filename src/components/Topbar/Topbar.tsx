@@ -24,15 +24,21 @@ export default function Topbar({ onNavigate, onSelectConteudo }: TopbarProps) {
   useEffect(() => {
     if (!isLoggedIn || !token) return;
 
-    fetch('/api/user/topbar-data', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => res.json())
-    .then(json => {
-      if (!json.error) setData(json);
-    })
-    .catch(console.error);
+    const loadData = () => {
+      fetch('/api/user/topbar-data', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(json => {
+        if (!json.error) setData(json);
+      })
+      .catch(console.error);
+    };
 
+    loadData();
+
+    window.addEventListener('activityCompleted', loadData);
+    return () => window.removeEventListener('activityCompleted', loadData);
   }, [isLoggedIn, token]);
 
   if (!isLoggedIn) return null;

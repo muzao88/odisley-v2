@@ -29,12 +29,23 @@ export async function POST(req: Request) {
     
     let novoStreakAtual = user.streakAtual || 0;
     
+    const getMidnightInSaoPaulo = (d: Date) => {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric'
+      }).formatToParts(d);
+      const year = parseInt(parts.find(p => p.type === 'year')?.value || '0', 10);
+      const month = parseInt(parts.find(p => p.type === 'month')?.value || '0', 10) - 1;
+      const day = parseInt(parts.find(p => p.type === 'day')?.value || '0', 10);
+      return new Date(year, month, day);
+    };
+    
     if (ultimaAtividade) {
-      const dataAgora = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-      const dataUltima = new Date(ultimaAtividade.getFullYear(), ultimaAtividade.getMonth(), ultimaAtividade.getDate());
+      const dataAgora = getMidnightInSaoPaulo(agora);
+      const dataUltima = getMidnightInSaoPaulo(ultimaAtividade);
       
       const msPorDia = 1000 * 60 * 60 * 24;
-      const diferencaDias = Math.floor((dataAgora.getTime() - dataUltima.getTime()) / msPorDia);
+      // Using Math.round to avoid DST issues (e.g., 23 hours rounding to 0)
+      const diferencaDias = Math.round((dataAgora.getTime() - dataUltima.getTime()) / msPorDia);
 
       if (diferencaDias === 1) {
         // Logou no dia seguinte (streak continua)

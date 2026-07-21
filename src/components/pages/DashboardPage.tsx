@@ -92,6 +92,9 @@ export default function DashboardPage({ onNavigate, onSelectConteudo }: Props) {
       }
     };
     fetch_();
+
+    window.addEventListener('activityCompleted', fetch_);
+    return () => window.removeEventListener('activityCompleted', fetch_);
   }, [user, token, isLoggedIn]);
 
   const totalAulas = progresso.reduce((s, p) => s + p.total, 0);

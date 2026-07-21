@@ -636,6 +636,19 @@ export default function ConteudoPage({
         ),
       );
       setAulaAtiva((prev) => (prev ? { ...prev, concluida: true } : null));
+
+      // Registrar atividade para a ofensiva (streak)
+      if (token) {
+        fetch('/api/user/activity', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              window.dispatchEvent(new Event('activityCompleted'));
+            }
+          })
+          .catch(console.error);
+      }
+
       // Auto-avança para próxima aula disponível
       const idx = aulas.findIndex((a) => a._id === aulaAtiva._id);
       const next = aulas[idx + 1];

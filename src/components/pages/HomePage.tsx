@@ -48,6 +48,8 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
 
   const NEW_MODULES = ["Função Modular", "Função Trigonométrica"];
   const [userProgress, setUserProgress] = useState<any[]>([]);
+  const [userProgressRaw, setUserProgressRaw] = useState<any[]>([]);
+  const [dbConteudos, setDbConteudos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +61,14 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
       })
       .catch(console.error);
 
+    // Busca conteúdos do banco para obter seus IDs
+    fetch("/api/conteudos")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setDbConteudos(data);
+      })
+      .catch(console.error);
+
     // Se logado, busca progresso real para o card do Hero
     if (isLoggedIn && user && token) {
       fetch(`/api/progresso/${user._id}`, {
@@ -67,6 +77,7 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         .then((r) => r.json())
         .then((data) => {
           if (Array.isArray(data)) {
+            setUserProgressRaw(data);
             // Filtra: apenas > 0% e < 100% (em andamento)
             const filtered = data.filter(
               (p: any) => p.percentual > 0 && p.percentual < 100
@@ -277,7 +288,9 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         >
           <div>
             <div className="section-tag">Trilha completa</div>
-            <h2 className="section-title">24 conteúdos de matemática</h2>
+            <h2 className="section-title">
+              {stats.contents > 0 ? `${stats.contents} conteúdos de matemática` : "24 conteúdos de matemática"}
+            </h2>
             <p className="section-sub">
               Do básico ao avançado, tudo que cai no ENEM e vestibulares.
             </p>
@@ -292,11 +305,18 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
         <div className="conteudo-grid">
           {preview.map((c) => {
             const cor = CATEGORIA_CORES[c.categoria];
+            const dbContent = dbConteudos.find((db) => db.nome === c.nome);
+            const contentId = dbContent ? dbContent._id : "";
+            const totalAulas = dbContent ? dbContent.totalAulas : c.totalAulas;
+            const aulasGratuitas = dbContent ? dbContent.aulasGratuitas : c.aulasGratuitas;
+            const pData = isLoggedIn ? userProgressRaw.find((p) => p.nome === c.nome) : null;
+            const percentual = pData ? pData.percentual : 0;
+
             return (
               <div
                 key={c.nome}
                 className="conteudo-card"
-                onClick={() => onNavigate("cursos")}
+                onClick={() => contentId ? onSelectConteudo(contentId, c.nome) : onNavigate("cursos")}
                 style={{ "--card-color": cor } as any}
               >
                 <div
@@ -318,17 +338,17 @@ export default function HomePage({ onNavigate, onOpenAuth, onSelectConteudo }: P
                   {NEW_MODULES.includes(c.nome) && <span className="badge-new">Novo</span>}
                 </div>
                 <div className="cc-aulas">
-                  {c.totalAulas} aulas · {c.aulasGratuitas} gratuitas
+                  {totalAulas} aulas · {aulasGratuitas} gratuitas
                 </div>
                 <div className="cc-bar-wrap">
                   <div className="cc-bar-label">
                     <span>Progresso</span>
-                    <span>0%</span>
+                    <span>{percentual}%</span>
                   </div>
                   <div className="cc-bar progress-bar-bg">
                     <div
                       className="cc-bar-fill"
-                      style={{ width: "0%", background: cor }}
+                      style={{ width: `${percentual}%`, background: cor }}
                     />
                   </div>
                 </div>
