@@ -35,3 +35,6 @@ next-env.d.ts
 # scratch
 scratch/env.local
 scratch/
+
+# scripts de diagnóstico (não devem ir para o repositório)
+/scripts/
